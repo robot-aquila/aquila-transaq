@@ -1,0 +1,15 @@
+<document>
+    <zulu>Test message</zulu>
+    <foo></foo>
+    <bar>gizmo 15</bar>
+    <zulu>Best message</zulu>
+    <bar>torino 24</bar>
+    <bar>cabuchha 28</bar>
+    <foo></foo>
+    <zulu>Guest message</zulu>
+    <bar>kimura</bar>
+    <tutuma>
+        <halo>245</halo>
+    </tutuma>
+    <zulu>Nest message</zulu>
+</document>

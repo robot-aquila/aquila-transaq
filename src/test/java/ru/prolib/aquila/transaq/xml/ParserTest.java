@@ -12,7 +12,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
@@ -24,7 +26,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import ru.prolib.aquila.core.BusinessEntities.CDecimalBD;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdate;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.transaq.entity.Board;
@@ -32,8 +33,6 @@ import ru.prolib.aquila.transaq.entity.CandleKind;
 import ru.prolib.aquila.transaq.entity.Market;
 import ru.prolib.aquila.transaq.entity.SecField;
 import ru.prolib.aquila.transaq.entity.SecType;
-import ru.prolib.aquila.transaq.entity.SecurityUpdate1;
-import ru.prolib.aquila.transaq.entity.SecurityBoardParams;
 
 public class ParserTest {
 	private static XMLInputFactory factory;
@@ -453,6 +452,36 @@ public class ParserTest {
 				break;
 			}
 		}
+	}
+	
+	@Test
+	public void testSkipElement() throws Exception {
+		InputStream is = new FileInputStream(new File("fixture/skip_element.xml"));
+		XMLStreamReader sr = factory.createXMLStreamReader(is);
+		Set<String> actual_score = new LinkedHashSet<>();
+		while ( sr.hasNext() ) {
+			switch ( sr.next() ) {
+			case XMLStreamReader.START_ELEMENT:
+				String tag_name = sr.getLocalName();
+				switch ( tag_name ) {
+				case "tag1":
+				case "tag2":
+				case "tag3":
+				case "tag4":
+					service.skipElement(sr);
+					assertEquals(tag_name, sr.getLocalName());
+					assertEquals(XMLStreamReader.END_ELEMENT, sr.getEventType());
+					actual_score.add(tag_name);
+					break;
+				}
+			}
+		}
+		Set<String> expected_score = new LinkedHashSet<>();
+		expected_score.add("tag1");
+		expected_score.add("tag2");
+		expected_score.add("tag3");
+		expected_score.add("tag4");
+		assertEquals(expected_score, actual_score);
 	}
 	
 	@Ignore

@@ -1,7 +1,6 @@
 package ru.prolib.aquila.transaq.xml;
 
 import static ru.prolib.aquila.transaq.entity.SecurityUpdate1.*;
-import static ru.prolib.aquila.core.BusinessEntities.CDecimalBD.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,14 +24,18 @@ import ru.prolib.aquila.transaq.entity.CandleKind;
 import ru.prolib.aquila.transaq.entity.Market;
 import ru.prolib.aquila.transaq.entity.SecField;
 import ru.prolib.aquila.transaq.entity.SecType;
-import ru.prolib.aquila.transaq.entity.SecurityUpdate1;
-import ru.prolib.aquila.transaq.entity.SecurityBoardParams;
 
 public class Parser {
 	private static final Logger logger;
+	private static final Parser instance;
 	
 	static {
 		logger = LoggerFactory.getLogger(Parser.class);
+		instance = new Parser();
+	}
+	
+	public static Parser getInstance() {
+		return instance;
 	}
 	
 	/**
@@ -76,7 +79,31 @@ public class Parser {
 		return CDecimalBD.of(readCharacters(reader));
 	}
 	
-	private String readCharacters(XMLStreamReader reader) throws XMLStreamException {
+	public void skipElement(XMLStreamReader reader) throws XMLStreamException {
+		String tag_name = reader.getLocalName();
+		int level_index = 0;
+		while ( reader.hasNext() ) {
+			switch ( reader.next() ) {
+			case XMLStreamReader.START_ELEMENT:
+				if ( reader.getLocalName().equals(tag_name) ) {
+					level_index ++;
+				}
+				break;
+			case XMLStreamReader.END_ELEMENT:
+				if ( reader.getLocalName().equals(tag_name) ) {
+					if ( level_index == 0 ) {
+						return;
+					} else {
+						level_index --;
+					}
+				}
+				break;
+			}
+		}
+		throw new XMLStreamException("Premature end of file");
+	}
+	
+	public String readCharacters(XMLStreamReader reader) throws XMLStreamException {
 		StringBuilder result = new StringBuilder();
 		while ( reader.hasNext() ) {
 			switch ( reader.next() ) {
