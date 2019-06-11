@@ -57,6 +57,7 @@ public class DefaultMessageProcessor implements IMessageProcessor {
 			logger.debug("{} -> {}", entry.getKey(), entry.getValue());
 		}
 		unprocMessagesCount.clear();
+		logger.debug("Map of unprocessed messages has been cleared");
 	}
 
 }
