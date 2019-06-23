@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.prolib.aquila.transaq.impl.IMessageProcessor;
-import ru.prolib.aquila.transaq.xml.Parser;
+import ru.prolib.aquila.transaq.impl.Parser;
 
 public class DefaultMessageProcessor implements IMessageProcessor {
 	private static final String CLOSE_PROC_ID = "close";

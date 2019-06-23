@@ -13,8 +13,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ru.prolib.aquila.transaq.xml.Parser;
-
 public class MessageRouterTest {
 	
 	@BeforeClass

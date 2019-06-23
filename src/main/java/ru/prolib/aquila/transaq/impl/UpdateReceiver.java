@@ -1,9 +1,12 @@
 package ru.prolib.aquila.transaq.impl;
 
+import java.util.Map;
+
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdate;
 import ru.prolib.aquila.transaq.entity.Board;
 import ru.prolib.aquila.transaq.entity.CandleKind;
 import ru.prolib.aquila.transaq.entity.Market;
+import ru.prolib.aquila.transaq.entity.SecurityUpdate1;
 
 public class UpdateReceiver implements IUpdateReceiver {
 
@@ -26,19 +29,17 @@ public class UpdateReceiver implements IUpdateReceiver {
 	}
 
 	@Override
-	public void updateSecurity(DeltaUpdate entry) {
-		// TODO Auto-generated method stub
+	public void updateSecurity(SecurityUpdate1 entry) {
+		Map<Integer, Object> data = entry.getUpdate().getContents();
+		// не сработает. придется как-то определять какой это апдейт,
+		// что то бы определить набор доступных полей
+		// лучше сразу делать отдельными методами.
+		// Кстати, на security тоже может быть апдейт. Не факт что это
+		// первый запрос.
+		TQSecID1 sid = entry.getSecID();
 		
-	}
-
-	@Override
-	public void updateSecInfo(DeltaUpdate entry) {
-		// TODO Auto-generated method stub
 		
-	}
-
-	@Override
-	public void updateSecInfoUpd(DeltaUpdate entry) {
+		
 		// TODO Auto-generated method stub
 		
 	}

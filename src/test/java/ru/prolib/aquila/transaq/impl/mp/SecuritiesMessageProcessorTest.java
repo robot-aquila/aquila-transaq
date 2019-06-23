@@ -13,9 +13,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ru.prolib.aquila.core.BusinessEntities.DeltaUpdate;
+import ru.prolib.aquila.transaq.entity.SecurityUpdate1;
 import ru.prolib.aquila.transaq.impl.IUpdateReceiver;
-import ru.prolib.aquila.transaq.xml.Parser;
+import ru.prolib.aquila.transaq.impl.Parser;
 
 public class SecuritiesMessageProcessorTest {
 	
@@ -41,11 +41,11 @@ public class SecuritiesMessageProcessorTest {
 	@Test
 	public void testProcessMessage() throws Exception {
 		XMLStreamReader readerMock = control.createMock(XMLStreamReader.class);
-		List<DeltaUpdate> updates = new ArrayList<>();
-		DeltaUpdate duMock1, duMock2, duMock3;
-		updates.add(duMock1 = control.createMock(DeltaUpdate.class));
-		updates.add(duMock2 = control.createMock(DeltaUpdate.class));
-		updates.add(duMock3 = control.createMock(DeltaUpdate.class));
+		List<SecurityUpdate1> updates = new ArrayList<>();
+		SecurityUpdate1 duMock1, duMock2, duMock3;
+		updates.add(duMock1 = control.createMock(SecurityUpdate1.class));
+		updates.add(duMock2 = control.createMock(SecurityUpdate1.class));
+		updates.add(duMock3 = control.createMock(SecurityUpdate1.class));
 		expect(parserMock.readSecurities(readerMock)).andReturn(updates);
 		recvMock.updateSecurity(duMock1);
 		recvMock.updateSecurity(duMock2);

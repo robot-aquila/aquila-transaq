@@ -1,6 +1,6 @@
-package ru.prolib.aquila.transaq.entity;
+package ru.prolib.aquila.transaq.impl;
 
-public class SecField {
+public class TQSecField {
 	public static final int SECID				= 5200; // int
 	public static final int SECCODE				= 5201; // string
 	public static final int MARKETID			= 5202; // int
@@ -36,5 +36,11 @@ public class SecField {
 	public static final int OPT_TYPE			= 5240; // string
 	public static final int LOT_VOLUME			= 5241; // int
 	public static final int BGO_BUY				= 5242; // CDecimal
+	
+	/**
+	 * Special additional field to store universal security ID.<br>
+	 * Type: {@link TQSecID1}
+	 */
+	public static final int TQ_SEC_ID1			= 5500;
 
 }

@@ -5,6 +5,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import ru.prolib.aquila.core.BusinessEntities.DeltaUpdate;
+import ru.prolib.aquila.transaq.impl.TQSecID1;
+
 public class SecurityUpdate1 {
 	public static final int OPMASK_USECREDIT = 0x01;
 	public static final int OPMASK_BYMARKET = 0x02;
@@ -12,91 +15,20 @@ public class SecurityUpdate1 {
 	public static final int OPMASK_FOK = 0x08;
 	public static final int OPMASK_IOC = 0x10;
 	
-	private final int secID;
-	private final boolean active;
-	private final String secCode, secClass;
-	private final String defaultBoardCode;
-	private final int marketID;
-	private final String shortName;
-	private final SecurityBoardParams boardParams;
-	private final int opmask;
-	private final SecType secType;
-	private final String secTZ;
-	private final int quotesType;
+	private final TQSecID1 secID;
+	private final DeltaUpdate update;
 	
-	public SecurityUpdate1(int secID,
-			boolean active,
-			String secCode,
-			String secClass,
-			String defaultBoardCode,
-			int marketID,
-			String shortName,
-			SecurityBoardParams boardParams,
-			int opmask,
-			SecType secType,
-			String secTZ,
-			int quotesType)
-	{
+	public SecurityUpdate1(TQSecID1 secID, DeltaUpdate update) {
 		this.secID = secID;
-		this.active = active;
-		this.secCode = secCode;
-		this.secClass = secClass;
-		this.defaultBoardCode = defaultBoardCode;
-		this.marketID = marketID;
-		this.shortName = shortName;
-		this.boardParams = boardParams;
-		this.opmask = opmask;
-		this.secType = secType;
-		this.secTZ = secTZ;
-		this.quotesType = quotesType;
+		this.update = update;
 	}
 	
-	public int getSecID() {
+	public TQSecID1 getSecID() {
 		return secID;
 	}
 	
-	public boolean getActive() {
-		return active;
-	}
-	
-	public String getSecCode() {
-		return secCode;
-	}
-	
-	public String getSecClass() {
-		return secClass;
-	}
-	
-	public String getDefaultBoardCode() {
-		return defaultBoardCode;
-	}
-	
-	public int getMarketID() {
-		return marketID;
-	}
-	
-	public String getShortName() {
-		return shortName;
-	}
-	
-	public SecurityBoardParams getDefaultBoardParams() {
-		return boardParams;
-	}
-	
-	public int getOpMask() {
-		return opmask;
-	}
-	
-	public SecType getSecType() {
-		return secType;
-	}
-	
-	public String getSecTZ() {
-		return secTZ;
-	}
-	
-	public int getQuotesType() {
-		return quotesType;
+	public DeltaUpdate getUpdate() {
+		return update;
 	}
 	
 	@Override
@@ -110,17 +42,7 @@ public class SecurityUpdate1 {
 		SecurityUpdate1 o = (SecurityUpdate1) other;
 		return new EqualsBuilder()
 				.append(o.secID, secID)
-				.append(o.active, active)
-				.append(o.secCode, secCode)
-				.append(o.secClass, secClass)
-				.append(o.defaultBoardCode, defaultBoardCode)
-				.append(o.marketID, marketID)
-				.append(o.shortName, shortName)
-				.append(o.boardParams, boardParams)
-				.append(o.opmask, opmask)
-				.append(o.secType, secType)
-				.append(o.secTZ, secTZ)
-				.append(o.quotesType, quotesType)
+				.append(o.update, update)
 				.build();
 	}
 	
@@ -128,17 +50,7 @@ public class SecurityUpdate1 {
 	public int hashCode() {
 		return new HashCodeBuilder(10087251, 7129)
 				.append(secID)
-				.append(active)
-				.append(secCode)
-				.append(secClass)
-				.append(defaultBoardCode)
-				.append(marketID)
-				.append(shortName)
-				.append(boardParams)
-				.append(opmask)
-				.append(secType)
-				.append(secTZ)
-				.append(quotesType)
+				.append(update)
 				.build();
 	}
 	

@@ -18,7 +18,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ru.prolib.aquila.transaq.xml.Parser;
+import ru.prolib.aquila.transaq.impl.Parser;
 
 public class DefaultMessageProcessorTest {
 	private static XMLInputFactory factory;

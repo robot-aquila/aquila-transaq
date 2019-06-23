@@ -1,4 +1,4 @@
-package ru.prolib.aquila.transaq.xml;
+package ru.prolib.aquila.transaq.impl;
 
 import static org.junit.Assert.*;
 import static ru.prolib.aquila.core.BusinessEntities.CDecimalBD.*;
@@ -31,8 +31,9 @@ import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.transaq.entity.Board;
 import ru.prolib.aquila.transaq.entity.CandleKind;
 import ru.prolib.aquila.transaq.entity.Market;
-import ru.prolib.aquila.transaq.entity.SecField;
 import ru.prolib.aquila.transaq.entity.SecType;
+import ru.prolib.aquila.transaq.entity.SecurityUpdate1;
+import ru.prolib.aquila.transaq.impl.Parser;
 
 public class ParserTest {
 	private static XMLInputFactory factory;
@@ -208,7 +209,7 @@ public class ParserTest {
 	public void testReadSecurities() throws Exception {
 		InputStream is = new FileInputStream(new File("fixture/securities.xml"));
 		XMLStreamReader sr = factory.createXMLStreamReader(is);
-		List<DeltaUpdate> actual = null;
+		List<SecurityUpdate1> actual = null;
 		while ( sr.hasNext() ) {
 			switch ( sr.next() ) {
 			case XMLStreamReader.START_DOCUMENT:
@@ -219,58 +220,67 @@ public class ParserTest {
 				break;
 			}
 		}
-		List<DeltaUpdate> expected = new ArrayList<>();
-		expected.add(new DeltaUpdateBuilder()
-				.withToken(SecField.SECID, 0)
-				.withToken(SecField.ACTIVE, true)
-				.withToken(SecField.SECCODE, "IRGZ")
-				.withToken(SecField.SECCLASS, "E")
-				.withToken(SecField.DEFAULT_BOARDCODE, "TQBR")
-				.withToken(SecField.MARKETID, 1)
-				.withToken(SecField.SHORT_NAME, "IrkutskEnrg")
-				.withToken(SecField.DECIMALS, 2)
-				.withToken(SecField.MINSTEP, of("0.02"))
-				.withToken(SecField.LOTSIZE, of("100"))
-				.withToken(SecField.POINT_COST, of("1"))
-				.withToken(SecField.OPMASK, 0x01 | 0x02 | 0x04 | 0x08 | 0x10)
-				.withToken(SecField.SECTYPE, SecType.SHARE)
-				.withToken(SecField.SECTZ, "Russian Standard Time")
-				.withToken(SecField.QUOTESTYPE, 1)
-				.buildUpdate());
-		expected.add(new DeltaUpdateBuilder()
-				.withToken(SecField.SECID, 3)
-				.withToken(SecField.ACTIVE, true)
-				.withToken(SecField.SECCODE, "RU000A0ZZ505")
-				.withToken(SecField.SECCLASS, "B")
-				.withToken(SecField.DEFAULT_BOARDCODE, "EQOB")
-				.withToken(SecField.MARKETID, 1)
-				.withToken(SecField.SHORT_NAME, "Russian Agricultural Bank 09T1")
-				.withToken(SecField.DECIMALS, 2)
-				.withToken(SecField.MINSTEP, of("0.01"))
-				.withToken(SecField.LOTSIZE, of("1"))
-				.withToken(SecField.POINT_COST, of("10"))
-				.withToken(SecField.OPMASK, 0x01 | 0x04 | 0x08 | 0x10)
-				.withToken(SecField.SECTYPE, SecType.BOND)
-				.withToken(SecField.SECTZ, "Russian Standard Time")
-				.withToken(SecField.QUOTESTYPE, 1)
-				.buildUpdate());
-		expected.add(new DeltaUpdateBuilder()
-				.withToken(SecField.SECID, 41190)
-				.withToken(SecField.ACTIVE, true)
-				.withToken(SecField.SECCODE, "RIM9")
-				.withToken(SecField.SECCLASS, "F")
-				.withToken(SecField.DEFAULT_BOARDCODE, "FUT")
-				.withToken(SecField.MARKETID, 4)
-				.withToken(SecField.SHORT_NAME, "RTS-6.19")
-				.withToken(SecField.DECIMALS, 0)
-				.withToken(SecField.MINSTEP, of("10"))
-				.withToken(SecField.LOTSIZE, of("1"))
-				.withToken(SecField.POINT_COST, of("129.073"))
-				.withToken(SecField.OPMASK, 0x02 | 0x10)
-				.withToken(SecField.SECTYPE, SecType.FUT)
-				.withToken(SecField.SECTZ, "Russian Standard Time")
-				.withToken(SecField.QUOTESTYPE, 1)
-				.buildUpdate());
+		List<SecurityUpdate1> expected = new ArrayList<>();
+		expected.add(new SecurityUpdate1(
+			new TQSecID1("IRGZ", 1),
+			new DeltaUpdateBuilder()
+				.withToken(TQSecField.SECID, 0)
+				.withToken(TQSecField.ACTIVE, true)
+				.withToken(TQSecField.SECCODE, "IRGZ")
+				.withToken(TQSecField.SECCLASS, "E")
+				.withToken(TQSecField.DEFAULT_BOARDCODE, "TQBR")
+				.withToken(TQSecField.MARKETID, 1)
+				.withToken(TQSecField.SHORT_NAME, "IrkutskEnrg")
+				.withToken(TQSecField.DECIMALS, 2)
+				.withToken(TQSecField.MINSTEP, of("0.02"))
+				.withToken(TQSecField.LOTSIZE, of("100"))
+				.withToken(TQSecField.POINT_COST, of("1"))
+				.withToken(TQSecField.OPMASK, 0x01 | 0x02 | 0x04 | 0x08 | 0x10)
+				.withToken(TQSecField.SECTYPE, SecType.SHARE)
+				.withToken(TQSecField.SECTZ, "Russian Standard Time")
+				.withToken(TQSecField.QUOTESTYPE, 1)
+				.buildUpdate())
+			);
+		expected.add(new SecurityUpdate1(
+			new TQSecID1("RU000A0ZZ505", 1),
+			new DeltaUpdateBuilder()
+				.withToken(TQSecField.SECID, 3)
+				.withToken(TQSecField.ACTIVE, true)
+				.withToken(TQSecField.SECCODE, "RU000A0ZZ505")
+				.withToken(TQSecField.SECCLASS, "B")
+				.withToken(TQSecField.DEFAULT_BOARDCODE, "EQOB")
+				.withToken(TQSecField.MARKETID, 1)
+				.withToken(TQSecField.SHORT_NAME, "Russian Agricultural Bank 09T1")
+				.withToken(TQSecField.DECIMALS, 2)
+				.withToken(TQSecField.MINSTEP, of("0.01"))
+				.withToken(TQSecField.LOTSIZE, of("1"))
+				.withToken(TQSecField.POINT_COST, of("10"))
+				.withToken(TQSecField.OPMASK, 0x01 | 0x04 | 0x08 | 0x10)
+				.withToken(TQSecField.SECTYPE, SecType.BOND)
+				.withToken(TQSecField.SECTZ, "Russian Standard Time")
+				.withToken(TQSecField.QUOTESTYPE, 1)
+				.buildUpdate())
+			);
+		expected.add(new SecurityUpdate1(
+			new TQSecID1("RIM9", 4),
+			new DeltaUpdateBuilder()
+				.withToken(TQSecField.SECID, 41190)
+				.withToken(TQSecField.ACTIVE, true)
+				.withToken(TQSecField.SECCODE, "RIM9")
+				.withToken(TQSecField.SECCLASS, "F")
+				.withToken(TQSecField.DEFAULT_BOARDCODE, "FUT")
+				.withToken(TQSecField.MARKETID, 4)
+				.withToken(TQSecField.SHORT_NAME, "RTS-6.19")
+				.withToken(TQSecField.DECIMALS, 0)
+				.withToken(TQSecField.MINSTEP, of("10"))
+				.withToken(TQSecField.LOTSIZE, of("1"))
+				.withToken(TQSecField.POINT_COST, of("129.073"))
+				.withToken(TQSecField.OPMASK, 0x02 | 0x10)
+				.withToken(TQSecField.SECTYPE, SecType.FUT)
+				.withToken(TQSecField.SECTZ, "Russian Standard Time")
+				.withToken(TQSecField.QUOTESTYPE, 1)
+				.buildUpdate())
+			);
 		assertEquals(expected, actual);
 	}
 	
@@ -291,7 +301,7 @@ public class ParserTest {
 	public void testReadSecurities_UnknownSecTypeAndTags() throws Exception {
 		InputStream is = new FileInputStream(new File("fixture/securities1.xml"));
 		XMLStreamReader sr = factory.createXMLStreamReader(is);
-		List<DeltaUpdate> actual = null;
+		List<SecurityUpdate1> actual = null;
 		while ( sr.hasNext() ) {
 			switch ( sr.next() ) {
 			case XMLStreamReader.START_DOCUMENT:
@@ -302,24 +312,27 @@ public class ParserTest {
 				break;
 			}
 		}
-		List<DeltaUpdate> expected = new ArrayList<>();
-		expected.add(new DeltaUpdateBuilder()
-				.withToken(SecField.SECID, 0)
-				.withToken(SecField.ACTIVE, true)
-				.withToken(SecField.SECCODE, "IRGZ")
-				.withToken(SecField.SECCLASS, "E")
-				.withToken(SecField.DEFAULT_BOARDCODE, "TQBR")
-				.withToken(SecField.MARKETID, 1)
-				.withToken(SecField.SHORT_NAME, "IrkutskEnrg")
-				.withToken(SecField.DECIMALS, 2)
-				.withToken(SecField.MINSTEP, of("0.02"))
-				.withToken(SecField.LOTSIZE, of("100"))
-				.withToken(SecField.POINT_COST, of("1"))
-				.withToken(SecField.OPMASK, 0x01 | 0x02 | 0x04 | 0x08 | 0x10)
-				.withToken(SecField.SECTYPE, SecType.QUOTES)
-				.withToken(SecField.SECTZ, "Russian Standard Time")
-				.withToken(SecField.QUOTESTYPE, 1)
-				.buildUpdate());
+		List<SecurityUpdate1> expected = new ArrayList<>();
+		expected.add(new SecurityUpdate1(
+			new TQSecID1("IRGZ", 1),
+			new DeltaUpdateBuilder()
+				.withToken(TQSecField.SECID, 0)
+				.withToken(TQSecField.ACTIVE, true)
+				.withToken(TQSecField.SECCODE, "IRGZ")
+				.withToken(TQSecField.SECCLASS, "E")
+				.withToken(TQSecField.DEFAULT_BOARDCODE, "TQBR")
+				.withToken(TQSecField.MARKETID, 1)
+				.withToken(TQSecField.SHORT_NAME, "IrkutskEnrg")
+				.withToken(TQSecField.DECIMALS, 2)
+				.withToken(TQSecField.MINSTEP, of("0.02"))
+				.withToken(TQSecField.LOTSIZE, of("100"))
+				.withToken(TQSecField.POINT_COST, of("1"))
+				.withToken(TQSecField.OPMASK, 0x01 | 0x02 | 0x04 | 0x08 | 0x10)
+				.withToken(TQSecField.SECTYPE, SecType.QUOTES)
+				.withToken(TQSecField.SECTZ, "Russian Standard Time")
+				.withToken(TQSecField.QUOTESTYPE, 1)
+				.buildUpdate())
+			);
 		assertEquals(expected, actual);
 	}
 	
@@ -327,7 +340,7 @@ public class ParserTest {
 	public void testReadSecurities_Inactive() throws Exception {
 		InputStream is = new FileInputStream(new File("fixture/securities2.xml"));
 		XMLStreamReader sr = factory.createXMLStreamReader(is);
-		List<DeltaUpdate> actual = null;
+		List<SecurityUpdate1> actual = null;
 		while ( sr.hasNext() ) {
 			switch ( sr.next() ) {
 			case XMLStreamReader.START_DOCUMENT:
@@ -338,21 +351,24 @@ public class ParserTest {
 				break;
 			}
 		}
-		List<DeltaUpdate> expected = new ArrayList<>();
-		expected.add(new DeltaUpdateBuilder()
-				.withToken(SecField.SECID, 0)
-				.withToken(SecField.ACTIVE, true)
-				.withToken(SecField.SECCODE, "IRGZ")
-				.withToken(SecField.SECCLASS, "E")
-				.withToken(SecField.DEFAULT_BOARDCODE, "TQBR")
-				.withToken(SecField.MARKETID, 1)
-				.withToken(SecField.SHORT_NAME, "IrkutskEnrg")
-				.withToken(SecField.DECIMALS, 2)
-				.withToken(SecField.POINT_COST, of("1"))
-				.withToken(SecField.SECTYPE, SecType.SHARE)
-				.withToken(SecField.SECTZ, "Russian Standard Time")
-				.withToken(SecField.QUOTESTYPE, 1)
-				.buildUpdate());
+		List<SecurityUpdate1> expected = new ArrayList<>();
+		expected.add(new SecurityUpdate1(
+			new TQSecID1("IRGZ", 1),
+			new DeltaUpdateBuilder()
+				.withToken(TQSecField.SECID, 0)
+				.withToken(TQSecField.ACTIVE, true)
+				.withToken(TQSecField.SECCODE, "IRGZ")
+				.withToken(TQSecField.SECCLASS, "E")
+				.withToken(TQSecField.DEFAULT_BOARDCODE, "TQBR")
+				.withToken(TQSecField.MARKETID, 1)
+				.withToken(TQSecField.SHORT_NAME, "IrkutskEnrg")
+				.withToken(TQSecField.DECIMALS, 2)
+				.withToken(TQSecField.POINT_COST, of("1"))
+				.withToken(TQSecField.SECTYPE, SecType.SHARE)
+				.withToken(TQSecField.SECTZ, "Russian Standard Time")
+				.withToken(TQSecField.QUOTESTYPE, 1)
+				.buildUpdate())
+			);
 		assertEquals(expected, actual);
 	}
 	
@@ -372,27 +388,28 @@ public class ParserTest {
 			}
 		}
 		DeltaUpdate expected = new DeltaUpdateBuilder()
-				.withToken(SecField.SECID, 28334)
-				.withToken(SecField.SECNAME, "FOOBAR")
-				.withToken(SecField.SECCODE, "FOO-12.35")
-				.withToken(SecField.MARKETID, 4)
-				.withToken(SecField.PNAME, "pcs.")
-				.withToken(SecField.MAT_DATE, LocalDateTime.of(2019, 6, 1, 6, 26, 15))
-				.withToken(SecField.CLEARING_PRICE, of("203.082"))
-				.withToken(SecField.MINPRICE, of("100.000"))
-				.withToken(SecField.MAXPRICE, of("300.000"))
-				.withToken(SecField.BUY_DEPOSIT, of("278991.92"))
-				.withToken(SecField.SELL_DEPOSIT, of("728001.10"))
-				.withToken(SecField.BGO_C, of("79.03"))
-				.withToken(SecField.BGO_NC, of("86.12"))
-				.withToken(SecField.ACCRUED_INT, of("0.02"))
-				.withToken(SecField.COUPON_VALUE, of("192.77"))
-				.withToken(SecField.COUPON_DATE, LocalDateTime.of(2019, 12, 31, 0, 0, 0))
-				.withToken(SecField.COUPON_PERIOD, 12)
-				.withToken(SecField.FACE_VALUE, of("1000.00"))
-				.withToken(SecField.PUT_CALL, "P")
-				.withToken(SecField.OPT_TYPE, "M")
-				.withToken(SecField.LOT_VOLUME, 1)
+				.withToken(TQSecField.SECID, 28334)
+				.withToken(TQSecField.SECNAME, "FOOBAR")
+				.withToken(TQSecField.SECCODE, "FOO-12.35")
+				.withToken(TQSecField.MARKETID, 4)
+				.withToken(TQSecField.PNAME, "pcs.")
+				.withToken(TQSecField.MAT_DATE, LocalDateTime.of(2019, 6, 1, 6, 26, 15))
+				.withToken(TQSecField.CLEARING_PRICE, of("203.082"))
+				.withToken(TQSecField.MINPRICE, of("100.000"))
+				.withToken(TQSecField.MAXPRICE, of("300.000"))
+				.withToken(TQSecField.BUY_DEPOSIT, of("278991.92"))
+				.withToken(TQSecField.SELL_DEPOSIT, of("728001.10"))
+				.withToken(TQSecField.BGO_C, of("79.03"))
+				.withToken(TQSecField.BGO_NC, of("86.12"))
+				.withToken(TQSecField.ACCRUED_INT, of("0.02"))
+				.withToken(TQSecField.COUPON_VALUE, of("192.77"))
+				.withToken(TQSecField.COUPON_DATE, LocalDateTime.of(2019, 12, 31, 0, 0, 0))
+				.withToken(TQSecField.COUPON_PERIOD, 12)
+				.withToken(TQSecField.FACE_VALUE, of("1000.00"))
+				.withToken(TQSecField.PUT_CALL, "P")
+				.withToken(TQSecField.OPT_TYPE, "M")
+				.withToken(TQSecField.LOT_VOLUME, 1)
+				.withToken(TQSecField.TQ_SEC_ID1, new TQSecID1("FOO-12.35", 4))
 				.buildUpdate();
 		assertEquals(expected, actual);
 	}
@@ -426,17 +443,18 @@ public class ParserTest {
 			}
 		}
 		DeltaUpdate expected = new DeltaUpdateBuilder()
-				.withToken(SecField.SECID, 66)
-				.withToken(SecField.SECCODE, "BRH0")
-				.withToken(SecField.MARKETID, 4)
-				.withToken(SecField.BUY_DEPOSIT, of("6132.61"))
-				.withToken(SecField.SELL_DEPOSIT, of("6467.30"))
-				.withToken(SecField.MINPRICE, of("61.97"))
-				.withToken(SecField.MAXPRICE, of("67.19"))
-				.withToken(SecField.POINT_COST, of("7625.71"))
-				.withToken(SecField.BGO_C, of("811.44"))
-				.withToken(SecField.BGO_NC, of("4640.88"))
-				.withToken(SecField.BGO_BUY, of("4605.53"))
+				.withToken(TQSecField.SECID, 66)
+				.withToken(TQSecField.SECCODE, "BRH0")
+				.withToken(TQSecField.MARKETID, 4)
+				.withToken(TQSecField.BUY_DEPOSIT, of("6132.61"))
+				.withToken(TQSecField.SELL_DEPOSIT, of("6467.30"))
+				.withToken(TQSecField.MINPRICE, of("61.97"))
+				.withToken(TQSecField.MAXPRICE, of("67.19"))
+				.withToken(TQSecField.POINT_COST, of("7625.71"))
+				.withToken(TQSecField.BGO_C, of("811.44"))
+				.withToken(TQSecField.BGO_NC, of("4640.88"))
+				.withToken(TQSecField.BGO_BUY, of("4605.53"))
+				.withToken(TQSecField.TQ_SEC_ID1, new TQSecID1("BRH0", 4))
 				.buildUpdate();
 		assertEquals(expected, actual);
 	}
@@ -514,10 +532,10 @@ public class ParserTest {
 					case XMLStreamReader.START_ELEMENT:
 						if ( "securities".equals(sr.getLocalName()) ) {
 							count_sections ++;
-							List<DeltaUpdate> list = service.readSecurities(sr);
+							List<SecurityUpdate1> list = service.readSecurities(sr);
 							count_securities += list.size();
-							for  ( DeltaUpdate s : list ) {
-								if ( "RTS-6.19".equals(s.getContents().get(SecField.SHORT_NAME)) ) {
+							for  ( SecurityUpdate1 s : list ) {
+								if ( "RTS-6.19".equals(s.getUpdate().getContents().get(TQSecField.SHORT_NAME)) ) {
 									System.out.println(s);
 								}
 							}
