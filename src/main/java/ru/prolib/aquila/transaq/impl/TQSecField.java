@@ -41,6 +41,6 @@ public class TQSecField {
 	 * Special additional field to store universal security ID.<br>
 	 * Type: {@link TQSecID1}
 	 */
-	public static final int TQ_SEC_ID1			= 5500;
+	//public static final int TQ_SEC_ID1			= 5500;
 
 }

@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 
 import ru.prolib.aquila.core.BusinessEntities.CDecimal;
 import ru.prolib.aquila.core.BusinessEntities.CDecimalBD;
-import ru.prolib.aquila.core.BusinessEntities.DeltaUpdate;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.transaq.entity.Board;
 import ru.prolib.aquila.transaq.entity.CandleKind;
@@ -407,7 +406,7 @@ public class Parser {
 		throw new XMLStreamException("Premature end of file");
 	}
 	
-	public DeltaUpdate readSecInfo(XMLStreamReader reader) throws XMLStreamException {
+	public SecurityUpdate1 readSecInfo(XMLStreamReader reader) throws XMLStreamException {
 		if ( ! "sec_info".equals(reader.getLocalName()) ) {
 			throw new IllegalStateException("Unexpected current element: " + reader.getLocalName());
 		}
@@ -488,8 +487,10 @@ public class Parser {
 				case "sec_info":
 					checkNotNull(sec_code, "seccode");
 					checkNotNull(market_id, "market");
-					builder.withToken(TQSecField.TQ_SEC_ID1, new TQSecID1(sec_code,market_id));
-					return builder.buildUpdate();
+					return new SecurityUpdate1(
+							new TQSecID1(sec_code,market_id),
+							builder.buildUpdate()
+						);
 				}
 				break;
 			}
@@ -497,7 +498,7 @@ public class Parser {
 		throw new XMLStreamException("Premature end of file");
 	}
 	
-	public DeltaUpdate readSecInfoUpd(XMLStreamReader reader) throws XMLStreamException {
+	public SecurityUpdate1 readSecInfoUpd(XMLStreamReader reader) throws XMLStreamException {
 		if ( ! "sec_info_upd".equals(reader.getLocalName()) ) {
 			throw new IllegalStateException("Unexpected current element: " + reader.getLocalName());
 		}
@@ -548,8 +549,10 @@ public class Parser {
 				case "sec_info_upd":
 					checkNotNull(sec_code, "seccode");
 					checkNotNull(market_id, "market");
-					builder.withToken(TQSecField.TQ_SEC_ID1, new TQSecID1(sec_code, market_id));
-					return builder.buildUpdate();
+					return new SecurityUpdate1(
+							new TQSecID1(sec_code, market_id),
+							builder.buildUpdate()
+						);
 				}
 				break;
 			}

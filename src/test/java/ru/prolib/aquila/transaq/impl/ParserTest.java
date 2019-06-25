@@ -26,7 +26,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import ru.prolib.aquila.core.BusinessEntities.DeltaUpdate;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.transaq.entity.Board;
 import ru.prolib.aquila.transaq.entity.CandleKind;
@@ -376,7 +375,7 @@ public class ParserTest {
 	public void testReadSecInfo() throws Exception {
 		InputStream is = new FileInputStream(new File("fixture/sec_info.xml"));
 		XMLStreamReader sr = factory.createXMLStreamReader(is);
-		DeltaUpdate actual = null;
+		SecurityUpdate1 actual = null;
 		while ( sr.hasNext() ) {
 			switch ( sr.next() ) {
 			case XMLStreamReader.START_DOCUMENT:
@@ -387,7 +386,9 @@ public class ParserTest {
 				break;
 			}
 		}
-		DeltaUpdate expected = new DeltaUpdateBuilder()
+		SecurityUpdate1 expected = new SecurityUpdate1(
+			new TQSecID1("FOO-12.35", 4),
+			new DeltaUpdateBuilder()
 				.withToken(TQSecField.SECID, 28334)
 				.withToken(TQSecField.SECNAME, "FOOBAR")
 				.withToken(TQSecField.SECCODE, "FOO-12.35")
@@ -409,8 +410,8 @@ public class ParserTest {
 				.withToken(TQSecField.PUT_CALL, "P")
 				.withToken(TQSecField.OPT_TYPE, "M")
 				.withToken(TQSecField.LOT_VOLUME, 1)
-				.withToken(TQSecField.TQ_SEC_ID1, new TQSecID1("FOO-12.35", 4))
-				.buildUpdate();
+				.buildUpdate()
+			);
 		assertEquals(expected, actual);
 	}
 	
@@ -431,7 +432,7 @@ public class ParserTest {
 	public void testReadSecInfoUpd() throws Exception {
 		InputStream is = new FileInputStream(new File("fixture/sec_info_upd.xml"));
 		XMLStreamReader sr = factory.createXMLStreamReader(is);
-		DeltaUpdate actual = null;
+		SecurityUpdate1 actual = null;
 		while ( sr.hasNext() ) {
 			switch ( sr.next() ) {
 			case XMLStreamReader.START_DOCUMENT:
@@ -442,7 +443,9 @@ public class ParserTest {
 				break;
 			}
 		}
-		DeltaUpdate expected = new DeltaUpdateBuilder()
+		SecurityUpdate1 expected = new SecurityUpdate1(
+			new TQSecID1("BRH0", 4),
+			new DeltaUpdateBuilder()
 				.withToken(TQSecField.SECID, 66)
 				.withToken(TQSecField.SECCODE, "BRH0")
 				.withToken(TQSecField.MARKETID, 4)
@@ -454,8 +457,8 @@ public class ParserTest {
 				.withToken(TQSecField.BGO_C, of("811.44"))
 				.withToken(TQSecField.BGO_NC, of("4640.88"))
 				.withToken(TQSecField.BGO_BUY, of("4605.53"))
-				.withToken(TQSecField.TQ_SEC_ID1, new TQSecID1("BRH0", 4))
-				.buildUpdate();
+				.buildUpdate()
+			);
 		assertEquals(expected, actual);
 	}
 	
