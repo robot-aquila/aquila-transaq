@@ -1,4 +1,4 @@
-package ru.prolib.aquila.transaq.entity;
+package ru.prolib.aquila.transaq.impl;
 
 import static org.junit.Assert.*;
 
@@ -9,32 +9,29 @@ import org.junit.Test;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdate;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.core.utils.Variant;
-import ru.prolib.aquila.transaq.impl.TQSecField;
-import ru.prolib.aquila.transaq.impl.TQSecID1;
 
-public class SecurityUpdate1Test {
-	private TQSecID1 sec_id;
+public class TQSecurityUpdate3Test {
+	private TQSecID3 sec_id;
 	private DeltaUpdate update;
-	private SecurityUpdate1 service;
+	private TQSecurityUpdate3 service;
 
 	@Before
 	public void setUp() throws Exception {
-		sec_id = new TQSecID1("zulu24", 505);
+		sec_id = new TQSecID3("ken", 95, "barbie");
 		update = new DeltaUpdateBuilder()
 				.withToken(TQSecField.ACTIVE, true)
 				.withToken(TQSecField.DECIMALS, 2)
 				.buildUpdate();
-		service = new SecurityUpdate1(sec_id, update);
+		service = new TQSecurityUpdate3(sec_id, update);
 	}
 	
 	@Test
 	public void testCtorX() {
-		assertEquals(new TQSecID1("zulu24", 505), service.getSecID());
+		assertEquals(new TQSecID3("ken", 95, "barbie"), service.getSecID());
 		assertEquals(new DeltaUpdateBuilder()
 				.withToken(TQSecField.ACTIVE, true)
 				.withToken(TQSecField.DECIMALS, 2)
-				.buildUpdate(), service.getUpdate()
-			);
+				.buildUpdate(), service.getUpdate());
 	}
 	
 	@Test
@@ -43,12 +40,12 @@ public class SecurityUpdate1Test {
 		assertFalse(service.equals(null));
 		assertFalse(service.equals(this));
 	}
-	
+
 	@Test
 	public void testEquals() {
-		Variant<TQSecID1> vSID = new Variant<TQSecID1>()
+		Variant<TQSecID3> vSID = new Variant<TQSecID3>()
 				.add(sec_id)
-				.add(new TQSecID1("gambit", 247));
+				.add(new TQSecID3("gambit", 247, "babaka"));
 		Variant<DeltaUpdate> vUPD = new Variant<DeltaUpdate>(vSID)
 				.add(update)
 				.add(new DeltaUpdateBuilder()
@@ -57,34 +54,34 @@ public class SecurityUpdate1Test {
 					);
 		Variant<?> iterator = vUPD;
 		int foundCnt = 0;
-		SecurityUpdate1 x, found = null;
+		TQSecurityUpdate3 x, found = null;
 		do {
-			x = new SecurityUpdate1(vSID.get(), vUPD.get());
+			x = new TQSecurityUpdate3(vSID.get(), vUPD.get());
 			if ( service.equals(x) ) {
 				foundCnt ++;
 				found = x;
 			}
 		} while ( iterator.next() );
 		assertEquals(1, foundCnt);
-		assertEquals(new TQSecID1("zulu24", 505), found.getSecID());
+		assertEquals(new TQSecID3("ken", 95, "barbie"), found.getSecID());
 		assertEquals(update, found.getUpdate());
 	}
-	
+
 	@Test
 	public void testHashCode() {
-		int expected = new HashCodeBuilder(10087251, 7129)
+		int expected = new HashCodeBuilder(1236564123, 9114243)
 				.append(sec_id)
 				.append(update)
 				.build();
 		
 		assertEquals(expected, service.hashCode());
 	}
-
+	
 	@Test
 	public void testToString() {
 		String expected = new StringBuilder()
-				.append("SecurityUpdate1[")
-				.append("secID=TQSecID1[secCode=zulu24,marketID=505],")
+				.append("TQSecurityUpdate3[")
+				.append("secID=TQSecID3[secCode=ken,marketID=95,shortName=barbie],")
 				.append("update=DeltaUpdate[null {5203=true, 5207=2}]")
 				.append("]")
 				.toString();

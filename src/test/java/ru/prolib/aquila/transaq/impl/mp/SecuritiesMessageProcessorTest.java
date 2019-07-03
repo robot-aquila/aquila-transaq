@@ -13,9 +13,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ru.prolib.aquila.transaq.entity.SecurityUpdate1;
 import ru.prolib.aquila.transaq.impl.IUpdateReceiver;
 import ru.prolib.aquila.transaq.impl.Parser;
+import ru.prolib.aquila.transaq.impl.TQSecurityUpdate1;
+import ru.prolib.aquila.transaq.impl.TQSecurityUpdate3;
 
 public class SecuritiesMessageProcessorTest {
 	
@@ -41,11 +42,11 @@ public class SecuritiesMessageProcessorTest {
 	@Test
 	public void testProcessMessage() throws Exception {
 		XMLStreamReader readerMock = control.createMock(XMLStreamReader.class);
-		List<SecurityUpdate1> updates = new ArrayList<>();
-		SecurityUpdate1 duMock1, duMock2, duMock3;
-		updates.add(duMock1 = control.createMock(SecurityUpdate1.class));
-		updates.add(duMock2 = control.createMock(SecurityUpdate1.class));
-		updates.add(duMock3 = control.createMock(SecurityUpdate1.class));
+		List<TQSecurityUpdate3> updates = new ArrayList<>();
+		TQSecurityUpdate3 duMock1, duMock2, duMock3;
+		updates.add(duMock1 = control.createMock(TQSecurityUpdate3.class));
+		updates.add(duMock2 = control.createMock(TQSecurityUpdate3.class));
+		updates.add(duMock3 = control.createMock(TQSecurityUpdate3.class));
 		expect(parserMock.readSecurities(readerMock)).andReturn(updates);
 		recvMock.updateSecurity(duMock1);
 		recvMock.updateSecurity(duMock2);

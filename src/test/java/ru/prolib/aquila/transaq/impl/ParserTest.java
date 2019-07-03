@@ -31,7 +31,6 @@ import ru.prolib.aquila.transaq.entity.Board;
 import ru.prolib.aquila.transaq.entity.CandleKind;
 import ru.prolib.aquila.transaq.entity.Market;
 import ru.prolib.aquila.transaq.entity.SecType;
-import ru.prolib.aquila.transaq.entity.SecurityUpdate1;
 import ru.prolib.aquila.transaq.impl.Parser;
 
 public class ParserTest {
@@ -208,7 +207,7 @@ public class ParserTest {
 	public void testReadSecurities() throws Exception {
 		InputStream is = new FileInputStream(new File("fixture/securities.xml"));
 		XMLStreamReader sr = factory.createXMLStreamReader(is);
-		List<SecurityUpdate1> actual = null;
+		List<TQSecurityUpdate3> actual = null;
 		while ( sr.hasNext() ) {
 			switch ( sr.next() ) {
 			case XMLStreamReader.START_DOCUMENT:
@@ -219,9 +218,9 @@ public class ParserTest {
 				break;
 			}
 		}
-		List<SecurityUpdate1> expected = new ArrayList<>();
-		expected.add(new SecurityUpdate1(
-			new TQSecID1("IRGZ", 1),
+		List<TQSecurityUpdate3> expected = new ArrayList<>();
+		expected.add(new TQSecurityUpdate3(
+			new TQSecID3("IRGZ", 1, "IrkutskEnrg"),
 			new DeltaUpdateBuilder()
 				.withToken(TQSecField.SECID, 0)
 				.withToken(TQSecField.ACTIVE, true)
@@ -240,8 +239,8 @@ public class ParserTest {
 				.withToken(TQSecField.QUOTESTYPE, 1)
 				.buildUpdate())
 			);
-		expected.add(new SecurityUpdate1(
-			new TQSecID1("RU000A0ZZ505", 1),
+		expected.add(new TQSecurityUpdate3(
+			new TQSecID3("RU000A0ZZ505", 1, "Russian Agricultural Bank 09T1"),
 			new DeltaUpdateBuilder()
 				.withToken(TQSecField.SECID, 3)
 				.withToken(TQSecField.ACTIVE, true)
@@ -260,8 +259,8 @@ public class ParserTest {
 				.withToken(TQSecField.QUOTESTYPE, 1)
 				.buildUpdate())
 			);
-		expected.add(new SecurityUpdate1(
-			new TQSecID1("RIM9", 4),
+		expected.add(new TQSecurityUpdate3(
+			new TQSecID3("RIM9", 4, "RTS-6.19"),
 			new DeltaUpdateBuilder()
 				.withToken(TQSecField.SECID, 41190)
 				.withToken(TQSecField.ACTIVE, true)
@@ -300,7 +299,7 @@ public class ParserTest {
 	public void testReadSecurities_UnknownSecTypeAndTags() throws Exception {
 		InputStream is = new FileInputStream(new File("fixture/securities1.xml"));
 		XMLStreamReader sr = factory.createXMLStreamReader(is);
-		List<SecurityUpdate1> actual = null;
+		List<TQSecurityUpdate3> actual = null;
 		while ( sr.hasNext() ) {
 			switch ( sr.next() ) {
 			case XMLStreamReader.START_DOCUMENT:
@@ -311,9 +310,9 @@ public class ParserTest {
 				break;
 			}
 		}
-		List<SecurityUpdate1> expected = new ArrayList<>();
-		expected.add(new SecurityUpdate1(
-			new TQSecID1("IRGZ", 1),
+		List<TQSecurityUpdate3> expected = new ArrayList<>();
+		expected.add(new TQSecurityUpdate3(
+			new TQSecID3("IRGZ", 1, "IrkutskEnrg"),
 			new DeltaUpdateBuilder()
 				.withToken(TQSecField.SECID, 0)
 				.withToken(TQSecField.ACTIVE, true)
@@ -339,7 +338,7 @@ public class ParserTest {
 	public void testReadSecurities_Inactive() throws Exception {
 		InputStream is = new FileInputStream(new File("fixture/securities2.xml"));
 		XMLStreamReader sr = factory.createXMLStreamReader(is);
-		List<SecurityUpdate1> actual = null;
+		List<TQSecurityUpdate3> actual = null;
 		while ( sr.hasNext() ) {
 			switch ( sr.next() ) {
 			case XMLStreamReader.START_DOCUMENT:
@@ -350,9 +349,9 @@ public class ParserTest {
 				break;
 			}
 		}
-		List<SecurityUpdate1> expected = new ArrayList<>();
-		expected.add(new SecurityUpdate1(
-			new TQSecID1("IRGZ", 1),
+		List<TQSecurityUpdate3> expected = new ArrayList<>();
+		expected.add(new TQSecurityUpdate3(
+			new TQSecID3("IRGZ", 1, "IrkutskEnrg"),
 			new DeltaUpdateBuilder()
 				.withToken(TQSecField.SECID, 0)
 				.withToken(TQSecField.ACTIVE, true)
@@ -375,7 +374,7 @@ public class ParserTest {
 	public void testReadSecInfo() throws Exception {
 		InputStream is = new FileInputStream(new File("fixture/sec_info.xml"));
 		XMLStreamReader sr = factory.createXMLStreamReader(is);
-		SecurityUpdate1 actual = null;
+		TQSecurityUpdate1 actual = null;
 		while ( sr.hasNext() ) {
 			switch ( sr.next() ) {
 			case XMLStreamReader.START_DOCUMENT:
@@ -386,7 +385,7 @@ public class ParserTest {
 				break;
 			}
 		}
-		SecurityUpdate1 expected = new SecurityUpdate1(
+		TQSecurityUpdate1 expected = new TQSecurityUpdate1(
 			new TQSecID1("FOO-12.35", 4),
 			new DeltaUpdateBuilder()
 				.withToken(TQSecField.SECID, 28334)
@@ -432,7 +431,7 @@ public class ParserTest {
 	public void testReadSecInfoUpd() throws Exception {
 		InputStream is = new FileInputStream(new File("fixture/sec_info_upd.xml"));
 		XMLStreamReader sr = factory.createXMLStreamReader(is);
-		SecurityUpdate1 actual = null;
+		TQSecurityUpdate1 actual = null;
 		while ( sr.hasNext() ) {
 			switch ( sr.next() ) {
 			case XMLStreamReader.START_DOCUMENT:
@@ -443,7 +442,7 @@ public class ParserTest {
 				break;
 			}
 		}
-		SecurityUpdate1 expected = new SecurityUpdate1(
+		TQSecurityUpdate1 expected = new TQSecurityUpdate1(
 			new TQSecID1("BRH0", 4),
 			new DeltaUpdateBuilder()
 				.withToken(TQSecField.SECID, 66)
@@ -535,9 +534,9 @@ public class ParserTest {
 					case XMLStreamReader.START_ELEMENT:
 						if ( "securities".equals(sr.getLocalName()) ) {
 							count_sections ++;
-							List<SecurityUpdate1> list = service.readSecurities(sr);
+							List<TQSecurityUpdate3> list = service.readSecurities(sr);
 							count_securities += list.size();
-							for  ( SecurityUpdate1 s : list ) {
+							for  ( TQSecurityUpdate3 s : list ) {
 								if ( "RTS-6.19".equals(s.getUpdate().getContents().get(TQSecField.SHORT_NAME)) ) {
 									System.out.println(s);
 								}

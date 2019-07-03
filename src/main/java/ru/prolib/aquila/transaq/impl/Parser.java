@@ -1,6 +1,6 @@
 package ru.prolib.aquila.transaq.impl;
 
-import static ru.prolib.aquila.transaq.entity.SecurityUpdate1.*;
+import static ru.prolib.aquila.transaq.impl.TQOpmask.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,7 +22,6 @@ import ru.prolib.aquila.transaq.entity.Board;
 import ru.prolib.aquila.transaq.entity.CandleKind;
 import ru.prolib.aquila.transaq.entity.Market;
 import ru.prolib.aquila.transaq.entity.SecType;
-import ru.prolib.aquila.transaq.entity.SecurityUpdate1;
 
 public class Parser {
 	private static final Logger logger;
@@ -294,9 +293,9 @@ public class Parser {
 		throw new XMLStreamException("Premature end of file");
 	}
 	
-	private SecurityUpdate1 readSecurity(XMLStreamReader reader) throws XMLStreamException {
+	private TQSecurityUpdate3 readSecurity(XMLStreamReader reader) throws XMLStreamException {
 		Integer market_id = null;
-		String sec_code = null;
+		String sec_code = null, short_name = null;
 		DeltaUpdateBuilder builder = new DeltaUpdateBuilder()
 				.withToken(TQSecField.SECID, getAttributeInt(reader, "secid"))
 				.withToken(TQSecField.ACTIVE, getAttributeBool(reader, "active"));
@@ -317,7 +316,7 @@ public class Parser {
 					builder.withToken(TQSecField.MARKETID, market_id = readInt(reader));
 					break;
 				case "shortname":
-					builder.withToken(TQSecField.SHORT_NAME, readCharacters(reader));
+					builder.withToken(TQSecField.SHORT_NAME, short_name = readCharacters(reader));
 					break;
 				case "decimals":
 					builder.withToken(TQSecField.DECIMALS, readInt(reader));
@@ -370,8 +369,9 @@ public class Parser {
 				case "security":
 					checkNotNull(sec_code, "seccode");
 					checkNotNull(market_id, "market");
-					return new SecurityUpdate1(
-							new TQSecID1(sec_code, market_id),
+					checkNotNull(short_name, "shortname");
+					return new TQSecurityUpdate3(
+							new TQSecID3(sec_code, market_id, short_name),
 							builder.buildUpdate()
 						);
 				}
@@ -381,11 +381,11 @@ public class Parser {
 		throw new XMLStreamException("Premature end of file");
 	}
 	
-	public List<SecurityUpdate1> readSecurities(XMLStreamReader reader) throws XMLStreamException {
+	public List<TQSecurityUpdate3> readSecurities(XMLStreamReader reader) throws XMLStreamException {
 		if ( ! "securities".equals(reader.getLocalName()) ) {
 			throw new IllegalStateException("Unexpected current element: " + reader.getLocalName());
 		}
-		List<SecurityUpdate1> result = new ArrayList<>();
+		List<TQSecurityUpdate3> result = new ArrayList<>();
 		while ( reader.hasNext() ) {
 			switch ( reader.next() ) {
 			case XMLStreamReader.START_ELEMENT:
@@ -406,7 +406,7 @@ public class Parser {
 		throw new XMLStreamException("Premature end of file");
 	}
 	
-	public SecurityUpdate1 readSecInfo(XMLStreamReader reader) throws XMLStreamException {
+	public TQSecurityUpdate1 readSecInfo(XMLStreamReader reader) throws XMLStreamException {
 		if ( ! "sec_info".equals(reader.getLocalName()) ) {
 			throw new IllegalStateException("Unexpected current element: " + reader.getLocalName());
 		}
@@ -487,7 +487,7 @@ public class Parser {
 				case "sec_info":
 					checkNotNull(sec_code, "seccode");
 					checkNotNull(market_id, "market");
-					return new SecurityUpdate1(
+					return new TQSecurityUpdate1(
 							new TQSecID1(sec_code,market_id),
 							builder.buildUpdate()
 						);
@@ -498,7 +498,7 @@ public class Parser {
 		throw new XMLStreamException("Premature end of file");
 	}
 	
-	public SecurityUpdate1 readSecInfoUpd(XMLStreamReader reader) throws XMLStreamException {
+	public TQSecurityUpdate1 readSecInfoUpd(XMLStreamReader reader) throws XMLStreamException {
 		if ( ! "sec_info_upd".equals(reader.getLocalName()) ) {
 			throw new IllegalStateException("Unexpected current element: " + reader.getLocalName());
 		}
@@ -549,7 +549,7 @@ public class Parser {
 				case "sec_info_upd":
 					checkNotNull(sec_code, "seccode");
 					checkNotNull(market_id, "market");
-					return new SecurityUpdate1(
+					return new TQSecurityUpdate1(
 							new TQSecID1(sec_code, market_id),
 							builder.buildUpdate()
 						);

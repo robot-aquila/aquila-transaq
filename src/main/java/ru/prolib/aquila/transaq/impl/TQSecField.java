@@ -19,7 +19,7 @@ public class TQSecField {
 	
 	public static final int SECNAME				= 5220; // string
 	public static final int PNAME				= 5225; // string
-	public static final int MAT_DATE			= 5226; // date?
+	public static final int MAT_DATE			= 5226; // LocalDateTime
 	public static final int CLEARING_PRICE		= 5227; // CDecimal
 	public static final int MINPRICE			= 5228; // CDecimal
 	public static final int MAXPRICE			= 5229; // CDecimal

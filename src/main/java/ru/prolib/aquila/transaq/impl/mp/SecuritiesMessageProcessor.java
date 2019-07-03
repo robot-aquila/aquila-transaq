@@ -2,10 +2,10 @@ package ru.prolib.aquila.transaq.impl.mp;
 
 import javax.xml.stream.XMLStreamReader;
 
-import ru.prolib.aquila.transaq.entity.SecurityUpdate1;
 import ru.prolib.aquila.transaq.impl.IMessageProcessor;
 import ru.prolib.aquila.transaq.impl.IUpdateReceiver;
 import ru.prolib.aquila.transaq.impl.Parser;
+import ru.prolib.aquila.transaq.impl.TQSecurityUpdate3;
 
 public class SecuritiesMessageProcessor implements IMessageProcessor {
 	private final Parser parser;
@@ -22,7 +22,7 @@ public class SecuritiesMessageProcessor implements IMessageProcessor {
 
 	@Override
 	public void processMessage(XMLStreamReader reader) throws Exception {
-		for ( SecurityUpdate1 update : parser.readSecurities(reader) ) {
+		for ( TQSecurityUpdate3 update : parser.readSecurities(reader) ) {
 			receiver.updateSecurity(update);
 		}
 	}

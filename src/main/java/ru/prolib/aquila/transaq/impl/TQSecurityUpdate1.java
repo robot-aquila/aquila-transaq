@@ -1,4 +1,4 @@
-package ru.prolib.aquila.transaq.entity;
+package ru.prolib.aquila.transaq.impl;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -6,19 +6,12 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdate;
-import ru.prolib.aquila.transaq.impl.TQSecID1;
 
-public class SecurityUpdate1 {
-	public static final int OPMASK_USECREDIT = 0x01;
-	public static final int OPMASK_BYMARKET = 0x02;
-	public static final int OPMASK_NOSPLIT = 0x04;
-	public static final int OPMASK_FOK = 0x08;
-	public static final int OPMASK_IOC = 0x10;
-	
+public class TQSecurityUpdate1 {
 	private final TQSecID1 secID;
 	private final DeltaUpdate update;
 	
-	public SecurityUpdate1(TQSecID1 secID, DeltaUpdate update) {
+	public TQSecurityUpdate1(TQSecID1 secID, DeltaUpdate update) {
 		this.secID = secID;
 		this.update = update;
 	}
@@ -36,10 +29,10 @@ public class SecurityUpdate1 {
 		if ( other == this ) {
 			return true;
 		}
-		if ( other == null || other.getClass() != SecurityUpdate1.class ) {
+		if ( other == null || other.getClass() != TQSecurityUpdate1.class ) {
 			return false;
 		}
-		SecurityUpdate1 o = (SecurityUpdate1) other;
+		TQSecurityUpdate1 o = (TQSecurityUpdate1) other;
 		return new EqualsBuilder()
 				.append(o.secID, secID)
 				.append(o.update, update)

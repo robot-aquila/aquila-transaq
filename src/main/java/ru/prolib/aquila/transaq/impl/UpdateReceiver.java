@@ -6,7 +6,6 @@ import ru.prolib.aquila.core.BusinessEntities.DeltaUpdate;
 import ru.prolib.aquila.transaq.entity.Board;
 import ru.prolib.aquila.transaq.entity.CandleKind;
 import ru.prolib.aquila.transaq.entity.Market;
-import ru.prolib.aquila.transaq.entity.SecurityUpdate1;
 
 public class UpdateReceiver implements IUpdateReceiver {
 
@@ -29,7 +28,7 @@ public class UpdateReceiver implements IUpdateReceiver {
 	}
 
 	@Override
-	public void updateSecurity(SecurityUpdate1 entry) {
+	public void updateSecurity(TQSecurityUpdate1 entry) {
 		Map<Integer, Object> data = entry.getUpdate().getContents();
 		// не сработает. придется как-то определять какой это апдейт,
 		// что то бы определить набор доступных полей
@@ -40,6 +39,12 @@ public class UpdateReceiver implements IUpdateReceiver {
 		
 		
 		
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateSecurity(TQSecurityUpdate3 entry) {
 		// TODO Auto-generated method stub
 		
 	}
