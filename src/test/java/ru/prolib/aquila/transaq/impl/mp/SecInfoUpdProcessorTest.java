@@ -9,21 +9,21 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
-import ru.prolib.aquila.transaq.impl.IUpdateReceiver;
+import ru.prolib.aquila.transaq.impl.TQReactor;
 import ru.prolib.aquila.transaq.impl.Parser;
 import ru.prolib.aquila.transaq.impl.TQSecurityUpdate1;
 
 public class SecInfoUpdProcessorTest {
 	private IMocksControl control;
 	private Parser parserMock;
-	private IUpdateReceiver recvMock;
+	private TQReactor recvMock;
 	private SecInfoUpdProcessor service;
 
 	@Before
 	public void setUp() throws Exception {
 		control = createStrictControl();
 		parserMock = control.createMock(Parser.class);
-		recvMock = control.createMock(IUpdateReceiver.class);
+		recvMock = control.createMock(TQReactor.class);
 		service = new SecInfoUpdProcessor(recvMock, parserMock);
 	}
 

@@ -3,14 +3,14 @@ package ru.prolib.aquila.transaq.impl.mp;
 import javax.xml.stream.XMLStreamReader;
 
 import ru.prolib.aquila.transaq.impl.IMessageProcessor;
-import ru.prolib.aquila.transaq.impl.IUpdateReceiver;
+import ru.prolib.aquila.transaq.impl.TQReactor;
 import ru.prolib.aquila.transaq.impl.Parser;
 
 public class SecInfoUpdProcessor  implements IMessageProcessor {
 	private final Parser parser;
-	private final IUpdateReceiver receiver;
+	private final TQReactor receiver;
 
-	public SecInfoUpdProcessor(IUpdateReceiver receiver, Parser parser) {
+	public SecInfoUpdProcessor(TQReactor receiver, Parser parser) {
 		this.parser = parser;
 		this.receiver = receiver;
 	}

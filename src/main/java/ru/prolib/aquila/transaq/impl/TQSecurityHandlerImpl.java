@@ -5,21 +5,35 @@ import java.util.Set;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdate;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateConsumer;
-import ru.prolib.aquila.core.BusinessEntities.SecurityField;
 import ru.prolib.aquila.core.BusinessEntities.UpdatableStateContainerImpl;
 
-public class TQSecurityDataHandler {
+public class TQSecurityHandlerImpl implements TQSecurityHandler {
+	private final TQSecID3 id;
 	private final UpdatableStateContainerImpl state;
 	private volatile DeltaUpdateConsumer consumer;
 	
-	public TQSecurityDataHandler() {
+	public TQSecurityHandlerImpl(TQSecID3 id) {
+		this.id = id;
 		state = new UpdatableStateContainerImpl("TQ-SEC");
 	}
 	
-	public void setConsumer(DeltaUpdateConsumer consumer) {
-		this.consumer = consumer;
+	@Override
+	public TQSecID3 getSecID3() {
+		return id;
 	}
 	
+	@Override
+	public void setConsumer(DeltaUpdateConsumer consumer) {
+		this.consumer = consumer;
+		// TODO: send snapshot
+	}
+	
+	@Override
+	public void initialUpdate(DeltaUpdate update) {
+		
+	}
+	
+	@Override
 	public void update(DeltaUpdate update) {
 		DeltaUpdateBuilder builder = null;
 		DeltaUpdateConsumer consumer = this.consumer;
@@ -57,5 +71,5 @@ public class TQSecurityDataHandler {
 			state.unlock();
 		}
 	}
-	
+
 }

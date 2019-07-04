@@ -21,6 +21,13 @@ public class TQSecID1Test {
 	}
 	
 	@Test
+	public void testCtor1_SecID3() {
+		service = new TQSecID1(new TQSecID3("zulu24", 15, "foobar"));
+		assertEquals("zulu24", service.getSecCode());
+		assertEquals(15, service.getMarketID());
+	}
+	
+	@Test
 	public void testToString() {
 		String expected = "TQSecID1[secCode=foo,marketID=220]";
 		

@@ -13,7 +13,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ru.prolib.aquila.transaq.impl.IUpdateReceiver;
+import ru.prolib.aquila.transaq.impl.TQReactor;
 import ru.prolib.aquila.transaq.impl.Parser;
 import ru.prolib.aquila.transaq.impl.TQSecurityUpdate1;
 import ru.prolib.aquila.transaq.impl.TQSecurityUpdate3;
@@ -28,14 +28,14 @@ public class SecuritiesMessageProcessorTest {
 	
 	private IMocksControl control;
 	private Parser parserMock;
-	private IUpdateReceiver recvMock;
+	private TQReactor recvMock;
 	private SecuritiesMessageProcessor service;
 
 	@Before
 	public void setUp() throws Exception {
 		control = createStrictControl();
 		parserMock = control.createMock(Parser.class);
-		recvMock = control.createMock(IUpdateReceiver.class);
+		recvMock = control.createMock(TQReactor.class);
 		service = new SecuritiesMessageProcessor(recvMock, parserMock);
 	}
 
