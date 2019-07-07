@@ -9,15 +9,16 @@ import org.junit.Test;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdate;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.core.utils.Variant;
+import ru.prolib.aquila.transaq.entity.SecType;
 
 public class TQSecurityUpdate3Test {
-	private TQSecID3 sec_id;
+	private TQSecID_F sec_id;
 	private DeltaUpdate update;
 	private TQSecurityUpdate3 service;
 
 	@Before
 	public void setUp() throws Exception {
-		sec_id = new TQSecID3("ken", 95, "barbie");
+		sec_id = new TQSecID_F("ken", 95, "barbie", SecType.SHARE);
 		update = new DeltaUpdateBuilder()
 				.withToken(TQSecField.ACTIVE, true)
 				.withToken(TQSecField.DECIMALS, 2)
@@ -27,7 +28,7 @@ public class TQSecurityUpdate3Test {
 	
 	@Test
 	public void testCtorX() {
-		assertEquals(new TQSecID3("ken", 95, "barbie"), service.getSecID());
+		assertEquals(new TQSecID_F("ken", 95, "barbie", SecType.SHARE), service.getSecID());
 		assertEquals(new DeltaUpdateBuilder()
 				.withToken(TQSecField.ACTIVE, true)
 				.withToken(TQSecField.DECIMALS, 2)
@@ -43,9 +44,9 @@ public class TQSecurityUpdate3Test {
 
 	@Test
 	public void testEquals() {
-		Variant<TQSecID3> vSID = new Variant<TQSecID3>()
+		Variant<TQSecID_F> vSID = new Variant<TQSecID_F>()
 				.add(sec_id)
-				.add(new TQSecID3("gambit", 247, "babaka"));
+				.add(new TQSecID_F("gambit", 247, "babaka", SecType.BOND));
 		Variant<DeltaUpdate> vUPD = new Variant<DeltaUpdate>(vSID)
 				.add(update)
 				.add(new DeltaUpdateBuilder()
@@ -63,7 +64,7 @@ public class TQSecurityUpdate3Test {
 			}
 		} while ( iterator.next() );
 		assertEquals(1, foundCnt);
-		assertEquals(new TQSecID3("ken", 95, "barbie"), found.getSecID());
+		assertEquals(new TQSecID_F("ken", 95, "barbie", SecType.SHARE), found.getSecID());
 		assertEquals(update, found.getUpdate());
 	}
 
@@ -81,7 +82,7 @@ public class TQSecurityUpdate3Test {
 	public void testToString() {
 		String expected = new StringBuilder()
 				.append("TQSecurityUpdate3[")
-				.append("secID=TQSecID3[secCode=ken,marketID=95,shortName=barbie],")
+				.append("secID=TQSecID_F[secCode=ken,marketID=95,shortName=barbie,type=SHARE],")
 				.append("update=DeltaUpdate[null {5203=true, 5207=2}]")
 				.append("]")
 				.toString();

@@ -17,7 +17,7 @@ public class TQSecID1 {
 		this.marketID = market_id;
 	}
 	
-	public TQSecID1(TQSecID3 sec_id3) {
+	public TQSecID1(TQSecID_F sec_id3) {
 		this(sec_id3.getSecCode(), sec_id3.getMarketID());
 	}
 	

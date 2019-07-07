@@ -13,6 +13,7 @@ import ru.prolib.aquila.core.BusinessEntities.DeltaUpdate;
 import ru.prolib.aquila.transaq.entity.Board;
 import ru.prolib.aquila.transaq.entity.CandleKind;
 import ru.prolib.aquila.transaq.entity.Market;
+import ru.prolib.aquila.transaq.entity.SecType;
 
 public class TQReactorImplTest {
 	private IMocksControl control;
@@ -90,12 +91,12 @@ public class TQReactorImplTest {
 
 	@Test
 	public void testUpdateSecurity_U3_NewHandler() {
-		TQSecID3 sec_id3 = new TQSecID3("foo", 7, "bar");
+		TQSecID_F sec_id3 = new TQSecID_F("foo", 7, "bar", SecType.BOND);
 		DeltaUpdate duMock = control.createMock(DeltaUpdate.class);
 		TQSecurityUpdate3 update = new TQSecurityUpdate3(sec_id3, duMock);
 		expect(shrMock.getHandlerOrNull(sec_id3)).andReturn(null);
 		expect(shfMock.createHandler(sec_id3)).andReturn(shMock1);
-		shMock1.initialUpdate(duMock);
+		shMock1.update(duMock);
 		shrMock.registerHandler(shMock1);
 		control.replay();
 		
@@ -106,7 +107,7 @@ public class TQReactorImplTest {
 
 	@Test
 	public void testUpdateSecurity_U3_ExistingHandler() {
-		TQSecID3 sec_id3 = new TQSecID3("buz", 8, "bar");
+		TQSecID_F sec_id3 = new TQSecID_F("buz", 8, "bar", SecType.GKO);
 		DeltaUpdate duMock = control.createMock(DeltaUpdate.class);
 		TQSecurityUpdate3 update = new TQSecurityUpdate3(sec_id3, duMock);
 		expect(shrMock.getHandlerOrNull(sec_id3)).andReturn(shMock1);

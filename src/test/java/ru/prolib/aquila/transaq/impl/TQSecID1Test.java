@@ -6,6 +6,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.junit.Before;
 import org.junit.Test;
 
+import ru.prolib.aquila.transaq.entity.SecType;
+
 public class TQSecID1Test {
 	private TQSecID1 service;
 
@@ -22,7 +24,7 @@ public class TQSecID1Test {
 	
 	@Test
 	public void testCtor1_SecID3() {
-		service = new TQSecID1(new TQSecID3("zulu24", 15, "foobar"));
+		service = new TQSecID1(new TQSecID_F("zulu24", 15, "foobar", SecType.FUT));
 		assertEquals("zulu24", service.getSecCode());
 		assertEquals(15, service.getMarketID());
 	}

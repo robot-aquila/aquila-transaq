@@ -296,6 +296,7 @@ public class Parser {
 	private TQSecurityUpdate3 readSecurity(XMLStreamReader reader) throws XMLStreamException {
 		Integer market_id = null;
 		String sec_code = null, short_name = null;
+		SecType sec_type = null;
 		DeltaUpdateBuilder builder = new DeltaUpdateBuilder()
 				.withToken(TQSecField.SECID, getAttributeInt(reader, "secid"))
 				.withToken(TQSecField.ACTIVE, getAttributeBool(reader, "active"));
@@ -342,7 +343,6 @@ public class Parser {
 					break;
 				case "sectype":
 					String str_sec_type = readCharacters(reader);
-					SecType sec_type;
 					try {
 						sec_type = SecType.valueOf(str_sec_type);
 					} catch ( IllegalArgumentException e ) {
@@ -370,8 +370,9 @@ public class Parser {
 					checkNotNull(sec_code, "seccode");
 					checkNotNull(market_id, "market");
 					checkNotNull(short_name, "shortname");
+					checkNotNull(sec_type, "sectype");
 					return new TQSecurityUpdate3(
-							new TQSecID3(sec_code, market_id, short_name),
+							new TQSecID_F(sec_code, market_id, short_name, sec_type),
 							builder.buildUpdate()
 						);
 				}

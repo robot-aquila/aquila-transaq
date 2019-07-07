@@ -8,15 +8,15 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdate;
 
 public class TQSecurityUpdate3 {
-	private final TQSecID3 secID;
+	private final TQSecID_F secID;
 	private final DeltaUpdate update;
 	
-	public TQSecurityUpdate3(TQSecID3 secID, DeltaUpdate update) {
+	public TQSecurityUpdate3(TQSecID_F secID, DeltaUpdate update) {
 		this.secID = secID;
 		this.update = update;
 	}
 	
-	public TQSecID3 getSecID() {
+	public TQSecID_F getSecID() {
 		return secID;
 	}
 	

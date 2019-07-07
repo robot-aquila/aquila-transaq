@@ -10,11 +10,13 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
+import ru.prolib.aquila.transaq.entity.SecType;
+
 public class TQSecurityHandlerRegistryImplTest {
 	private IMocksControl control;
 	private TQSecurityHandler shMock1, shMock2, shMock3;
 	private Map<TQSecID1, TQSecurityHandler> map_sec_id1;
-	private Map<TQSecID3, TQSecurityHandler> map_sec_id3;
+	private Map<TQSecID_F, TQSecurityHandler> map_sec_id3;
 	private TQSecurityHandlerRegistryImpl service;
 
 	@Before
@@ -29,19 +31,19 @@ public class TQSecurityHandlerRegistryImplTest {
 	}
 	
 	@Test
-	public void testGetHandlerOrNull_ID3() {
-		map_sec_id3.put(new TQSecID3("app", 87, "ppa"), shMock1);
-		map_sec_id3.put(new TQSecID3("bam", 21, "gap"), shMock2);
+	public void testGetHandlerOrNull_FullID() {
+		map_sec_id3.put(new TQSecID_F("app", 87, "ppa", SecType.BOND), shMock1);
+		map_sec_id3.put(new TQSecID_F("bam", 21, "gap", SecType.SHARE), shMock2);
 		
-		assertNull(service.getHandlerOrNull(new TQSecID3("gap", 22, "map")));
+		assertNull(service.getHandlerOrNull(new TQSecID_F("gap", 22, "map", SecType.FUT)));
 		
-		map_sec_id3.put(new TQSecID3("gap", 22, "map"), shMock3);
+		map_sec_id3.put(new TQSecID_F("gap", 22, "map", SecType.FUT), shMock3);
 		
-		assertSame(shMock3, service.getHandlerOrNull(new TQSecID3("gap", 22, "map")));
+		assertSame(shMock3, service.getHandlerOrNull(new TQSecID_F("gap", 22, "map", SecType.FUT)));
 	}
 	
 	@Test
-	public void testGetHandler_ID2() {
+	public void testGetHandler_ShortID() {
 		map_sec_id1.put(new TQSecID1("foo", 12), shMock1);
 		map_sec_id1.put(new TQSecID1("bar", 13), shMock2);
 		map_sec_id1.put(new TQSecID1("buz", 14), shMock3);
@@ -50,7 +52,7 @@ public class TQSecurityHandlerRegistryImplTest {
 	}
 	
 	@Test (expected=IllegalArgumentException.class)
-	public void testGetHandler_ID2_ThrowsIfNotExists() {
+	public void testGetHandler_ShortID_ThrowsIfNotExists() {
 		map_sec_id1.put(new TQSecID1("foo", 12), shMock1);
 		map_sec_id1.put(new TQSecID1("bar", 13), shMock2);
 		map_sec_id1.put(new TQSecID1("buz", 14), shMock3);
@@ -60,9 +62,9 @@ public class TQSecurityHandlerRegistryImplTest {
 	
 	@Test (expected=IllegalStateException.class)
 	public void testRegisterHandler_ThrowsIfExists() {
-		map_sec_id3.put(new TQSecID3("foo", 12, "gap"), shMock1);
-		map_sec_id3.put(new TQSecID3("bar", 13, "pag"), shMock2);
-		expect(shMock3.getSecID3()).andStubReturn(new TQSecID3("foo", 12, "gap"));
+		map_sec_id3.put(new TQSecID_F("foo", 12, "gap", SecType.BOND), shMock1);
+		map_sec_id3.put(new TQSecID_F("bar", 13, "pag", SecType.GKO), shMock2);
+		expect(shMock3.getSecID3()).andStubReturn(new TQSecID_F("foo", 12, "gap", SecType.BOND));
 		control.replay();
 
 		service.registerHandler(shMock3);
@@ -70,15 +72,15 @@ public class TQSecurityHandlerRegistryImplTest {
 
 	@Test
 	public void testRegisterHandler() {
-		map_sec_id3.put(new TQSecID3("foo", 12, "gap"), shMock1);
-		map_sec_id3.put(new TQSecID3("bar", 13, "pag"), shMock2);
-		expect(shMock3.getSecID3()).andStubReturn(new TQSecID3("boo", 15, "var"));
+		map_sec_id3.put(new TQSecID_F("foo", 12, "gap", SecType.BOND), shMock1);
+		map_sec_id3.put(new TQSecID_F("bar", 13, "pag", SecType.GKO), shMock2);
+		expect(shMock3.getSecID3()).andStubReturn(new TQSecID_F("boo", 15, "var", SecType.FUT));
 		control.replay();
 
 		service.registerHandler(shMock3);
 		
 		control.verify();
-		assertSame(shMock3, map_sec_id3.get(new TQSecID3("boo", 15, "var")));
+		assertSame(shMock3, map_sec_id3.get(new TQSecID_F("boo", 15, "var", SecType.FUT)));
 		assertSame(shMock3, map_sec_id1.get(new TQSecID1("boo", 15)));
 	}
 

@@ -41,11 +41,11 @@ public class TQReactorImpl implements TQReactor {
 
 	@Override
 	public void updateSecurity(TQSecurityUpdate3 update) {
-		TQSecID3 sec_id = update.getSecID();
+		TQSecID_F sec_id = update.getSecID();
 		TQSecurityHandler x = shr.getHandlerOrNull(sec_id);
 		if ( x == null ) {
 			x = shf.createHandler(sec_id);
-			x.initialUpdate(update.getUpdate());
+			x.update(update.getUpdate());
 			shr.registerHandler(x);
 		} else {
 			x.update(update.getUpdate());

@@ -220,7 +220,7 @@ public class ParserTest {
 		}
 		List<TQSecurityUpdate3> expected = new ArrayList<>();
 		expected.add(new TQSecurityUpdate3(
-			new TQSecID3("IRGZ", 1, "IrkutskEnrg"),
+			new TQSecID_F("IRGZ", 1, "IrkutskEnrg", SecType.SHARE),
 			new DeltaUpdateBuilder()
 				.withToken(TQSecField.SECID, 0)
 				.withToken(TQSecField.ACTIVE, true)
@@ -240,7 +240,7 @@ public class ParserTest {
 				.buildUpdate())
 			);
 		expected.add(new TQSecurityUpdate3(
-			new TQSecID3("RU000A0ZZ505", 1, "Russian Agricultural Bank 09T1"),
+			new TQSecID_F("RU000A0ZZ505", 1, "Russian Agricultural Bank 09T1", SecType.BOND),
 			new DeltaUpdateBuilder()
 				.withToken(TQSecField.SECID, 3)
 				.withToken(TQSecField.ACTIVE, true)
@@ -260,7 +260,7 @@ public class ParserTest {
 				.buildUpdate())
 			);
 		expected.add(new TQSecurityUpdate3(
-			new TQSecID3("RIM9", 4, "RTS-6.19"),
+			new TQSecID_F("RIM9", 4, "RTS-6.19", SecType.FUT),
 			new DeltaUpdateBuilder()
 				.withToken(TQSecField.SECID, 41190)
 				.withToken(TQSecField.ACTIVE, true)
@@ -312,7 +312,7 @@ public class ParserTest {
 		}
 		List<TQSecurityUpdate3> expected = new ArrayList<>();
 		expected.add(new TQSecurityUpdate3(
-			new TQSecID3("IRGZ", 1, "IrkutskEnrg"),
+			new TQSecID_F("IRGZ", 1, "IrkutskEnrg", SecType.QUOTES),
 			new DeltaUpdateBuilder()
 				.withToken(TQSecField.SECID, 0)
 				.withToken(TQSecField.ACTIVE, true)
@@ -351,7 +351,7 @@ public class ParserTest {
 		}
 		List<TQSecurityUpdate3> expected = new ArrayList<>();
 		expected.add(new TQSecurityUpdate3(
-			new TQSecID3("IRGZ", 1, "IrkutskEnrg"),
+			new TQSecID_F("IRGZ", 1, "IrkutskEnrg", SecType.SHARE),
 			new DeltaUpdateBuilder()
 				.withToken(TQSecField.SECID, 0)
 				.withToken(TQSecField.ACTIVE, true)

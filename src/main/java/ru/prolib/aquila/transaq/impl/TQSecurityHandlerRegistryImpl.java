@@ -5,10 +5,10 @@ import java.util.Map;
 
 public class TQSecurityHandlerRegistryImpl implements TQSecurityHandlerRegistry {
 	private final Map<TQSecID1, TQSecurityHandler> mapSecID1;
-	private final Map<TQSecID3, TQSecurityHandler> mapSecID3;
+	private final Map<TQSecID_F, TQSecurityHandler> mapSecID3;
 	
 	TQSecurityHandlerRegistryImpl(Map<TQSecID1, TQSecurityHandler> map_sec_id1,
-								  Map<TQSecID3, TQSecurityHandler> map_sec_id3)
+								  Map<TQSecID_F, TQSecurityHandler> map_sec_id3)
 	{
 		this.mapSecID1 = map_sec_id1;
 		this.mapSecID3 = map_sec_id3;
@@ -19,7 +19,7 @@ public class TQSecurityHandlerRegistryImpl implements TQSecurityHandlerRegistry 
 	}
 
 	@Override
-	public synchronized TQSecurityHandler getHandlerOrNull(TQSecID3 sec_id) {
+	public synchronized TQSecurityHandler getHandlerOrNull(TQSecID_F sec_id) {
 		return mapSecID3.get(sec_id);
 	}
 
@@ -34,7 +34,7 @@ public class TQSecurityHandlerRegistryImpl implements TQSecurityHandlerRegistry 
 
 	@Override
 	public synchronized void registerHandler(TQSecurityHandler handler) {
-		TQSecID3 sec_id3 = handler.getSecID3();
+		TQSecID_F sec_id3 = handler.getSecID3();
 		if ( mapSecID3.containsKey(sec_id3) ) {
 			throw new IllegalStateException("Handler already exists: " + sec_id3);
 		}

@@ -7,13 +7,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ru.prolib.aquila.core.utils.Variant;
+import ru.prolib.aquila.transaq.entity.SecType;
 
-public class TQSecID3Test {
-	private TQSecID3 service;
+public class TQSecID_FTest {
+	private TQSecID_F service;
 
 	@Before
 	public void setUp() throws Exception {
-		service = new TQSecID3("foo", 19, "bar");
+		service = new TQSecID_F("foo", 19, "bar", SecType.FUT);
 	}
 	
 	@Test
@@ -21,11 +22,12 @@ public class TQSecID3Test {
 		assertEquals("foo", service.getSecCode());
 		assertEquals(19, service.getMarketID());
 		assertEquals("bar", service.getShortName());
+		assertEquals(SecType.FUT, service.getType());
 	}
 	
 	@Test
 	public void testToString() {
-		String expected = "TQSecID3[secCode=foo,marketID=19,shortName=bar]";
+		String expected = "TQSecID_F[secCode=foo,marketID=19,shortName=bar,type=FUT]";
 		
 		assertEquals(expected, service.toString());
 	}
@@ -36,6 +38,7 @@ public class TQSecID3Test {
 				.append("foo")
 				.append(19)
 				.append("bar")
+				.append(SecType.FUT)
 				.build();
 		
 		assertEquals(expected, service.hashCode());
@@ -53,11 +56,12 @@ public class TQSecID3Test {
 		Variant<String> vSC = new Variant<>("foo", "zulu24");
 		Variant<Integer> vMID = new Variant<>(vSC, 19, 27);
 		Variant<String> vSN = new Variant<>(vMID, "bar", "buzz");
-		Variant<?> iterator = vSN;
+		Variant<SecType> vTYP = new Variant<>(vSN, SecType.FUT, SecType.BOND);
+		Variant<?> iterator = vTYP;
 		int found_cnt = 0;
-		TQSecID3 x, found = null;
+		TQSecID_F x, found = null;
 		do {
-			x = new TQSecID3(vSC.get(), vMID.get(), vSN.get());
+			x = new TQSecID_F(vSC.get(), vMID.get(), vSN.get(), vTYP.get());
 			if ( service.equals(x) ) {
 				found_cnt ++;
 				found = x;
@@ -67,6 +71,7 @@ public class TQSecID3Test {
 		assertEquals("foo", found.getSecCode());
 		assertEquals(19, found.getMarketID());
 		assertEquals("bar", found.getShortName());
+		assertEquals(SecType.FUT, found.getType());
 	}
 
 }
