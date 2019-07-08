@@ -43,4 +43,14 @@ public class TQDirectoryImpl implements TQDirectory {
 		listCandleKinds.addAll(candle_kinds);
 	}
 
+	@Override
+	public synchronized String getMarketName(int market_id) {
+		for ( Market market : listMarkets ) {
+			if ( market.getID() == market_id ) {
+				return market.getName();
+			}
+		}
+		throw new IllegalArgumentException("Market not found: " + market_id);
+	}
+
 }

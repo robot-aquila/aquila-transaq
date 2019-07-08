@@ -99,5 +99,25 @@ public class TQDirectoryImplTest {
 		
 		assertEquals(expected, candle_kinds_stub);
 	}
+	
+	@Test
+	public void testGetMarketName() {
+		markets_stub.add(new Market(0, "foo"));
+		markets_stub.add(new Market(1, "bar"));
+		markets_stub.add(new Market(2, "zoo"));
+		
+		assertEquals("foo", service.getMarketName(0));
+		assertEquals("bar", service.getMarketName(1));
+		assertEquals("zoo", service.getMarketName(2));
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testGetMarketName_ThrowsIfNotFound() {
+		markets_stub.add(new Market(0, "foo"));
+		markets_stub.add(new Market(1, "bar"));
+		markets_stub.add(new Market(2, "zoo"));
+
+		service.getMarketName(3);
+	}
 
 }

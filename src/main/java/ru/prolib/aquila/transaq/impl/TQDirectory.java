@@ -10,4 +10,5 @@ public interface TQDirectory {
 	void updateBoards(List<Board> boards);
 	void updateMarkets(List<Market> markets);
 	void updateCandleKinds(List<CandleKind> candle_kinds);
+	String getMarketName(int market_id);
 }
