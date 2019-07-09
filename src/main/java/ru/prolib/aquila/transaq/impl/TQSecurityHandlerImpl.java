@@ -5,17 +5,33 @@ import java.util.Set;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdate;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateConsumer;
+import ru.prolib.aquila.core.BusinessEntities.SecurityField;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
+import ru.prolib.aquila.core.BusinessEntities.UpdatableStateContainer;
 import ru.prolib.aquila.core.BusinessEntities.UpdatableStateContainerImpl;
 
 public class TQSecurityHandlerImpl implements TQSecurityHandler {
 	private final TQSecID_F id;
-	private final UpdatableStateContainerImpl state;
-	private volatile DeltaUpdateConsumer consumer;
+	private final Symbol symbol;
+	private final DeltaUpdateConsumer consumer;
+	private final UpdatableStateContainer state;
 	
-	public TQSecurityHandlerImpl(TQSecID_F id) {
+	public TQSecurityHandlerImpl(TQSecID_F id,
+			Symbol symbol,
+			DeltaUpdateConsumer consumer,
+			UpdatableStateContainer state)
+	{
 		this.id = id;
-		state = new UpdatableStateContainerImpl("TQ-SEC");
+		this.symbol = symbol;
+		this.consumer = consumer;
+		this.state = state;
+	}
+	
+	public TQSecurityHandlerImpl(TQSecID_F id,
+			Symbol symbol,
+			DeltaUpdateConsumer consumer)
+	{
+		this(id, symbol, consumer, new UpdatableStateContainerImpl("TQ-SEC-" + symbol.toString()));
 	}
 	
 	@Override
@@ -25,33 +41,27 @@ public class TQSecurityHandlerImpl implements TQSecurityHandler {
 	
 	@Override
 	public Symbol getSymbol() {
-		return null;
-	}
-	
-	@Override
-	public void setConsumer(DeltaUpdateConsumer consumer) {
-		this.consumer = consumer;
-		// TODO: send snapshot
+		return symbol;
 	}
 	
 	@Override
 	public void update(DeltaUpdate update) {
-		DeltaUpdateBuilder builder = null;
-		DeltaUpdateConsumer consumer = this.consumer;
 		state.lock();
 		try {
 			state.consume(update);
-			if ( consumer == null || ! state.hasChanged() ) {
+			if ( ! state.hasChanged() ) {
 				return;
 			}
-			builder = new DeltaUpdateBuilder();
-			Set<Integer> changed_tokens = state.getUpdatedTokens();
+			DeltaUpdateBuilder builder = new DeltaUpdateBuilder();
 			
-			// 1) to detect symbol (aquila style) required:
-			// TQSecField.SECTYPE to convert to aquila type
-			// TQSecField.SHORT_NAME as code
-			// TQSecField.MARKET
-			// currency is always RUB
+			
+			Set<Integer> changed_tokens = state.getUpdatedTokens();
+			if ( changed_tokens.contains(TQSecField.SHORT_NAME) ) {
+				builder.withToken(SecurityField.DISPLAY_NAME, state.getString(TQSecField.SHORT_NAME));
+			}
+			if ( changed_tokens.contains(TQSecField.LOTSIZE) ) {
+			//	builder.withToken(SecurityField.LOT_SIZE, value)
+			}
 
 
 			// SecurityField.DISPLAY_NAME = TQSecField.SHORT_NAME
