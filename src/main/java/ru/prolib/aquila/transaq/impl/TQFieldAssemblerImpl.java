@@ -50,44 +50,44 @@ public class TQFieldAssemblerImpl implements TQFieldAssembler {
 	}
 
 	@Override
-	public boolean toSecDisplayName(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
+	public int toSecDisplayName(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
 		if ( ! tq_sec_state.hasChanged(TQSecField.SHORT_NAME) ) {
-			return false;
+			return 0;
 		}
 		aq_sec_upd_builder.withToken(SecurityField.DISPLAY_NAME, tq_sec_state.getString(TQSecField.SHORT_NAME));
-		return true;
+		return 1;
 	}
 
 	@Override
-	public boolean toSecLotSize(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
+	public int toSecLotSize(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
 		if ( ! tq_sec_state.hasChanged(TQSecField.LOTSIZE) ) {
-			return false;
+			return 0;
 		}
 		aq_sec_upd_builder.withToken(SecurityField.LOT_SIZE, tq_sec_state.getCDecimal(TQSecField.LOTSIZE));
-		return true;
+		return 1;
 	}
 
 	@Override
-	public boolean toSecTickSize(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
+	public int toSecTickSize(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
 		if ( ! tq_sec_state.hasChanged(TQSecField.MINSTEP) ) {
-			return false;
+			return 0;
 		}
 		aq_sec_upd_builder.withToken(SecurityField.TICK_SIZE, tq_sec_state.getCDecimal(TQSecField.MINSTEP));
-		return true;
+		return 1;
 	}
 
 	@Override
-	public boolean toSecTickValue(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
+	public int toSecTickValue(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
 		// SecurityField.TICK_VALUE = TQSecField.POINT_COST * TQSecField.MINSTEP * 10 ^ TQSecField.DECIMALS
 		int expected_tokens[] = { TQSecField.POINT_COST, TQSecField.MINSTEP, TQSecField.DECIMALS };
 		if ( ! tq_sec_state.atLeastOneHasChanged(expected_tokens) ) {
-			return false;
+			return 0;
 		}
 		Integer decimals = tq_sec_state.getInteger(TQSecField.DECIMALS);
 		CDecimal point_cost = tq_sec_state.getCDecimal(TQSecField.POINT_COST);
 		CDecimal min_step = tq_sec_state.getCDecimal(TQSecField.MINSTEP);
 		if ( decimals == null || point_cost == null || min_step == null ) {
-			return false;
+			return 0;
 		}
 		CDecimal tick_value = CDecimalBD.ofRUB5("10")
 				.pow(decimals)
@@ -95,93 +95,93 @@ public class TQFieldAssemblerImpl implements TQFieldAssembler {
 				.multiply(min_step)
 				.divideExact(100L, 5);
 		aq_sec_upd_builder.withToken(SecurityField.TICK_VALUE, tick_value);
-		return true;
+		return 1;
 	}
 
 	@Override
-	public boolean toSecInitialMargin(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
+	public int toSecInitialMargin(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
 		// SecurityField.INITIAL_MARGIN = MAX(TQSecField.BUY_DEPOSIT, TQSecField.SELL_DEPOSIT)
 		int expected_tokens[] = { TQSecField.BUY_DEPOSIT, TQSecField.SELL_DEPOSIT };
 		if( ! tq_sec_state.atLeastOneHasChanged(expected_tokens) ) {
-			return false;
+			return 0;
 		}
 		CDecimal one_rub5 = CDecimalBD.ofRUB5("1");
 		CDecimal b_depo = tq_sec_state.getCDecimal(TQSecField.BUY_DEPOSIT);
 		CDecimal s_depo = tq_sec_state.getCDecimal(TQSecField.SELL_DEPOSIT);
 		if ( b_depo != null && s_depo != null ) {
 			aq_sec_upd_builder.withToken(SecurityField.INITIAL_MARGIN, one_rub5.multiply(b_depo.max(s_depo)));
-			return true;
+			return 1;
 		}
 		if ( b_depo != null ) {
 			aq_sec_upd_builder.withToken(SecurityField.INITIAL_MARGIN, one_rub5.multiply(b_depo));
-			return true;
+			return 1;
 		}
 		if ( s_depo != null ) {
 			aq_sec_upd_builder.withToken(SecurityField.INITIAL_MARGIN, one_rub5.multiply(s_depo));
-			return true;
+			return 1;
 		}
-		return false;
+		return 0;
 	}
 
 	@Override
-	public boolean toSecSettlementPrice(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
+	public int toSecSettlementPrice(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
 		if ( ! tq_sec_state.hasChanged(TQSecField.CLEARING_PRICE) ) {
-			return false;
+			return 0;
 		}
 		aq_sec_upd_builder.withToken(SecurityField.SETTLEMENT_PRICE, tq_sec_state.getCDecimal(TQSecField.CLEARING_PRICE));
-		return true;
+		return 1;
 	}
 
 	@Override
-	public boolean toSecLowerPriceLimit(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
+	public int toSecLowerPriceLimit(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
 		if ( ! tq_sec_state.hasChanged(TQSecField.MINPRICE) ) {
-			return false;
+			return 0;
 		}
 		aq_sec_upd_builder.withToken(SecurityField.LOWER_PRICE_LIMIT, tq_sec_state.getCDecimal(TQSecField.MINPRICE));
-		return true;
+		return 1;
 	}
 
 	@Override
-	public boolean toSecUpperPriceLimit(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
+	public int toSecUpperPriceLimit(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
 		if ( ! tq_sec_state.hasChanged(TQSecField.MAXPRICE) ) {
-			return false;
+			return 0;
 		}
 		aq_sec_upd_builder.withToken(SecurityField.UPPER_PRICE_LIMIT, tq_sec_state.getCDecimal(TQSecField.MAXPRICE));
-		return true;
+		return 1;
 	}
 
 	@Override
-	public boolean toSecOpenPrice(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
+	public int toSecOpenPrice(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
 		// TODO: not yet done
-		return false;
+		return 0;
 	}
 
 	@Override
-	public boolean toSecHighPrice(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
+	public int toSecHighPrice(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
 		// TODO: not yet done
-		return false;
+		return 0;
 	}
 
 	@Override
-	public boolean toSecLowPrice(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
+	public int toSecLowPrice(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
 		// TODO: not yet done
-		return false;
+		return 0;
 	}
 
 	@Override
-	public boolean toSecClosePrice(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
+	public int toSecClosePrice(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
 		// TODO: not yet done
-		return false;
+		return 0;
 	}
 
 	@Override
-	public boolean toSecExpirationTime(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
+	public int toSecExpirationTime(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {
 		if ( ! tq_sec_state.hasChanged(TQSecField.MAT_DATE) ) {
-			return false;
+			return 0;
 		}
 		LocalDateTime x = (LocalDateTime) tq_sec_state.getObject(TQSecField.MAT_DATE);
 		aq_sec_upd_builder.withToken(SecurityField.EXPIRATION_TIME, x.atZone(ZONE_ID).toInstant());
-		return true;
+		return 1;
 	}
 
 }

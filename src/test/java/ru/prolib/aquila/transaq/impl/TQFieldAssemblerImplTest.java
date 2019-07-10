@@ -68,7 +68,7 @@ public class TQFieldAssemblerImplTest {
 		sec_state.update(TQSecField.SHORT_NAME, "zulu24");
 		assertTrue(sec_state.hasChanged(TQSecField.SHORT_NAME));
 		
-		assertTrue(service.toSecDisplayName(sec_state, builder));
+		assertEquals(1, service.toSecDisplayName(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.DISPLAY_NAME, "zulu24")
@@ -81,7 +81,7 @@ public class TQFieldAssemblerImplTest {
 		sec_state.update(TQSecField.SHORT_NAME, "zulu24");
 		sec_state.resetChanges();
 		
-		assertFalse(service.toSecDisplayName(sec_state, builder));
+		assertEquals(0, service.toSecDisplayName(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -92,7 +92,7 @@ public class TQFieldAssemblerImplTest {
 	public void testToSecLotSize() {
 		sec_state.update(TQSecField.LOTSIZE, of(100L));
 		
-		assertTrue(service.toSecLotSize(sec_state, builder));
+		assertEquals(1, service.toSecLotSize(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.LOT_SIZE, of(100L))
@@ -105,7 +105,7 @@ public class TQFieldAssemblerImplTest {
 		sec_state.update(TQSecField.LOTSIZE, of(100L));
 		sec_state.resetChanges();
 		
-		assertFalse(service.toSecLotSize(sec_state, builder));
+		assertEquals(0, service.toSecLotSize(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -116,7 +116,7 @@ public class TQFieldAssemblerImplTest {
 	public void testToSecTickSize() {
 		sec_state.update(TQSecField.MINSTEP, of("0.01"));
 		
-		assertTrue(service.toSecTickSize(sec_state, builder));
+		assertEquals(1, service.toSecTickSize(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.TICK_SIZE, of("0.01"))
@@ -129,7 +129,7 @@ public class TQFieldAssemblerImplTest {
 		sec_state.update(TQSecField.MINSTEP, of("0.01"));
 		sec_state.resetChanges();
 		
-		assertFalse(service.toSecTickSize(sec_state, builder));
+		assertEquals(0, service.toSecTickSize(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -142,7 +142,7 @@ public class TQFieldAssemblerImplTest {
 		sec_state.update(TQSecField.MINSTEP, of("0.02"));
 		sec_state.update(TQSecField.POINT_COST, of("1"));
 
-		assertTrue(service.toSecTickValue(sec_state, builder));
+		assertEquals(1, service.toSecTickValue(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.TICK_VALUE, ofRUB5("0.02000"))
@@ -156,7 +156,7 @@ public class TQFieldAssemblerImplTest {
 		sec_state.update(TQSecField.MINSTEP, of("10"));
 		sec_state.update(TQSecField.POINT_COST, of("129.073"));
 		
-		assertTrue(service.toSecTickValue(sec_state, builder));
+		assertEquals(1, service.toSecTickValue(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.TICK_VALUE, ofRUB5("12.90730"))
@@ -170,7 +170,7 @@ public class TQFieldAssemblerImplTest {
 		sec_state.update(TQSecField.MINSTEP, of("0.1"));
 		sec_state.update(TQSecField.POINT_COST, of("645.364"));
 		
-		assertTrue(service.toSecTickValue(sec_state, builder));
+		assertEquals(1, service.toSecTickValue(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.TICK_VALUE, ofRUB5("6.45364"))
@@ -185,7 +185,7 @@ public class TQFieldAssemblerImplTest {
 		sec_state.update(TQSecField.POINT_COST, of("1"));
 		sec_state.resetChanges();
 
-		assertFalse(service.toSecTickValue(sec_state, builder));
+		assertEquals(0, service.toSecTickValue(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -198,7 +198,7 @@ public class TQFieldAssemblerImplTest {
 		sec_state.update(TQSecField.MINSTEP, of("0.02"));
 		sec_state.update(TQSecField.POINT_COST, of("1"));
 		
-		assertFalse(service.toSecTickValue(sec_state, builder));
+		assertEquals(0, service.toSecTickValue(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -211,7 +211,7 @@ public class TQFieldAssemblerImplTest {
 		sec_state.update(TQSecField.MINSTEP, of("0.02"));
 		//sec_state.update(TQSecField.POINT_COST, of("1"));
 		
-		assertFalse(service.toSecTickValue(sec_state, builder));
+		assertEquals(0, service.toSecTickValue(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -224,7 +224,7 @@ public class TQFieldAssemblerImplTest {
 		//sec_state.update(TQSecField.MINSTEP, of("0.02"));
 		sec_state.update(TQSecField.POINT_COST, of("1"));
 		
-		assertFalse(service.toSecTickValue(sec_state, builder));
+		assertEquals(0, service.toSecTickValue(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -239,7 +239,7 @@ public class TQFieldAssemblerImplTest {
 		sec_state.resetChanges();
 		sec_state.update(TQSecField.DECIMALS, 3);
 		
-		assertTrue(service.toSecTickValue(sec_state, builder));
+		assertEquals(1, service.toSecTickValue(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.TICK_VALUE, ofRUB5("0.20000"))
@@ -255,7 +255,7 @@ public class TQFieldAssemblerImplTest {
 		sec_state.resetChanges();
 		sec_state.update(TQSecField.MINSTEP, of("0.05"));
 		
-		assertTrue(service.toSecTickValue(sec_state, builder));
+		assertEquals(1, service.toSecTickValue(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.TICK_VALUE, ofRUB5("0.05000"))
@@ -271,7 +271,7 @@ public class TQFieldAssemblerImplTest {
 		sec_state.resetChanges();
 		sec_state.update(TQSecField.MINSTEP, of("0.01"));
 		
-		assertTrue(service.toSecTickValue(sec_state, builder));
+		assertEquals(1, service.toSecTickValue(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.TICK_VALUE, ofRUB5("0.01000"))
@@ -285,7 +285,7 @@ public class TQFieldAssemblerImplTest {
 		sec_state.update(TQSecField.SELL_DEPOSIT, of("10.152"));
 		sec_state.resetChanges();
 		
-		assertFalse(service.toSecInitialMargin(sec_state, builder));
+		assertEquals(0, service.toSecInitialMargin(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -297,7 +297,7 @@ public class TQFieldAssemblerImplTest {
 		sec_state.update(TQSecField.BUY_DEPOSIT, of("12.284"));
 		sec_state.update(TQSecField.SELL_DEPOSIT, of("10.152"));
 		
-		assertTrue(service.toSecInitialMargin(sec_state, builder));
+		assertEquals(1, service.toSecInitialMargin(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.INITIAL_MARGIN, ofRUB5("12.28400"))
@@ -310,7 +310,7 @@ public class TQFieldAssemblerImplTest {
 		sec_state.update(TQSecField.BUY_DEPOSIT, of("12.284"));
 		sec_state.update(TQSecField.SELL_DEPOSIT, of("18.506"));
 		
-		assertTrue(service.toSecInitialMargin(sec_state, builder));
+		assertEquals(1, service.toSecInitialMargin(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.INITIAL_MARGIN, ofRUB5("18.50600"))
@@ -322,7 +322,7 @@ public class TQFieldAssemblerImplTest {
 	public void testToSecInitialMargin_BuyDepositOnlyDefined() {
 		sec_state.update(TQSecField.BUY_DEPOSIT, of("12.284"));
 		
-		assertTrue(service.toSecInitialMargin(sec_state, builder));
+		assertEquals(1, service.toSecInitialMargin(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.INITIAL_MARGIN, ofRUB5("12.28400"))
@@ -334,7 +334,7 @@ public class TQFieldAssemblerImplTest {
 	public void testToSecInitialMargin_SellDepositOnlyDefined() {
 		sec_state.update(TQSecField.SELL_DEPOSIT, of("18.506"));
 		
-		assertTrue(service.toSecInitialMargin(sec_state, builder));
+		assertEquals(1, service.toSecInitialMargin(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.INITIAL_MARGIN, ofRUB5("18.50600"))
@@ -346,7 +346,7 @@ public class TQFieldAssemblerImplTest {
 	public void testToSecSettlementPrice() {
 		sec_state.update(TQSecField.CLEARING_PRICE, of("142.94"));
 		
-		assertTrue(service.toSecSettlementPrice(sec_state, builder));
+		assertEquals(1, service.toSecSettlementPrice(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.SETTLEMENT_PRICE, of("142.94"))
@@ -359,7 +359,7 @@ public class TQFieldAssemblerImplTest {
 		sec_state.update(TQSecField.CLEARING_PRICE, of("142.94"));
 		sec_state.resetChanges();
 		
-		assertFalse(service.toSecSettlementPrice(sec_state, builder));
+		assertEquals(0, service.toSecSettlementPrice(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -370,7 +370,7 @@ public class TQFieldAssemblerImplTest {
 	public void testToSecLowerPriceLimit() {
 		sec_state.update(TQSecField.MINPRICE, of("245.12"));
 		
-		assertTrue(service.toSecLowerPriceLimit(sec_state, builder));
+		assertEquals(1, service.toSecLowerPriceLimit(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.LOWER_PRICE_LIMIT, of("245.12"))
@@ -383,7 +383,7 @@ public class TQFieldAssemblerImplTest {
 		sec_state.update(TQSecField.MINPRICE, of("245.12"));
 		sec_state.resetChanges();
 		
-		assertFalse(service.toSecLowerPriceLimit(sec_state, builder));
+		assertEquals(0, service.toSecLowerPriceLimit(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -394,7 +394,7 @@ public class TQFieldAssemblerImplTest {
 	public void testToSecUpperPriceLimit() {
 		sec_state.update(TQSecField.MAXPRICE, of("98712.312"));
 		
-		assertTrue(service.toSecUpperPriceLimit(sec_state, builder));
+		assertEquals(1, service.toSecUpperPriceLimit(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.UPPER_PRICE_LIMIT, of("98712.312"))
@@ -407,7 +407,7 @@ public class TQFieldAssemblerImplTest {
 		sec_state.update(TQSecField.MAXPRICE, of("98712.312"));
 		sec_state.resetChanges();
 		
-		assertFalse(service.toSecUpperPriceLimit(sec_state, builder));
+		assertEquals(0, service.toSecUpperPriceLimit(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -417,7 +417,7 @@ public class TQFieldAssemblerImplTest {
 	@Test
 	public void testToSecOpenPrice() {
 		
-		assertFalse(service.toSecOpenPrice(sec_state, builder));
+		assertEquals(0, service.toSecOpenPrice(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -427,7 +427,7 @@ public class TQFieldAssemblerImplTest {
 	@Test
 	public void testToSecHighPrice() {
 		
-		assertFalse(service.toSecHighPrice(sec_state, builder));
+		assertEquals(0, service.toSecHighPrice(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -437,7 +437,7 @@ public class TQFieldAssemblerImplTest {
 	@Test
 	public void testToSecLowPrice() {
 		
-		assertFalse(service.toSecLowPrice(sec_state, builder));
+		assertEquals(0, service.toSecLowPrice(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -447,7 +447,7 @@ public class TQFieldAssemblerImplTest {
 	@Test
 	public void testToSecClosePrice() {
 		
-		assertFalse(service.toSecClosePrice(sec_state, builder));
+		assertEquals(0, service.toSecClosePrice(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -459,7 +459,7 @@ public class TQFieldAssemblerImplTest {
 		sec_state.update(TQSecField.MAT_DATE, LocalDateTime.of(2019, 7, 9, 12, 35));
 		sec_state.resetChanges();
 		
-		assertFalse(service.toSecExpirationTime(sec_state, builder));
+		assertEquals(0, service.toSecExpirationTime(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -470,7 +470,7 @@ public class TQFieldAssemblerImplTest {
 	public void testToSecExpirationTime() {
 		sec_state.update(TQSecField.MAT_DATE, LocalDateTime.of(2019, 7, 9, 12, 35));
 		
-		assertTrue(service.toSecExpirationTime(sec_state, builder));
+		assertEquals(1, service.toSecExpirationTime(sec_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.EXPIRATION_TIME,
