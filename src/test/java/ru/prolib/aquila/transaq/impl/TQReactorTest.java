@@ -15,13 +15,13 @@ import ru.prolib.aquila.transaq.entity.CandleKind;
 import ru.prolib.aquila.transaq.entity.Market;
 import ru.prolib.aquila.transaq.entity.SecType;
 
-public class TQReactorImplTest {
+public class TQReactorTest {
 	private IMocksControl control;
 	private TQDirectory dirMock;
 	private TQSecurityHandlerRegistry shrMock;
 	private TQSecurityHandlerFactory shfMock;
 	private TQSecurityHandler shMock1;
-	private TQReactorImpl service;
+	private TQReactor service;
 
 	@Before
 	public void setUp() throws Exception {
@@ -30,7 +30,7 @@ public class TQReactorImplTest {
 		shrMock = control.createMock(TQSecurityHandlerRegistry.class);
 		shfMock = control.createMock(TQSecurityHandlerFactory.class);
 		shMock1 = control.createMock(TQSecurityHandler.class);
-		service = new TQReactorImpl(dirMock, shrMock, shfMock);
+		service = new TQReactor(dirMock, shrMock, shfMock);
 	}
 	
 	@Test

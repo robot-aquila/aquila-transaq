@@ -23,16 +23,16 @@ import ru.prolib.aquila.transaq.entity.CandleKind;
 import ru.prolib.aquila.transaq.entity.Market;
 import ru.prolib.aquila.transaq.entity.SecType;
 
-public class Parser {
+public class TQParser {
 	private static final Logger logger;
-	private static final Parser instance;
+	private static final TQParser instance;
 	
 	static {
-		logger = LoggerFactory.getLogger(Parser.class);
-		instance = new Parser();
+		logger = LoggerFactory.getLogger(TQParser.class);
+		instance = new TQParser();
 	}
 	
-	public static Parser getInstance() {
+	public static TQParser getInstance() {
 		return instance;
 	}
 	

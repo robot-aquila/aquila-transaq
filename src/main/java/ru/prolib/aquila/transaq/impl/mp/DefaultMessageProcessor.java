@@ -9,10 +9,10 @@ import javax.xml.stream.XMLStreamReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ru.prolib.aquila.transaq.impl.IMessageProcessor;
-import ru.prolib.aquila.transaq.impl.Parser;
+import ru.prolib.aquila.transaq.impl.TQMessageProcessor;
+import ru.prolib.aquila.transaq.impl.TQParser;
 
-public class DefaultMessageProcessor implements IMessageProcessor {
+public class DefaultMessageProcessor implements TQMessageProcessor {
 	private static final String CLOSE_PROC_ID = "close";
 	private static final Logger logger;
 	
@@ -21,15 +21,15 @@ public class DefaultMessageProcessor implements IMessageProcessor {
 	}
 	
 	private final Map<String, Integer> unprocMessagesCount;
-	private final Parser parser;
+	private final TQParser parser;
 	
-	public DefaultMessageProcessor(Map<String, Integer> unproc_count, Parser parser) {
+	public DefaultMessageProcessor(Map<String, Integer> unproc_count, TQParser parser) {
 		this.unprocMessagesCount = unproc_count;
 		this.parser = parser;
 	}
 	
 	public DefaultMessageProcessor() {
-		this(new LinkedHashMap<>(), Parser.getInstance());
+		this(new LinkedHashMap<>(), TQParser.getInstance());
 	}
 
 	@Override

@@ -15,13 +15,13 @@ import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.core.BusinessEntities.UpdatableStateContainer;
 import ru.prolib.aquila.transaq.entity.SecType;
 
-public class TQSecurityHandlerImplTest {
+public class TQSecurityHandlerTest {
 	private IMocksControl control;
 	private DeltaUpdateConsumer consMock;
 	private UpdatableStateContainer stateMock;
 	private TQFieldAssembler asmMock;
 	private DeltaUpdate updateMock;
-	private TQSecurityHandlerImpl service;
+	private TQSecurityHandler service;
 
 	@Before
 	public void setUp() throws Exception {
@@ -30,7 +30,7 @@ public class TQSecurityHandlerImplTest {
 		stateMock = control.createMock(UpdatableStateContainer.class);
 		asmMock = control.createMock(TQFieldAssembler.class);
 		updateMock = control.createMock(DeltaUpdate.class);
-		service = new TQSecurityHandlerImpl(
+		service = new TQSecurityHandler(
 				new TQSecID_F("foo", 2, "bar", SecType.BOND),
 				new Symbol("F:RTS-6.19@FORTS:RUB"),
 				consMock,

@@ -9,21 +9,21 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ru.prolib.aquila.transaq.impl.TQReactor;
-import ru.prolib.aquila.transaq.impl.Parser;
+import ru.prolib.aquila.transaq.impl.TQParser;
 import ru.prolib.aquila.transaq.impl.TQSecurityUpdate1;
 
 public class SecInfoProcessorTest {
 	private IMocksControl control;
-	private Parser parserMock;
-	private TQReactor recvMock;
+	private TQParser parserMock;
+	private TQReactor reactorMock;
 	private SecInfoProcessor service;
 	
 	@Before
 	public void setUp() throws Exception {
 		control = createStrictControl();
-		parserMock = control.createMock(Parser.class);
-		recvMock = control.createMock(TQReactor.class);
-		service = new SecInfoProcessor(recvMock, parserMock);
+		parserMock = control.createMock(TQParser.class);
+		reactorMock = control.createMock(TQReactor.class);
+		service = new SecInfoProcessor(reactorMock, parserMock);
 	}
 
 	@Test
@@ -31,7 +31,7 @@ public class SecInfoProcessorTest {
 		XMLStreamReader readerMock = control.createMock(XMLStreamReader.class);
 		TQSecurityUpdate1 suMock = control.createMock(TQSecurityUpdate1.class);
 		expect(parserMock.readSecInfo(readerMock)).andReturn(suMock);
-		recvMock.updateSecurity(suMock);
+		reactorMock.updateSecurity(suMock);
 		control.replay();
 		
 		service.processMessage(readerMock);

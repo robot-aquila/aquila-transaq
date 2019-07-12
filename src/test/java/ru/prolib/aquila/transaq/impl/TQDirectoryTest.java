@@ -14,12 +14,12 @@ import ru.prolib.aquila.transaq.entity.Board;
 import ru.prolib.aquila.transaq.entity.CandleKind;
 import ru.prolib.aquila.transaq.entity.Market;
 
-public class TQDirectoryImplTest {
+public class TQDirectoryTest {
 	private IMocksControl control;
 	private List<Board> boards_stub;
 	private List<Market> markets_stub;
 	private List<CandleKind> candle_kinds_stub;
-	private TQDirectoryImpl service;
+	private TQDirectory service;
 
 	@Before
 	public void setUp() throws Exception {
@@ -27,7 +27,7 @@ public class TQDirectoryImplTest {
 		boards_stub = new ArrayList<>();
 		markets_stub = new ArrayList<>();
 		candle_kinds_stub = new ArrayList<>();
-		service = new TQDirectoryImpl(boards_stub, markets_stub, candle_kinds_stub);
+		service = new TQDirectory(boards_stub, markets_stub, candle_kinds_stub);
 	}
 	
 	@Test

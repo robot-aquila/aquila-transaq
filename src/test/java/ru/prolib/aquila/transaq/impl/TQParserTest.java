@@ -31,9 +31,9 @@ import ru.prolib.aquila.transaq.entity.Board;
 import ru.prolib.aquila.transaq.entity.CandleKind;
 import ru.prolib.aquila.transaq.entity.Market;
 import ru.prolib.aquila.transaq.entity.SecType;
-import ru.prolib.aquila.transaq.impl.Parser;
+import ru.prolib.aquila.transaq.impl.TQParser;
 
-public class ParserTest {
+public class TQParserTest {
 	private static XMLInputFactory factory;
 
 	@BeforeClass
@@ -43,11 +43,11 @@ public class ParserTest {
 		factory = XMLInputFactory.newInstance();
 	}
 	
-	private Parser service;
+	private TQParser service;
 
 	@Before
 	public void setUp() throws Exception {
-		service = new Parser();
+		service = new TQParser();
 	}
 	
 	@Test

@@ -2,22 +2,22 @@ package ru.prolib.aquila.transaq.impl.mp;
 
 import javax.xml.stream.XMLStreamReader;
 
-import ru.prolib.aquila.transaq.impl.IMessageProcessor;
+import ru.prolib.aquila.transaq.impl.TQMessageProcessor;
 import ru.prolib.aquila.transaq.impl.TQReactor;
-import ru.prolib.aquila.transaq.impl.Parser;
+import ru.prolib.aquila.transaq.impl.TQParser;
 
-public class SecInfoProcessor implements IMessageProcessor {
-	private final Parser parser;
-	private final TQReactor receiver;
+public class SecInfoProcessor implements TQMessageProcessor {
+	private final TQParser parser;
+	private final TQReactor reactor;
 
-	public SecInfoProcessor(TQReactor receiver, Parser parser) {
+	public SecInfoProcessor(TQReactor reactor, TQParser parser) {
 		this.parser = parser;
-		this.receiver = receiver;
+		this.reactor = reactor;
 	}
 	
 	@Override
 	public void processMessage(XMLStreamReader reader) throws Exception {
-		receiver.updateSecurity(parser.readSecInfo(reader));
+		reactor.updateSecurity(parser.readSecInfo(reader));
 	}
 
 }

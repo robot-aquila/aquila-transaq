@@ -18,7 +18,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ru.prolib.aquila.transaq.impl.Parser;
+import ru.prolib.aquila.transaq.impl.TQParser;
 
 public class DefaultMessageProcessorTest {
 	private static XMLInputFactory factory;
@@ -36,7 +36,7 @@ public class DefaultMessageProcessorTest {
 	@Before
 	public void setUp() throws Exception {
 		dataStub = new LinkedHashMap<>();
-		service = new DefaultMessageProcessor(dataStub, Parser.getInstance());
+		service = new DefaultMessageProcessor(dataStub, TQParser.getInstance());
 	}
 
 	@Test

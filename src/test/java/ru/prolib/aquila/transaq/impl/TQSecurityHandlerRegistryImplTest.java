@@ -17,7 +17,7 @@ public class TQSecurityHandlerRegistryImplTest {
 	private TQSecurityHandler shMock1, shMock2, shMock3;
 	private Map<TQSecID1, TQSecurityHandler> map_sec_id1;
 	private Map<TQSecID_F, TQSecurityHandler> map_sec_id3;
-	private TQSecurityHandlerRegistryImpl service;
+	private TQSecurityHandlerRegistry service;
 
 	@Before
 	public void setUp() throws Exception {
@@ -27,7 +27,7 @@ public class TQSecurityHandlerRegistryImplTest {
 		shMock3 = control.createMock(TQSecurityHandler.class);
 		map_sec_id1 = new LinkedHashMap<>();
 		map_sec_id3 = new LinkedHashMap<>();
-		service = new TQSecurityHandlerRegistryImpl(map_sec_id1, map_sec_id3);
+		service = new TQSecurityHandlerRegistry(map_sec_id1, map_sec_id3);
 	}
 	
 	@Test

@@ -21,16 +21,16 @@ import ru.prolib.aquila.core.BusinessEntities.UpdatableStateContainerImpl;
 import ru.prolib.aquila.transaq.entity.Market;
 import ru.prolib.aquila.transaq.entity.SecType;
 
-public class TQFieldAssemblerImplTest {
+public class TQFieldAssemblerTest {
 	private TQDirectory dir;
-	private TQFieldAssemblerImpl service;
+	private TQFieldAssembler service;
 	private UpdatableStateContainer sec_state;
 	private DeltaUpdateBuilder builder;
 
 	@Before
 	public void setUp() throws Exception {
-		dir = new TQDirectoryImpl();
-		service = new TQFieldAssemblerImpl(dir);
+		dir = new TQDirectory();
+		service = new TQFieldAssembler(dir);
 
 		List<Market> markets = new ArrayList<>();
 		markets.add(new Market(0, "foo"));

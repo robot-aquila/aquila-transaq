@@ -14,8 +14,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ru.prolib.aquila.transaq.impl.TQReactor;
-import ru.prolib.aquila.transaq.impl.Parser;
-import ru.prolib.aquila.transaq.impl.TQSecurityUpdate1;
+import ru.prolib.aquila.transaq.impl.TQParser;
 import ru.prolib.aquila.transaq.impl.TQSecurityUpdate3;
 
 public class SecuritiesMessageProcessorTest {
@@ -27,16 +26,16 @@ public class SecuritiesMessageProcessorTest {
 	}
 	
 	private IMocksControl control;
-	private Parser parserMock;
-	private TQReactor recvMock;
+	private TQParser parserMock;
+	private TQReactor reactorMock;
 	private SecuritiesMessageProcessor service;
 
 	@Before
 	public void setUp() throws Exception {
 		control = createStrictControl();
-		parserMock = control.createMock(Parser.class);
-		recvMock = control.createMock(TQReactor.class);
-		service = new SecuritiesMessageProcessor(recvMock, parserMock);
+		parserMock = control.createMock(TQParser.class);
+		reactorMock = control.createMock(TQReactor.class);
+		service = new SecuritiesMessageProcessor(reactorMock, parserMock);
 	}
 
 	@Test
@@ -48,9 +47,9 @@ public class SecuritiesMessageProcessorTest {
 		updates.add(duMock2 = control.createMock(TQSecurityUpdate3.class));
 		updates.add(duMock3 = control.createMock(TQSecurityUpdate3.class));
 		expect(parserMock.readSecurities(readerMock)).andReturn(updates);
-		recvMock.updateSecurity(duMock1);
-		recvMock.updateSecurity(duMock2);
-		recvMock.updateSecurity(duMock3);
+		reactorMock.updateSecurity(duMock1);
+		reactorMock.updateSecurity(duMock2);
+		reactorMock.updateSecurity(duMock3);
 		control.replay();
 		
 		service.processMessage(readerMock);
