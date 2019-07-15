@@ -10,8 +10,13 @@ import ru.prolib.aquila.transaq.impl.mp.SecInfoUpdProcessor;
 import ru.prolib.aquila.transaq.impl.mp.SecuritiesMessageProcessor;
 
 public class TQConnectorFactory {
+	private final Section config;
 	
-	public TQConnector createInstance(Section config, EditableTerminal terminal) throws Exception {
+	public TQConnectorFactory(Section config) {
+		this.config = config;
+	}
+	
+	public TQConnector createInstance(EditableTerminal terminal) throws Exception {
 		TQParser parser = TQParser.getInstance();
 		TQDirectory directory = new TQDirectory();
 		TQFieldAssembler assembler = new TQFieldAssembler(directory);

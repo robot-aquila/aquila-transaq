@@ -1,5 +1,7 @@
 package ru.prolib.aquila.transaq.impl;
 
+import org.ini4j.Profile.Section;
+
 import ru.prolib.aquila.core.BusinessEntities.EditableOrder;
 import ru.prolib.aquila.core.BusinessEntities.EditablePortfolio;
 import ru.prolib.aquila.core.BusinessEntities.EditableSecurity;
@@ -11,10 +13,15 @@ import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.core.data.DataProvider;
 
 public class TQDataProviderImpl implements DataProvider {
-	private final TQConnector connector;
+	private final TQConnectorFactory factory;
+	private TQConnector connector;
 	
-	public TQDataProviderImpl(TQConnector connector) {
-		this.connector = connector;
+	public TQDataProviderImpl(TQConnectorFactory factory) {
+		this.factory = factory;
+	}
+	
+	public TQDataProviderImpl(Section config) {
+		this(new TQConnectorFactory(config));
 	}
 
 	@Override
@@ -55,6 +62,7 @@ public class TQDataProviderImpl implements DataProvider {
 	@Override
 	public void subscribeRemoteObjects(EditableTerminal terminal) {
 		try {
+			connector = factory.createInstance(terminal);
 			connector.init();
 			connector.connect();
 		} catch ( Exception e ) {

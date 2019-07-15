@@ -16,6 +16,7 @@ public class TQDataProviderImplTest {
 	private EditableSecurity securityMock;
 	private EditablePortfolio portfolioMock;
 	private EditableTerminal terminalMock;
+	private TQConnectorFactory factoryMock;
 	private TQConnector connMock;
 	private TQDataProviderImpl service;
 
@@ -25,8 +26,9 @@ public class TQDataProviderImplTest {
 		securityMock = control.createMock(EditableSecurity.class);
 		portfolioMock = control.createMock(EditablePortfolio.class);
 		terminalMock = control.createMock(EditableTerminal.class);
+		factoryMock = control.createMock(TQConnectorFactory.class);
 		connMock = control.createMock(TQConnector.class);
-		service = new TQDataProviderImpl(connMock);
+		service = new TQDataProviderImpl(factoryMock);
 	}
 	
 	@Test
@@ -89,6 +91,7 @@ public class TQDataProviderImplTest {
 
 	@Test
 	public void testSubscribeRemoteObject() throws Exception {
+		expect(factoryMock.createInstance(terminalMock)).andReturn(connMock);
 		connMock.init();
 		connMock.connect();
 		control.replay();
@@ -100,6 +103,13 @@ public class TQDataProviderImplTest {
 	
 	@Test
 	public void testUnsubscribeRemoteObject() throws Exception {
+		expect(factoryMock.createInstance(terminalMock)).andReturn(connMock);
+		connMock.init();
+		connMock.connect();
+		control.replay();
+		service.subscribeRemoteObjects(terminalMock);
+		control.resetToStrict();
+		
 		connMock.disconnect();
 		connMock.close();
 		control.replay();
