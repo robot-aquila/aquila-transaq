@@ -13,7 +13,7 @@ import ru.prolib.aquila.transaq.impl.TQMessageProcessor;
 import ru.prolib.aquila.transaq.impl.TQParser;
 
 public class DefaultMessageProcessor implements TQMessageProcessor {
-	private static final String CLOSE_PROC_ID = "close";
+	private static final String DUMP_PROC_ID = "dump_stats";
 	private static final Logger logger;
 	
 	static {
@@ -28,6 +28,10 @@ public class DefaultMessageProcessor implements TQMessageProcessor {
 		this.parser = parser;
 	}
 	
+	public DefaultMessageProcessor(TQParser parser) {
+		this(new LinkedHashMap<>(), parser);
+	}
+	
 	public DefaultMessageProcessor() {
 		this(new LinkedHashMap<>(), TQParser.getInstance());
 	}
@@ -36,8 +40,8 @@ public class DefaultMessageProcessor implements TQMessageProcessor {
 	public void processMessage(XMLStreamReader reader) throws Exception {
 		String proc_id = reader.getLocalName();
 		parser.skipElement(reader);
-		if ( CLOSE_PROC_ID.equals(proc_id) ) {
-			close();
+		if ( DUMP_PROC_ID.equals(proc_id) ) {
+			dump_stats();
 		} else {
 			Integer x = unprocMessagesCount.get(proc_id);
 			if ( x == null ) {
@@ -49,7 +53,7 @@ public class DefaultMessageProcessor implements TQMessageProcessor {
 		}
 	}
 
-	private void close() {
+	private void dump_stats() {
 		logger.debug("Dumping map of unprocessed messages: ");
 		Iterator<Map.Entry<String, Integer>> it = unprocMessagesCount.entrySet().iterator();
 		while ( it.hasNext() ) {

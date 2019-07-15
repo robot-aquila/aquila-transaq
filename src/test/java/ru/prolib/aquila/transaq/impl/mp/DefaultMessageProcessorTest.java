@@ -62,11 +62,11 @@ public class DefaultMessageProcessorTest {
 	}
 	
 	@Test
-	public void testProcessMessage_Close() throws Exception {
+	public void testProcessMessage_DumpStats() throws Exception {
 		dataStub.put("foo", 15);
 		dataStub.put("bar", 97);
 		dataStub.put("buz", 34);
-		InputStream is = new ByteArrayInputStream("<document><close/></document>".getBytes(StandardCharsets.UTF_8));
+		InputStream is = new ByteArrayInputStream("<document><dump_stats/></document>".getBytes(StandardCharsets.UTF_8));
 		XMLStreamReader sr = factory.createXMLStreamReader(is);
 		while ( sr.hasNext() ) {
 			switch ( sr.next() ) {

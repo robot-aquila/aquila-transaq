@@ -11,6 +11,11 @@ import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.core.data.DataProvider;
 
 public class TQDataProviderImpl implements DataProvider {
+	private final TQConnector connector;
+	
+	public TQDataProviderImpl(TQConnector connector) {
+		this.connector = connector;
+	}
 
 	@Override
 	public void subscribeStateUpdates(EditableSecurity security) {
@@ -49,14 +54,18 @@ public class TQDataProviderImpl implements DataProvider {
 	
 	@Override
 	public void subscribeRemoteObjects(EditableTerminal terminal) {
-		// TODO Auto-generated method stub
-		
+		try {
+			connector.init();
+			connector.connect();
+		} catch ( Exception e ) {
+			throw new RuntimeException("Establishing connection failed: ", e);
+		}
 	}
 
 	@Override
 	public void unsubscribeRemoteObjects(EditableTerminal terminal) {
-		// TODO Auto-generated method stub
-		
+		connector.disconnect();
+		connector.close();
 	}
 
 }

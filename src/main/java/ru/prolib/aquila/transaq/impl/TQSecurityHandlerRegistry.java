@@ -8,7 +8,7 @@ public class TQSecurityHandlerRegistry {
 	private final Map<TQSecID_F, TQSecurityHandler> mapSecID3;
 	
 	TQSecurityHandlerRegistry(Map<TQSecID1, TQSecurityHandler> map_sec_id1,
-								  Map<TQSecID_F, TQSecurityHandler> map_sec_id3)
+			Map<TQSecID_F, TQSecurityHandler> map_sec_id3)
 	{
 		this.mapSecID1 = map_sec_id1;
 		this.mapSecID3 = map_sec_id3;

@@ -1,28 +1,32 @@
 package ru.prolib.aquila.transaq.impl;
 
-import static org.junit.Assert.*;
 import static org.easymock.EasyMock.*;
 
 import org.easymock.IMocksControl;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import ru.prolib.aquila.core.BusinessEntities.EditablePortfolio;
 import ru.prolib.aquila.core.BusinessEntities.EditableSecurity;
+import ru.prolib.aquila.core.BusinessEntities.EditableTerminal;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 
 public class TQDataProviderImplTest {
 	private IMocksControl control;
 	private EditableSecurity securityMock;
 	private EditablePortfolio portfolioMock;
+	private EditableTerminal terminalMock;
+	private TQConnector connMock;
 	private TQDataProviderImpl service;
 
 	@Before
 	public void setUp() throws Exception {
 		control = createStrictControl();
 		securityMock = control.createMock(EditableSecurity.class);
-		service = new TQDataProviderImpl();
+		portfolioMock = control.createMock(EditablePortfolio.class);
+		terminalMock = control.createMock(EditableTerminal.class);
+		connMock = control.createMock(TQConnector.class);
+		service = new TQDataProviderImpl(connMock);
 	}
 	
 	@Test
@@ -83,16 +87,26 @@ public class TQDataProviderImplTest {
 		service.cancelOrder(null);
 	}
 
-	@Ignore
 	@Test
-	public void testSubscribeRemoteObject() {
-		fail("Not yet implemented");
+	public void testSubscribeRemoteObject() throws Exception {
+		connMock.init();
+		connMock.connect();
+		control.replay();
+		
+		service.subscribeRemoteObjects(terminalMock);
+		
+		control.verify();
 	}
 	
-	@Ignore
 	@Test
-	public void testUnsubscribeRemoteObject() {
-		fail("Not yet implemented");
+	public void testUnsubscribeRemoteObject() throws Exception {
+		connMock.disconnect();
+		connMock.close();
+		control.replay();
+		
+		service.unsubscribeRemoteObjects(terminalMock);
+		
+		control.verify();
 	}
 
 }
