@@ -6,15 +6,12 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
-import ru.prolib.aquila.core.BusinessEntities.EditablePortfolio;
-import ru.prolib.aquila.core.BusinessEntities.EditableSecurity;
+import ru.prolib.aquila.core.BusinessEntities.Account;
 import ru.prolib.aquila.core.BusinessEntities.EditableTerminal;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 
 public class TQDataProviderImplTest {
 	private IMocksControl control;
-	private EditableSecurity securityMock;
-	private EditablePortfolio portfolioMock;
 	private EditableTerminal terminalMock;
 	private TQConnectorFactory factoryMock;
 	private TQConnector connMock;
@@ -23,47 +20,10 @@ public class TQDataProviderImplTest {
 	@Before
 	public void setUp() throws Exception {
 		control = createStrictControl();
-		securityMock = control.createMock(EditableSecurity.class);
-		portfolioMock = control.createMock(EditablePortfolio.class);
 		terminalMock = control.createMock(EditableTerminal.class);
 		factoryMock = control.createMock(TQConnectorFactory.class);
 		connMock = control.createMock(TQConnector.class);
 		service = new TQDataProviderImpl(factoryMock);
-	}
-	
-	@Test
-	public void testSubscribeStateUpdates_Security() {
-		control.replay();
-		
-		service.subscribeStateUpdates(securityMock);
-		
-		control.verify();
-	}
-	
-	@Test
-	public void testSubscribeLevel1Data() {
-		control.replay();
-		
-		service.subscribeLevel1Data(new Symbol("foo"), securityMock);
-		
-		control.verify();
-	}
-	
-	@Test
-	public void testSubscribeLevel2Data() {
-		control.replay();
-		
-		service.subscribeLevel2Data(new Symbol("bar"), securityMock);
-		
-		control.verify();
-	}
-	
-	@Test (expected=UnsupportedOperationException.class)
-	public void testSubscribeStateUpdates_Portfolio() {
-		control.replay();
-		
-		service.subscribeStateUpdates(portfolioMock);
-		
 	}
 	
 	@Test (expected=UnsupportedOperationException.class)
@@ -115,6 +75,42 @@ public class TQDataProviderImplTest {
 		control.replay();
 		
 		service.unsubscribeRemoteObjects(terminalMock);
+		
+		control.verify();
+	}
+	
+	@Test
+	public void testSubscribe_Symbol() throws Exception {
+		control.replay();
+		
+		service.subscribe(new Symbol("foo"), terminalMock);
+		
+		control.verify();
+	}
+	
+	@Test
+	public void testUnsubscribe_Symbol() throws Exception {
+		control.replay();
+		
+		service.unsubscribe(new Symbol("bar"), terminalMock);
+		
+		control.verify();
+	}
+	
+	@Test
+	public void testSubscribe_Account() throws Exception {
+		control.replay();
+		
+		service.subscribe(new Account("charlie"), terminalMock);
+		
+		control.verify();
+	}
+	
+	@Test
+	public void gtestUnsubscribe_Account() throws Exception {
+		control.replay();
+		
+		service.unsubscribe(new Account("gamma"), terminalMock);
 		
 		control.verify();
 	}
