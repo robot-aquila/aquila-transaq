@@ -6,6 +6,7 @@ public class TQHandler extends JTransaqHandler {
 	private final TQMessageRouter router;
 	
 	public TQHandler(TQMessageRouter router) {
+		super();
 		this.router = router;
 	}
 

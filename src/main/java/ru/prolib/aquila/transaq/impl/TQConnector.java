@@ -15,10 +15,12 @@ public class TQConnector {
 	
 	private final Section config;
 	private final JTransaqServer server;
+	private final TQHandler handler;
 	
-	public TQConnector(Section config, JTransaqServer server) {
+	public TQConnector(Section config, JTransaqServer server, TQHandler handler) {
 		this.config = config;
 		this.server = server;
+		this.handler = handler;
 	}
 	
 	private String cfg_var(String key) throws TQConnectorException {
@@ -76,6 +78,8 @@ public class TQConnector {
 		} catch ( Exception e ) {
 			logger.error("Error shutting down: ", e);
 		}
+		handler.Handle("<dump_stats/>");
+		handler.delete();
 	}
 	
 }

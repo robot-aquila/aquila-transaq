@@ -14,13 +14,15 @@ public class TQConnectorTest {
 	private JTransaqServer serverMock;
 	private Section configMock;
 	private TQConnector service;
+	private TQHandler handlerMock;
 
 	@Before
 	public void setUp() throws Exception {
 		control = createStrictControl();
 		serverMock = control.createMock(JTransaqServer.class);
 		configMock = control.createMock(Section.class);
-		service = new TQConnector(configMock, serverMock);
+		handlerMock = control.createMock(TQHandler.class);
+		service = new TQConnector(configMock, serverMock, handlerMock);
 	}
 	
 	@Test
@@ -77,6 +79,8 @@ public class TQConnectorTest {
 	@Test
 	public void testClose() throws Exception {
 		serverMock.UnInitialize();
+		expect(handlerMock.Handle("<dump_stats/>")).andReturn(true);
+		handlerMock.delete();
 		control.replay();
 		
 		service.close();

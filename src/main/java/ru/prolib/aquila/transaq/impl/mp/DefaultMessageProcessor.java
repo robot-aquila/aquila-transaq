@@ -13,7 +13,7 @@ import ru.prolib.aquila.transaq.impl.TQMessageProcessor;
 import ru.prolib.aquila.transaq.impl.TQParser;
 
 public class DefaultMessageProcessor implements TQMessageProcessor {
-	private static final String DUMP_PROC_ID = "dump_stats";
+	public static final String DUMP_PROC_ID = "dump_stats";
 	private static final Logger logger;
 	
 	static {
