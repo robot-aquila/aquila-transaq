@@ -6,22 +6,29 @@ import static ru.prolib.aquila.core.BusinessEntities.CDecimalBD.*;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import ru.prolib.aquila.core.EventQueue;
+import ru.prolib.aquila.core.EventQueueImpl;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdate;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.core.BusinessEntities.SecurityField;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.core.BusinessEntities.UpdatableStateContainer;
 import ru.prolib.aquila.core.BusinessEntities.UpdatableStateContainerImpl;
-import ru.prolib.aquila.transaq.entity.Market;
 import ru.prolib.aquila.transaq.entity.SecType;
 
 public class TQFieldAssemblerTest {
+	private static EventQueue queue;
+	
+	@BeforeClass
+	public static void setUpBeforeClass() {
+		queue = new EventQueueImpl();
+	}
+	
 	private TQDirectory dir;
 	private TQFieldAssembler service;
 	private UpdatableStateContainer sec_state;
@@ -29,14 +36,24 @@ public class TQFieldAssemblerTest {
 
 	@Before
 	public void setUp() throws Exception {
-		dir = new TQDirectory();
+		dir = new TQDirectory(queue);
 		service = new TQFieldAssembler(dir);
 
-		List<Market> markets = new ArrayList<>();
-		markets.add(new Market(0, "foo"));
-		markets.add(new Market(1, "bar"));
-		markets.add(new Market(2, "zoo"));
-		dir.updateMarkets(markets);
+		dir.updateMarket(new TQStateUpdate<Integer>(0, new DeltaUpdateBuilder()
+				.withToken(TQMarketField.ID, 0)
+				.withToken(TQMarketField.NAME, "foo")
+				.buildUpdate()
+			));
+		dir.updateMarket(new TQStateUpdate<Integer>(1, new DeltaUpdateBuilder()
+				.withToken(TQMarketField.ID, 1)
+				.withToken(TQMarketField.NAME, "bar")
+				.buildUpdate()
+			));
+		dir.updateMarket(new TQStateUpdate<Integer>(2, new DeltaUpdateBuilder()
+				.withToken(TQMarketField.ID, 2)
+				.withToken(TQMarketField.NAME, "zoo")
+				.buildUpdate()
+			));
 		
 		sec_state = new UpdatableStateContainerImpl("X");
 		builder = new DeltaUpdateBuilder();

@@ -14,8 +14,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ru.prolib.aquila.transaq.impl.TQReactor;
+import ru.prolib.aquila.transaq.impl.TQSecID_F;
 import ru.prolib.aquila.transaq.impl.TQParser;
-import ru.prolib.aquila.transaq.impl.TQSecurityUpdate3;
+import ru.prolib.aquila.transaq.impl.TQStateUpdate;
 
 public class SecuritiesMessageProcessorTest {
 	
@@ -38,18 +39,19 @@ public class SecuritiesMessageProcessorTest {
 		service = new SecuritiesMessageProcessor(reactorMock, parserMock);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testProcessMessage() throws Exception {
 		XMLStreamReader readerMock = control.createMock(XMLStreamReader.class);
-		List<TQSecurityUpdate3> updates = new ArrayList<>();
-		TQSecurityUpdate3 duMock1, duMock2, duMock3;
-		updates.add(duMock1 = control.createMock(TQSecurityUpdate3.class));
-		updates.add(duMock2 = control.createMock(TQSecurityUpdate3.class));
-		updates.add(duMock3 = control.createMock(TQSecurityUpdate3.class));
+		List<TQStateUpdate<TQSecID_F>> updates = new ArrayList<>();
+		TQStateUpdate<TQSecID_F> duMock1, duMock2, duMock3;
+		updates.add(duMock1 = control.createMock(TQStateUpdate.class));
+		updates.add(duMock2 = control.createMock(TQStateUpdate.class));
+		updates.add(duMock3 = control.createMock(TQStateUpdate.class));
 		expect(parserMock.readSecurities(readerMock)).andReturn(updates);
-		reactorMock.updateSecurity(duMock1);
-		reactorMock.updateSecurity(duMock2);
-		reactorMock.updateSecurity(duMock3);
+		reactorMock.updateSecurityF(duMock1);
+		reactorMock.updateSecurityF(duMock2);
+		reactorMock.updateSecurityF(duMock3);
 		control.replay();
 		
 		service.processMessage(readerMock);

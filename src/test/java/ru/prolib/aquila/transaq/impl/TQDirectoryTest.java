@@ -3,121 +3,99 @@ package ru.prolib.aquila.transaq.impl;
 import static org.junit.Assert.*;
 import static org.easymock.EasyMock.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
+import ru.prolib.aquila.core.BusinessEntities.DeltaUpdate;
+import ru.prolib.aquila.core.BusinessEntities.osc.OSCRepository;
 import ru.prolib.aquila.transaq.entity.Board;
-import ru.prolib.aquila.transaq.entity.CandleKind;
+import ru.prolib.aquila.transaq.entity.CKind;
 import ru.prolib.aquila.transaq.entity.Market;
 
 public class TQDirectoryTest {
 	private IMocksControl control;
-	private List<Board> boards_stub;
-	private List<Market> markets_stub;
-	private List<CandleKind> candle_kinds_stub;
+	private OSCRepository<Integer, CKind> ckindsMock;
+	private OSCRepository<Integer, Market> marketsMock;
+	private OSCRepository<String, Board> boardsMock;
+	private DeltaUpdate duMock;
 	private TQDirectory service;
 
+	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
 		control = createStrictControl();
-		boards_stub = new ArrayList<>();
-		markets_stub = new ArrayList<>();
-		candle_kinds_stub = new ArrayList<>();
-		service = new TQDirectory(boards_stub, markets_stub, candle_kinds_stub);
+		boardsMock = control.createMock(OSCRepository.class);
+		marketsMock = control.createMock(OSCRepository.class);
+		ckindsMock = control.createMock(OSCRepository.class);
+		duMock = control.createMock(DeltaUpdate.class);
+		service = new TQDirectory(ckindsMock, marketsMock, boardsMock);
 	}
 	
 	@Test
-	public void testUpdateBoards() {
-		Board
-			bMock1 = control.createMock(Board.class),
-			bMock2 = control.createMock(Board.class),
-			bMock3 = control.createMock(Board.class),
-			bMock4 = control.createMock(Board.class),
-			bMock5 = control.createMock(Board.class),
-			bMock6 = control.createMock(Board.class),
-			bMock7 = control.createMock(Board.class);
-		boards_stub.add(bMock1);
-		boards_stub.add(bMock2);
-		boards_stub.add(bMock3);
+	public void testUpdateCKind() {
+		TQStateUpdate<Integer> update = new TQStateUpdate<>(12, duMock);
+		CKind ckindMock = control.createMock(CKind.class);
+		expect(ckindsMock.getOrCreate(12)).andReturn(ckindMock);
+		ckindMock.consume(duMock);
+		control.replay();
 		
-		List<Board> expected = new ArrayList<>();
-		expected.add(bMock4);
-		expected.add(bMock5);
-		expected.add(bMock6);
-		expected.add(bMock7);
-		service.updateBoards(expected);
-			
-		assertEquals(expected, boards_stub);
+		service.updateCKind(update);
+		
+		control.verify();
 	}
 	
 	@Test
-	public void testUpdateMarkets() {
-		Market
-			mMock1 = control.createMock(Market.class),
-			mMock2 = control.createMock(Market.class),
-			mMock3 = control.createMock(Market.class),
-			mMock4 = control.createMock(Market.class),
-			mMock5 = control.createMock(Market.class),
-			mMock6 = control.createMock(Market.class),
-			mMock7 = control.createMock(Market.class);
-		markets_stub.add(mMock7);
-		markets_stub.add(mMock6);
-		markets_stub.add(mMock5);
+	public void testUpdateMarket() {
+		TQStateUpdate<Integer> update = new TQStateUpdate<>(56, duMock);
+		Market marketMock = control.createMock(Market.class);
+		expect(marketsMock.getOrCreate(56)).andReturn(marketMock);
+		marketMock.consume(duMock);
+		control.replay();
 		
-		List<Market> expected = new ArrayList<>();
-		expected.add(mMock4);
-		expected.add(mMock3);
-		expected.add(mMock2);
-		expected.add(mMock1);
-		service.updateMarkets(expected);
+		service.updateMarket(update);
 		
-		assertEquals(expected, markets_stub);
+		control.verify();
 	}
-
+	
 	@Test
-	public void testUpdateCandleKinds() {
-		CandleKind
-			kMock1 = control.createMock(CandleKind.class),
-			kMock2 = control.createMock(CandleKind.class),
-			kMock3 = control.createMock(CandleKind.class),
-			kMock4 = control.createMock(CandleKind.class),
-			kMock5 = control.createMock(CandleKind.class),
-			kMock6 = control.createMock(CandleKind.class);
-		candle_kinds_stub.add(kMock4);
-		candle_kinds_stub.add(kMock5);
-		candle_kinds_stub.add(kMock6);
+	public void testUpdateBoard() {
+		TQStateUpdate<String> update = new TQStateUpdate<>("foo", duMock);
+		Board boardMock = control.createMock(Board.class);
+		expect(boardsMock.getOrCreate("foo")).andReturn(boardMock);
+		boardMock.consume(duMock);
+		control.replay();
 		
-		List<CandleKind> expected = new ArrayList<>();
-		expected.add(kMock1);
-		expected.add(kMock2);
-		expected.add(kMock3);
-		service.updateCandleKinds(expected);
+		service.updateBoard(update);
 		
-		assertEquals(expected, candle_kinds_stub);
+		control.verify();
 	}
 	
 	@Test
 	public void testGetMarketName() {
-		markets_stub.add(new Market(0, "foo"));
-		markets_stub.add(new Market(1, "bar"));
-		markets_stub.add(new Market(2, "zoo"));
+		Market marketMock = control.createMock(Market.class);
+		expect(marketsMock.getOrThrow(71)).andReturn(marketMock);
+		expect(marketMock.getName()).andReturn("zulu24");
+		control.replay();
 		
-		assertEquals("foo", service.getMarketName(0));
-		assertEquals("bar", service.getMarketName(1));
-		assertEquals("zoo", service.getMarketName(2));
+		assertEquals("zulu24", service.getMarketName(71));
+		
+		control.verify();
 	}
 	
-	@Test (expected=IllegalArgumentException.class)
-	public void testGetMarketName_ThrowsIfNotFound() {
-		markets_stub.add(new Market(0, "foo"));
-		markets_stub.add(new Market(1, "bar"));
-		markets_stub.add(new Market(2, "zoo"));
-
-		service.getMarketName(3);
+	@Test
+	public void testGetMarketRepository() {
+		assertSame(marketsMock, service.getMarketRepository());
+	}
+	
+	@Test
+	public void testGetCKindRepository() {
+		assertSame(ckindsMock, service.getCKindRepository());
+	}
+	
+	@Test
+	public void testGetBoardRepository() {
+		assertSame(boardsMock, service.getBoardRepository());
 	}
 
 }

@@ -10,15 +10,14 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<skipITs>true</skipITs>
-		<aquila.version>0.1.51</aquila.version>
 	</properties>
 
 	<dependencies>
 
 		<dependency>
 			<groupId>ru.prolib.aquila</groupId>
-			<artifactId>aquila-core</artifactId>
-			<version>${aquila.version}</version>			
+			<artifactId>aquila-ui</artifactId>
+			<version>0.1.53</version>			
 		</dependency>
 
 		<dependency>

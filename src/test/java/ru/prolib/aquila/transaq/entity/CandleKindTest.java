@@ -1,72 +1,48 @@
 package ru.prolib.aquila.transaq.entity;
 
+import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
-import ru.prolib.aquila.core.utils.Variant;
+import ru.prolib.aquila.core.EventQueue;
+import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
+import ru.prolib.aquila.core.BusinessEntities.osc.OSCControllerStub;
+import ru.prolib.aquila.core.BusinessEntities.osc.OSCRepository;
+import ru.prolib.aquila.transaq.impl.TQCKindField;
 
 public class CandleKindTest {
-	private CandleKind service;
+	private IMocksControl control;
+	private OSCRepository<Integer, CKind> repoMock;
+	private EventQueue queueMock;
+	private CKind service;
 
+	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
-		service = new CandleKind(14, 300, "5 minutes");
+		control = createStrictControl();
+		repoMock = control.createMock(OSCRepository.class);
+		queueMock = control.createMock(EventQueue.class);
+		service = new CKindFactory(queueMock).produce(repoMock, 25);
 	}
 	
 	@Test
 	public void testCtor3() {
-		assertEquals(14, service.getID());
-		assertEquals(300, service.getPeriod());
-		assertEquals("5 minutes", service.getName());
-	}
-	
-	@Test
-	public void testEquals_SpecialCases() {
-		assertTrue(service.equals(service));
-		assertFalse(service.equals(null));
-		assertFalse(service.equals(this));
-	}
-	
-	@Test
-	public void testEquals() {
-		Variant<Integer> vID = new Variant<>(14, 22);
-		Variant<Integer> vPer = new Variant<>(vID, 300, 1200);
-		Variant<String> vName = new Variant<>(vPer, "5 minutes", "foobar");
-		Variant<?> iterator = vName;
-		int foundCnt = 0;
-		CandleKind x, found = null;
-		do {
-			x = new CandleKind(vID.get(), vPer.get(), vName.get());
-			if ( service.equals(x) ) {
-				foundCnt ++;
-				found = x;
-			}
-		} while ( iterator.next() );
-		assertEquals(1, foundCnt);
-		assertEquals(14, found.getID());
-		assertEquals(300, found.getPeriod());
-		assertEquals("5 minutes", found.getName());
-	}
-	
-	@Test
-	public void testHashCode() {
-		int expected = new HashCodeBuilder(65232311, 7751)
-				.append(14)
-				.append(300)
-				.append("5 minutes")
-				.build();
+		service.consume(new DeltaUpdateBuilder()
+				.withToken(TQCKindField.CKIND_ID, 25)
+				.withToken(TQCKindField.CKIND_PERIOD, 60)
+				.withToken(TQCKindField.CKIND_NAME, "60 minutes")
+				.buildUpdate()
+			);
 		
-		assertEquals(expected, service.hashCode());
-	}
-
-	@Test
-	public void testToString() {
-		String expected = "CandleKind[id=14,period=300,name=5 minutes]";
+		assertEquals(25, service.getID());
+		assertEquals(60, service.getPeriod());
+		assertEquals("60 minutes", service.getName());
 		
-		assertEquals(expected, service.toString());
+		assertEquals("CKind#25", service.getContainerID());
+		assertEquals(OSCControllerStub.class, service.getController().getClass());
 	}
 
 }

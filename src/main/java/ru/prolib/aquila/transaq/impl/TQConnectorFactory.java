@@ -6,22 +6,29 @@ import ru.prolib.JTransaq.JTransaqServer;
 import ru.prolib.aquila.core.BusinessEntities.EditableTerminal;
 import ru.prolib.aquila.transaq.impl.mp.BoardsProcessor;
 import ru.prolib.aquila.transaq.impl.mp.CandleKindsProcessor;
+import ru.prolib.aquila.transaq.impl.mp.ClientProcessor;
 import ru.prolib.aquila.transaq.impl.mp.DefaultMessageProcessor;
 import ru.prolib.aquila.transaq.impl.mp.MarketsProcessor;
+import ru.prolib.aquila.transaq.impl.mp.RawMessageDumper;
 import ru.prolib.aquila.transaq.impl.mp.SecInfoProcessor;
 import ru.prolib.aquila.transaq.impl.mp.SecInfoUpdProcessor;
 import ru.prolib.aquila.transaq.impl.mp.SecuritiesMessageProcessor;
 
 public class TQConnectorFactory {
 	private final Section config;
+	private final TQDirectory directory;
 	
-	public TQConnectorFactory(Section config) {
+	public TQConnectorFactory(Section config, TQDirectory directory) {
 		this.config = config;
+		this.directory = directory;
+	}
+	
+	public TQDirectory getDirectory() {
+		return directory;
 	}
 	
 	public TQConnector createInstance(EditableTerminal terminal) throws Exception {
 		TQParser parser = TQParser.getInstance();
-		TQDirectory directory = new TQDirectory();
 		TQFieldAssembler assembler = new TQFieldAssembler(directory);
 		TQReactor reactor = new TQReactor(
 				directory,
@@ -36,6 +43,15 @@ public class TQConnectorFactory {
 				.withProcessor("markets", new MarketsProcessor(reactor, parser))
 				.withProcessor("boards", new BoardsProcessor(reactor, parser))
 				.withProcessor("candlekinds", new CandleKindsProcessor(reactor, parser))
+				// TODO: do it
+				.withProcessor("client", new ClientProcessor())
+				.withProcessor("pits", new RawMessageDumper())
+				.withProcessor("messages", new RawMessageDumper())
+				.withProcessor("positions", new RawMessageDumper())
+				.withProcessor("union", new RawMessageDumper())
+				.withProcessor("overnight", new RawMessageDumper())
+				.withProcessor("server_status", new RawMessageDumper())
+				
 				.build());
 		TQHandler handler = new TQHandler(router);
 		JTransaqServer server = new JTransaqServer(handler);

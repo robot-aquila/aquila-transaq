@@ -7,17 +7,17 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdate;
 
-public class TQSecurityUpdate3 {
-	private final TQSecID_F secID;
+public class TQStateUpdate<KeyType> {
+	private final KeyType id;
 	private final DeltaUpdate update;
-	
-	public TQSecurityUpdate3(TQSecID_F secID, DeltaUpdate update) {
-		this.secID = secID;
+
+	public TQStateUpdate(KeyType id, DeltaUpdate update) {
+		this.id = id;
 		this.update = update;
 	}
 	
-	public TQSecID_F getSecID() {
-		return secID;
+	public KeyType getID() {
+		return id;
 	}
 	
 	public DeltaUpdate getUpdate() {
@@ -31,8 +31,8 @@ public class TQSecurityUpdate3 {
 	
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder(1236564123, 9114243)
-				.append(secID)
+		return new HashCodeBuilder(216688123, 5651)
+				.append(id)
 				.append(update)
 				.build();
 	}
@@ -42,14 +42,14 @@ public class TQSecurityUpdate3 {
 		if ( other == this ) {
 			return true;
 		}
-		if ( other == null || other.getClass() != TQSecurityUpdate3.class ) {
+		if ( other == null || other.getClass() != TQStateUpdate.class ) {
 			return false;
 		}
-		TQSecurityUpdate3 o = (TQSecurityUpdate3) other;
+		TQStateUpdate<?> o = (TQStateUpdate<?>) other;
 		return new EqualsBuilder()
-				.append(o.secID, secID)
+				.append(o.id, id)
 				.append(o.update, update)
 				.build();
 	}
-
+	
 }

@@ -4,8 +4,9 @@ import javax.xml.stream.XMLStreamReader;
 
 import ru.prolib.aquila.transaq.impl.TQMessageProcessor;
 import ru.prolib.aquila.transaq.impl.TQReactor;
+import ru.prolib.aquila.transaq.impl.TQSecID_F;
 import ru.prolib.aquila.transaq.impl.TQParser;
-import ru.prolib.aquila.transaq.impl.TQSecurityUpdate3;
+import ru.prolib.aquila.transaq.impl.TQStateUpdate;
 
 public class SecuritiesMessageProcessor implements TQMessageProcessor {
 	private final TQParser parser;
@@ -22,9 +23,14 @@ public class SecuritiesMessageProcessor implements TQMessageProcessor {
 
 	@Override
 	public void processMessage(XMLStreamReader reader) throws Exception {
-		for ( TQSecurityUpdate3 update : parser.readSecurities(reader) ) {
-			reactor.updateSecurity(update);
+		for ( TQStateUpdate<TQSecID_F> update : parser.readSecurities(reader) ) {
+			reactor.updateSecurityF(update);
 		}
+	}
+
+	@Override
+	public void processRawMessage(String message) throws Exception {
+		
 	}
 
 }

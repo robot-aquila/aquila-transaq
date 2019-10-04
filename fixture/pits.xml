@@ -1,0 +1,100 @@
+<pits>
+	<pit seccode="IRGZ" board ="TQBR">
+		<market>1</market>
+		<decimals>2</decimals>
+		<minstep>0.02</minstep>
+		<lotsize>100</lotsize>
+		<point_cost>1</point_cost>
+	</pit>
+	<pit seccode="IRGZ" board ="SMAL">
+		<market>1</market>
+		<decimals>2</decimals>
+		<minstep>0.02</minstep>
+		<lotsize>1</lotsize>
+		<point_cost>1</point_cost>
+	</pit>
+	<pit seccode="IRGZ" board ="EQRP">
+		<market>1</market>
+		<decimals>4</decimals>
+		<minstep>0.01</minstep>
+		<lotsize>100</lotsize>
+		<point_cost>0.01</point_cost>
+	</pit>
+	<pit seccode="IRGZ" board ="PSEQ">
+		<market>1</market>
+		<decimals>2</decimals>
+		<minstep>0.02</minstep>
+		<lotsize>100</lotsize>
+		<point_cost>1</point_cost>
+	</pit>
+	<pit seccode="IRGZ" board ="PSRP">
+		<market>1</market>
+		<decimals>4</decimals>
+		<minstep>0.01</minstep>
+		<lotsize>100</lotsize>
+		<point_cost>0.01</point_cost>
+	</pit>
+	<pit seccode="IRGZ" board ="PTEQ">
+		<market>1</market>
+		<decimals>2</decimals>
+		<minstep>0.02</minstep>
+		<lotsize>100</lotsize>
+		<point_cost>1</point_cost>
+	</pit>
+	<pit seccode="IRGZ" board ="RPEU">
+		<market>1</market>
+		<decimals>6</decimals>
+		<minstep>0.000001</minstep>
+		<lotsize>1</lotsize>
+		<point_cost>0.006429</point_cost>
+	</pit>
+	<pit seccode="IRGZ" board ="RPMA">
+		<market>1</market>
+		<decimals>6</decimals>
+		<minstep>0.000001</minstep>
+		<lotsize>1</lotsize>
+		<point_cost>0.0001</point_cost>
+	</pit>
+	<pit seccode="IRGZ" board ="RPMO">
+		<market>1</market>
+		<decimals>6</decimals>
+		<minstep>0.000001</minstep>
+		<lotsize>1</lotsize>
+		<point_cost>0.0001</point_cost>
+	</pit>
+	<pit seccode="RU000A0ZZ505" board ="EQOB">
+		<market>1</market>
+		<decimals>2</decimals>
+		<minstep>0.01</minstep>
+		<lotsize>1</lotsize>
+		<point_cost>10</point_cost>
+	</pit>
+	<pit seccode="RU000A0ZZ505" board ="PSOB">
+		<market>1</market>
+		<decimals>2</decimals>
+		<minstep>0.01</minstep>
+		<lotsize>1</lotsize>
+		<point_cost>10</point_cost>
+	</pit>
+	<pit seccode="RU000A0ZZ505" board ="RPEU">
+		<market>1</market>
+		<decimals>6</decimals>
+		<minstep>0.000001</minstep>
+		<lotsize>1</lotsize>
+		<point_cost>0.001</point_cost>
+	</pit>
+	<pit seccode="RU000A0ZZ505" board ="RPMO">
+		<market>1</market>
+		<decimals>4</decimals>
+		<minstep>0.0001</minstep>
+		<lotsize>1</lotsize>
+		<point_cost>0.1</point_cost>
+	</pit>
+	<pit seccode="PRTK" board ="TQBR">
+		<market>1</market>
+		<decimals>1</decimals>
+		<minstep>0.1</minstep>
+		<lotsize>10</lotsize>
+		<point_cost>10</point_cost>
+	</pit>
+</pits>

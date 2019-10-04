@@ -64,4 +64,9 @@ public class DefaultMessageProcessor implements TQMessageProcessor {
 		logger.debug("Map of unprocessed messages has been cleared");
 	}
 
+	@Override
+	public void processRawMessage(String message) throws Exception {
+		
+	}
+
 }

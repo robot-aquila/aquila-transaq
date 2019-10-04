@@ -1,67 +1,29 @@
 package ru.prolib.aquila.transaq.entity;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
+import ru.prolib.aquila.core.BusinessEntities.ObservableStateContainerImpl;
+import ru.prolib.aquila.core.BusinessEntities.osc.OSCParams;
+import ru.prolib.aquila.transaq.impl.TQBoardField;
 
-public class Board {
-	private final String code, name;
-	private final int marketID, typeID;
+public class Board extends ObservableStateContainerImpl {
 	
-	public Board(String code, String name, int marketID, int typeID) {
-		this.code = code;
-		this.name = name;
-		this.marketID = marketID;
-		this.typeID = typeID;
+	public Board(OSCParams params) {
+		super(params);
 	}
 	
 	public String getCode() {
-		return code;
+		return this.getString(TQBoardField.CODE);
 	}
 	
 	public String getName() {
-		return name;
+		return this.getString(TQBoardField.NAME);
 	}
 	
 	public int getMarketID() {
-		return marketID;
+		return this.getInteger(TQBoardField.MARKET_ID);
 	}
 	
 	public int getTypeID() {
-		return typeID;
-	}
-	
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder(1365413, 59)
-				.append(code)
-				.append(name)
-				.append(marketID)
-				.append(typeID)
-				.build();
-	}
-	
-	@Override
-	public boolean equals(Object other) {
-		if ( other == this ) {
-			return true;
-		}
-		if  ( other == null || other.getClass() != Board.class ) {
-			return false;
-		}
-		Board o = (Board) other;
-		return new EqualsBuilder()
-				.append(o.code, code)
-				.append(o.name, name)
-				.append(o.marketID, marketID)
-				.append(o.typeID, typeID)
-				.build();
-	}
-	
-	@Override
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+		return this.getInteger(TQBoardField.TYPE);
 	}
 
 }

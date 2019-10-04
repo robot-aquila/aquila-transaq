@@ -27,9 +27,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
-import ru.prolib.aquila.transaq.entity.Board;
-import ru.prolib.aquila.transaq.entity.CandleKind;
-import ru.prolib.aquila.transaq.entity.Market;
 import ru.prolib.aquila.transaq.entity.SecType;
 import ru.prolib.aquila.transaq.impl.TQParser;
 
@@ -88,7 +85,7 @@ public class TQParserTest {
 	public void testReadMarkets() throws Exception {
 		InputStream is = new FileInputStream(new File("fixture/markets.xml"));
 		XMLStreamReader sr = factory.createXMLStreamReader(is);
-		List<Market> actual = null;
+		List<TQStateUpdate<Integer>> actual = null;
 		while ( sr.hasNext() ) {
         	switch ( sr.next() ) {
         	case XMLStreamReader.START_DOCUMENT:
@@ -99,16 +96,52 @@ public class TQParserTest {
         		break;
         	}
 		}
-		List<Market> expected = new ArrayList<>();
-		expected.add(new Market( 0, "Collateral"));
-		expected.add(new Market( 1, "MICEX"));
-		expected.add(new Market( 4, "FORTS"));
-		expected.add(new Market( 7, "SPBEX"));
-		expected.add(new Market( 8, "INF"));
-		expected.add(new Market( 9, "9 [N/A]"));
-		expected.add(new Market(12, "12 [N/A]"));
-		expected.add(new Market(14, "MMA"));
-		expected.add(new Market(15, "ETS"));
+		List<TQStateUpdate<Integer>> expected = new ArrayList<>();
+		expected.add(new TQStateUpdate<>(0, new DeltaUpdateBuilder()
+				.withToken(TQMarketField.ID, 0)
+				.withToken(TQMarketField.NAME, "Collateral")
+				.buildUpdate()
+			));
+		expected.add(new TQStateUpdate<>(1, new DeltaUpdateBuilder()
+				.withToken(TQMarketField.ID, 1)
+				.withToken(TQMarketField.NAME, "MICEX")
+				.buildUpdate()
+			));
+		expected.add(new TQStateUpdate<>(4, new DeltaUpdateBuilder()
+				.withToken(TQMarketField.ID, 4)
+				.withToken(TQMarketField.NAME, "FORTS")
+				.buildUpdate()
+			));
+		expected.add(new TQStateUpdate<>(7, new DeltaUpdateBuilder()
+				.withToken(TQMarketField.ID, 7)
+				.withToken(TQMarketField.NAME, "SPBEX")
+				.buildUpdate()
+			));
+		expected.add(new TQStateUpdate<>(8, new DeltaUpdateBuilder()
+				.withToken(TQMarketField.ID, 8)
+				.withToken(TQMarketField.NAME, "INF")
+				.buildUpdate()
+			));		
+		expected.add(new TQStateUpdate<>(9, new DeltaUpdateBuilder()
+				.withToken(TQMarketField.ID, 9)
+				.withToken(TQMarketField.NAME, "9 [N/A]")
+				.buildUpdate()
+			));
+		expected.add(new TQStateUpdate<>(12, new DeltaUpdateBuilder()
+				.withToken(TQMarketField.ID, 12)
+				.withToken(TQMarketField.NAME, "12 [N/A]")
+				.buildUpdate()
+			));
+		expected.add(new TQStateUpdate<>(14, new DeltaUpdateBuilder()
+				.withToken(TQMarketField.ID, 14)
+				.withToken(TQMarketField.NAME, "MMA")
+				.buildUpdate()
+			));
+		expected.add(new TQStateUpdate<>(15, new DeltaUpdateBuilder()
+				.withToken(TQMarketField.ID, 15)
+				.withToken(TQMarketField.NAME, "ETS")
+				.buildUpdate()
+			));
 		assertEquals(expected, actual);
 	}
 	
@@ -129,7 +162,7 @@ public class TQParserTest {
 	public void testReadBoards() throws Exception {
 		InputStream is = new FileInputStream(new File("fixture/boards.xml"));
 		XMLStreamReader sr = factory.createXMLStreamReader(is);
-		List<Board> actual = null;
+		List<TQStateUpdate<String>> actual = null;
 		while ( sr.hasNext() ) {
         	switch ( sr.next() ) {
         	case XMLStreamReader.START_DOCUMENT:
@@ -140,15 +173,63 @@ public class TQParserTest {
         		break;
         	}
 		}
-		List<Board> expected = new ArrayList<>();
-		expected.add(new Board("AUCT", "Auction", 1, 2));
-		expected.add(new Board("EQDB", "Main market: D bonds", 1, 2));
-		expected.add(new Board("EQDP", "Dark Pool", 1, 2));
-		expected.add(new Board("CNGD", "ETS Neg. deals", 15, 2));
-		expected.add(new Board("INDEXE", "ETS indexes", 15, 2));
-		expected.add(new Board("ZLG", "Залоговые инструменты", 0, 2));
-		expected.add(new Board("EQNL", "EQNL [N/A]", 255, 2));
-		expected.add(new Board("AETS", "Дополнительная сессия", 15, 2));
+		List<TQStateUpdate<String>> expected = new ArrayList<>();
+		expected.add(new TQStateUpdate<>("AUCT", new DeltaUpdateBuilder()
+				.withToken(TQBoardField.CODE, "AUCT")
+				.withToken(TQBoardField.NAME, "Auction")
+				.withToken(TQBoardField.MARKET_ID, 1)
+				.withToken(TQBoardField.TYPE, 2)
+				.buildUpdate()
+			));
+		expected.add(new TQStateUpdate<>("EQDB", new DeltaUpdateBuilder()
+				.withToken(TQBoardField.CODE, "EQDB")
+				.withToken(TQBoardField.NAME, "Main market: D bonds")
+				.withToken(TQBoardField.MARKET_ID, 1)
+				.withToken(TQBoardField.TYPE, 2)
+				.buildUpdate()
+			));
+		expected.add(new TQStateUpdate<>("EQDP", new DeltaUpdateBuilder()
+				.withToken(TQBoardField.CODE, "EQDP")
+				.withToken(TQBoardField.NAME, "Dark Pool")
+				.withToken(TQBoardField.MARKET_ID, 1)
+				.withToken(TQBoardField.TYPE, 2)
+				.buildUpdate()
+			));
+		expected.add(new TQStateUpdate<>("CNGD", new DeltaUpdateBuilder()
+				.withToken(TQBoardField.CODE, "CNGD")
+				.withToken(TQBoardField.NAME, "ETS Neg. deals")
+				.withToken(TQBoardField.MARKET_ID, 15)
+				.withToken(TQBoardField.TYPE, 2)
+				.buildUpdate()
+			));
+		expected.add(new TQStateUpdate<>("INDEXE", new DeltaUpdateBuilder()
+				.withToken(TQBoardField.CODE, "INDEXE")
+				.withToken(TQBoardField.NAME, "ETS indexes")
+				.withToken(TQBoardField.MARKET_ID, 15)
+				.withToken(TQBoardField.TYPE, 2)
+				.buildUpdate()
+			));
+		expected.add(new TQStateUpdate<>("ZLG", new DeltaUpdateBuilder()
+				.withToken(TQBoardField.CODE, "ZLG")
+				.withToken(TQBoardField.NAME, "Залоговые инструменты")
+				.withToken(TQBoardField.MARKET_ID, 0)
+				.withToken(TQBoardField.TYPE, 2)
+				.buildUpdate()
+			));
+		expected.add(new TQStateUpdate<>("EQNL", new DeltaUpdateBuilder()
+				.withToken(TQBoardField.CODE, "EQNL")
+				.withToken(TQBoardField.NAME, "EQNL [N/A]")
+				.withToken(TQBoardField.MARKET_ID, 255)
+				.withToken(TQBoardField.TYPE, 2)
+				.buildUpdate()
+			));
+		expected.add(new TQStateUpdate<>("AETS", new DeltaUpdateBuilder()
+				.withToken(TQBoardField.CODE, "AETS")
+				.withToken(TQBoardField.NAME, "Дополнительная сессия")
+				.withToken(TQBoardField.MARKET_ID, 15)
+				.withToken(TQBoardField.TYPE, 2)
+				.buildUpdate()
+			));
 		assertEquals(expected, actual);
 	}
 	
@@ -169,7 +250,7 @@ public class TQParserTest {
 	public void testReadCandleKinds() throws Exception {
 		InputStream is = new FileInputStream(new File("fixture/candlekinds.xml"));
 		XMLStreamReader sr = factory.createXMLStreamReader(is);
-		List<CandleKind> actual = null;
+		List<TQStateUpdate<Integer>> actual = null;
 		while ( sr.hasNext() ) {
 			switch ( sr.next() ) {
 			case XMLStreamReader.START_DOCUMENT:
@@ -180,13 +261,43 @@ public class TQParserTest {
 				break;
 			}
 		}
-		List<CandleKind> expected = new ArrayList<>();
-		expected.add(new CandleKind(1, 60, "1 minute"));
-		expected.add(new CandleKind(2, 300, "5 minutes"));
-		expected.add(new CandleKind(3, 900, "15 minutes"));
-		expected.add(new CandleKind(4, 3600, "1 hour"));
-		expected.add(new CandleKind(5, 86400, "1 day"));
-		expected.add(new CandleKind(6, 604800, "1 week"));
+		List<TQStateUpdate<Integer>> expected = new ArrayList<>();
+		expected.add(new TQStateUpdate<>(1, new DeltaUpdateBuilder()
+				.withToken(TQCKindField.CKIND_ID, 1)
+				.withToken(TQCKindField.CKIND_PERIOD, 60)
+				.withToken(TQCKindField.CKIND_NAME, "1 minute")
+				.buildUpdate()
+			));
+		expected.add(new TQStateUpdate<>(2, new DeltaUpdateBuilder()
+				.withToken(TQCKindField.CKIND_ID, 2)
+				.withToken(TQCKindField.CKIND_PERIOD, 300)
+				.withToken(TQCKindField.CKIND_NAME, "5 minutes")
+				.buildUpdate()
+			));
+		expected.add(new TQStateUpdate<>(3, new DeltaUpdateBuilder()
+				.withToken(TQCKindField.CKIND_ID, 3)
+				.withToken(TQCKindField.CKIND_PERIOD, 900)
+				.withToken(TQCKindField.CKIND_NAME, "15 minutes")
+				.buildUpdate()
+			));
+		expected.add(new TQStateUpdate<>(4, new DeltaUpdateBuilder()
+				.withToken(TQCKindField.CKIND_ID, 4)
+				.withToken(TQCKindField.CKIND_PERIOD, 3600)
+				.withToken(TQCKindField.CKIND_NAME, "1 hour")
+				.buildUpdate()
+			));
+		expected.add(new TQStateUpdate<>(5, new DeltaUpdateBuilder()
+				.withToken(TQCKindField.CKIND_ID, 5)
+				.withToken(TQCKindField.CKIND_PERIOD, 86400)
+				.withToken(TQCKindField.CKIND_NAME, "1 day")
+				.buildUpdate()
+			));
+		expected.add(new TQStateUpdate<>(6, new DeltaUpdateBuilder()
+				.withToken(TQCKindField.CKIND_ID, 6)
+				.withToken(TQCKindField.CKIND_PERIOD, 604800)
+				.withToken(TQCKindField.CKIND_NAME, "1 week")
+				.buildUpdate()
+			));
 		assertEquals(expected, actual);
 	}
 	
@@ -207,7 +318,7 @@ public class TQParserTest {
 	public void testReadSecurities() throws Exception {
 		InputStream is = new FileInputStream(new File("fixture/securities.xml"));
 		XMLStreamReader sr = factory.createXMLStreamReader(is);
-		List<TQSecurityUpdate3> actual = null;
+		List<TQStateUpdate<TQSecID_F>> actual = null;
 		while ( sr.hasNext() ) {
 			switch ( sr.next() ) {
 			case XMLStreamReader.START_DOCUMENT:
@@ -218,8 +329,8 @@ public class TQParserTest {
 				break;
 			}
 		}
-		List<TQSecurityUpdate3> expected = new ArrayList<>();
-		expected.add(new TQSecurityUpdate3(
+		List<TQStateUpdate<TQSecID_F>> expected = new ArrayList<>();
+		expected.add(new TQStateUpdate<>(
 			new TQSecID_F("IRGZ", 1, "IrkutskEnrg", SecType.SHARE),
 			new DeltaUpdateBuilder()
 				.withToken(TQSecField.SECID, 0)
@@ -239,7 +350,7 @@ public class TQParserTest {
 				.withToken(TQSecField.QUOTESTYPE, 1)
 				.buildUpdate())
 			);
-		expected.add(new TQSecurityUpdate3(
+		expected.add(new TQStateUpdate<>(
 			new TQSecID_F("RU000A0ZZ505", 1, "Russian Agricultural Bank 09T1", SecType.BOND),
 			new DeltaUpdateBuilder()
 				.withToken(TQSecField.SECID, 3)
@@ -259,7 +370,7 @@ public class TQParserTest {
 				.withToken(TQSecField.QUOTESTYPE, 1)
 				.buildUpdate())
 			);
-		expected.add(new TQSecurityUpdate3(
+		expected.add(new TQStateUpdate<>(
 			new TQSecID_F("RIM9", 4, "RTS-6.19", SecType.FUT),
 			new DeltaUpdateBuilder()
 				.withToken(TQSecField.SECID, 41190)
@@ -299,7 +410,7 @@ public class TQParserTest {
 	public void testReadSecurities_UnknownSecTypeAndTags() throws Exception {
 		InputStream is = new FileInputStream(new File("fixture/securities1.xml"));
 		XMLStreamReader sr = factory.createXMLStreamReader(is);
-		List<TQSecurityUpdate3> actual = null;
+		List<TQStateUpdate<TQSecID_F>> actual = null;
 		while ( sr.hasNext() ) {
 			switch ( sr.next() ) {
 			case XMLStreamReader.START_DOCUMENT:
@@ -310,8 +421,8 @@ public class TQParserTest {
 				break;
 			}
 		}
-		List<TQSecurityUpdate3> expected = new ArrayList<>();
-		expected.add(new TQSecurityUpdate3(
+		List<TQStateUpdate<TQSecID_F>> expected = new ArrayList<>();
+		expected.add(new TQStateUpdate<>(
 			new TQSecID_F("IRGZ", 1, "IrkutskEnrg", SecType.QUOTES),
 			new DeltaUpdateBuilder()
 				.withToken(TQSecField.SECID, 0)
@@ -338,7 +449,7 @@ public class TQParserTest {
 	public void testReadSecurities_Inactive() throws Exception {
 		InputStream is = new FileInputStream(new File("fixture/securities2.xml"));
 		XMLStreamReader sr = factory.createXMLStreamReader(is);
-		List<TQSecurityUpdate3> actual = null;
+		List<TQStateUpdate<TQSecID_F>> actual = null;
 		while ( sr.hasNext() ) {
 			switch ( sr.next() ) {
 			case XMLStreamReader.START_DOCUMENT:
@@ -349,8 +460,8 @@ public class TQParserTest {
 				break;
 			}
 		}
-		List<TQSecurityUpdate3> expected = new ArrayList<>();
-		expected.add(new TQSecurityUpdate3(
+		List<TQStateUpdate<TQSecID_F>> expected = new ArrayList<>();
+		expected.add(new TQStateUpdate<>(
 			new TQSecID_F("IRGZ", 1, "IrkutskEnrg", SecType.SHARE),
 			new DeltaUpdateBuilder()
 				.withToken(TQSecField.SECID, 0)
@@ -374,7 +485,7 @@ public class TQParserTest {
 	public void testReadSecInfo() throws Exception {
 		InputStream is = new FileInputStream(new File("fixture/sec_info.xml"));
 		XMLStreamReader sr = factory.createXMLStreamReader(is);
-		TQSecurityUpdate1 actual = null;
+		TQStateUpdate<TQSecID1> actual = null;
 		while ( sr.hasNext() ) {
 			switch ( sr.next() ) {
 			case XMLStreamReader.START_DOCUMENT:
@@ -385,7 +496,7 @@ public class TQParserTest {
 				break;
 			}
 		}
-		TQSecurityUpdate1 expected = new TQSecurityUpdate1(
+		TQStateUpdate<TQSecID1> expected = new TQStateUpdate<>(
 			new TQSecID1("FOO-12.35", 4),
 			new DeltaUpdateBuilder()
 				.withToken(TQSecField.SECID, 28334)
@@ -431,7 +542,7 @@ public class TQParserTest {
 	public void testReadSecInfoUpd() throws Exception {
 		InputStream is = new FileInputStream(new File("fixture/sec_info_upd.xml"));
 		XMLStreamReader sr = factory.createXMLStreamReader(is);
-		TQSecurityUpdate1 actual = null;
+		TQStateUpdate<TQSecID1> actual = null;
 		while ( sr.hasNext() ) {
 			switch ( sr.next() ) {
 			case XMLStreamReader.START_DOCUMENT:
@@ -442,7 +553,7 @@ public class TQParserTest {
 				break;
 			}
 		}
-		TQSecurityUpdate1 expected = new TQSecurityUpdate1(
+		TQStateUpdate<TQSecID1> expected = new TQStateUpdate<>(
 			new TQSecID1("BRH0", 4),
 			new DeltaUpdateBuilder()
 				.withToken(TQSecField.SECID, 66)
@@ -534,9 +645,9 @@ public class TQParserTest {
 					case XMLStreamReader.START_ELEMENT:
 						if ( "securities".equals(sr.getLocalName()) ) {
 							count_sections ++;
-							List<TQSecurityUpdate3> list = service.readSecurities(sr);
+							List<TQStateUpdate<TQSecID_F>> list = service.readSecurities(sr);
 							count_securities += list.size();
-							for  ( TQSecurityUpdate3 s : list ) {
+							for  ( TQStateUpdate<TQSecID_F> s : list ) {
 								if ( "RTS-6.19".equals(s.getUpdate().getContents().get(TQSecField.SHORT_NAME)) ) {
 									System.out.println(s);
 								}
@@ -575,5 +686,150 @@ public class TQParserTest {
 				}
 
 	 */
+	
+	@Test
+	public void testReadPits() throws Exception{
+		InputStream is = new FileInputStream(new File("fixture/pits.xml"));
+		XMLStreamReader sr = factory.createXMLStreamReader(is);
+		List<TQStateUpdate<TQSecID2>> actual = null;
+		while ( sr.hasNext() ) {
+			switch ( sr.next() ) {
+			case XMLStreamReader.START_DOCUMENT:
+			case XMLStreamReader.START_ELEMENT:
+				if ( "pits".equals(sr.getLocalName()) ) {
+					actual = service.readPits(sr);
+				}
+				break;
+			}
+		}
+		List<TQStateUpdate<TQSecID2>> expected = new ArrayList<>();
+		expected.add(new TQStateUpdate<>(new TQSecID2("IRGZ", "TQBR"), new DeltaUpdateBuilder()
+				.withToken(TQSecField.SECCODE, "IRGZ")
+				.withToken(TQBoardField.CODE, "TQBR")
+				.withToken(TQSecField.MARKETID, 1)
+				.withToken(TQSecField.DECIMALS, 2)
+				.withToken(TQSecField.MINSTEP, of("0.02"))
+				.withToken(TQSecField.LOTSIZE, of("100"))
+				.withToken(TQSecField.POINT_COST, of("1"))
+				.buildUpdate()));
+		expected.add(new TQStateUpdate<>(new TQSecID2("IRGZ", "SMAL"), new DeltaUpdateBuilder()
+				.withToken(TQSecField.SECCODE, "IRGZ")
+				.withToken(TQBoardField.CODE, "SMAL")
+				.withToken(TQSecField.MARKETID, 1)
+				.withToken(TQSecField.DECIMALS, 2)
+				.withToken(TQSecField.MINSTEP, of("0.02"))
+				.withToken(TQSecField.LOTSIZE, of("1"))
+				.withToken(TQSecField.POINT_COST, of("1"))
+				.buildUpdate()));
+		expected.add(new TQStateUpdate<>(new TQSecID2("IRGZ", "EQRP"), new DeltaUpdateBuilder()
+				.withToken(TQSecField.SECCODE, "IRGZ")
+				.withToken(TQBoardField.CODE, "EQRP")
+				.withToken(TQSecField.MARKETID, 1)
+				.withToken(TQSecField.DECIMALS, 4)
+				.withToken(TQSecField.MINSTEP, of("0.01"))
+				.withToken(TQSecField.LOTSIZE, of("100"))
+				.withToken(TQSecField.POINT_COST, of("0.01"))
+				.buildUpdate()));
+		expected.add(new TQStateUpdate<>(new TQSecID2("IRGZ", "PSEQ"), new DeltaUpdateBuilder()
+				.withToken(TQSecField.SECCODE, "IRGZ")
+				.withToken(TQBoardField.CODE, "PSEQ")
+				.withToken(TQSecField.MARKETID, 1)
+				.withToken(TQSecField.DECIMALS, 2)
+				.withToken(TQSecField.MINSTEP, of("0.02"))
+				.withToken(TQSecField.LOTSIZE, of("100"))
+				.withToken(TQSecField.POINT_COST, of("1"))
+				.buildUpdate()));
+		expected.add(new TQStateUpdate<>(new TQSecID2("IRGZ", "PSRP"), new DeltaUpdateBuilder()
+				.withToken(TQSecField.SECCODE, "IRGZ")
+				.withToken(TQBoardField.CODE, "PSRP")
+				.withToken(TQSecField.MARKETID, 1)
+				.withToken(TQSecField.DECIMALS, 4)
+				.withToken(TQSecField.MINSTEP, of("0.01"))
+				.withToken(TQSecField.LOTSIZE, of("100"))
+				.withToken(TQSecField.POINT_COST, of("0.01"))
+				.buildUpdate()));
+		expected.add(new TQStateUpdate<>(new TQSecID2("IRGZ", "PTEQ"), new DeltaUpdateBuilder()
+				.withToken(TQSecField.SECCODE, "IRGZ")
+				.withToken(TQBoardField.CODE, "PTEQ")
+				.withToken(TQSecField.MARKETID, 1)
+				.withToken(TQSecField.DECIMALS, 2)
+				.withToken(TQSecField.MINSTEP, of("0.02"))
+				.withToken(TQSecField.LOTSIZE, of("100"))
+				.withToken(TQSecField.POINT_COST, of("1"))
+				.buildUpdate()));
+		expected.add(new TQStateUpdate<>(new TQSecID2("IRGZ", "RPEU"), new DeltaUpdateBuilder()
+				.withToken(TQSecField.SECCODE, "IRGZ")
+				.withToken(TQBoardField.CODE, "RPEU")
+				.withToken(TQSecField.MARKETID, 1)
+				.withToken(TQSecField.DECIMALS, 6)
+				.withToken(TQSecField.MINSTEP, of("0.000001"))
+				.withToken(TQSecField.LOTSIZE, of("1"))
+				.withToken(TQSecField.POINT_COST, of("0.006429"))
+				.buildUpdate()));
+		expected.add(new TQStateUpdate<>(new TQSecID2("IRGZ", "RPMA"), new DeltaUpdateBuilder()
+				.withToken(TQSecField.SECCODE, "IRGZ")
+				.withToken(TQBoardField.CODE, "RPMA")
+				.withToken(TQSecField.MARKETID, 1)
+				.withToken(TQSecField.DECIMALS, 6)
+				.withToken(TQSecField.MINSTEP, of("0.000001"))
+				.withToken(TQSecField.LOTSIZE, of("1"))
+				.withToken(TQSecField.POINT_COST, of("0.0001"))
+				.buildUpdate()));
+		expected.add(new TQStateUpdate<>(new TQSecID2("IRGZ", "RPMO"), new DeltaUpdateBuilder()
+				.withToken(TQSecField.SECCODE, "IRGZ")
+				.withToken(TQBoardField.CODE, "RPMO")
+				.withToken(TQSecField.MARKETID, 1)
+				.withToken(TQSecField.DECIMALS, 6)
+				.withToken(TQSecField.MINSTEP, of("0.000001"))
+				.withToken(TQSecField.LOTSIZE, of("1"))
+				.withToken(TQSecField.POINT_COST, of("0.0001"))
+				.buildUpdate()));
+		expected.add(new TQStateUpdate<>(new TQSecID2("RU000A0ZZ505", "EQOB"), new DeltaUpdateBuilder()
+				.withToken(TQSecField.SECCODE, "RU000A0ZZ505")
+				.withToken(TQBoardField.CODE, "EQOB")
+				.withToken(TQSecField.MARKETID, 1)
+				.withToken(TQSecField.DECIMALS, 2)
+				.withToken(TQSecField.MINSTEP, of("0.01"))
+				.withToken(TQSecField.LOTSIZE, of("1"))
+				.withToken(TQSecField.POINT_COST, of("10"))
+				.buildUpdate()));
+		expected.add(new TQStateUpdate<>(new TQSecID2("RU000A0ZZ505", "PSOB"), new DeltaUpdateBuilder()
+				.withToken(TQSecField.SECCODE, "RU000A0ZZ505")
+				.withToken(TQBoardField.CODE, "PSOB")
+				.withToken(TQSecField.MARKETID, 1)
+				.withToken(TQSecField.DECIMALS, 2)
+				.withToken(TQSecField.MINSTEP, of("0.01"))
+				.withToken(TQSecField.LOTSIZE, of("1"))
+				.withToken(TQSecField.POINT_COST, of("10"))
+				.buildUpdate()));
+		expected.add(new TQStateUpdate<>(new TQSecID2("RU000A0ZZ505", "RPEU"), new DeltaUpdateBuilder()
+				.withToken(TQSecField.SECCODE, "RU000A0ZZ505")
+				.withToken(TQBoardField.CODE, "RPEU")
+				.withToken(TQSecField.MARKETID, 1)
+				.withToken(TQSecField.DECIMALS, 6)
+				.withToken(TQSecField.MINSTEP, of("0.000001"))
+				.withToken(TQSecField.LOTSIZE, of("1"))
+				.withToken(TQSecField.POINT_COST, of("0.001"))
+				.buildUpdate()));
+		expected.add(new TQStateUpdate<>(new TQSecID2("RU000A0ZZ505", "RPMO"), new DeltaUpdateBuilder()
+				.withToken(TQSecField.SECCODE, "RU000A0ZZ505")
+				.withToken(TQBoardField.CODE, "RPMO")
+				.withToken(TQSecField.MARKETID, 1)
+				.withToken(TQSecField.DECIMALS, 4)
+				.withToken(TQSecField.MINSTEP, of("0.0001"))
+				.withToken(TQSecField.LOTSIZE, of("1"))
+				.withToken(TQSecField.POINT_COST, of("0.1"))
+				.buildUpdate()));
+		expected.add(new TQStateUpdate<>(new TQSecID2("PRTK", "TQBR"), new DeltaUpdateBuilder()
+				.withToken(TQSecField.SECCODE, "PRTK")
+				.withToken(TQBoardField.CODE, "TQBR")
+				.withToken(TQSecField.MARKETID, 1)
+				.withToken(TQSecField.DECIMALS, 1)
+				.withToken(TQSecField.MINSTEP, of("0.1"))
+				.withToken(TQSecField.LOTSIZE, of("10"))
+				.withToken(TQSecField.POINT_COST, of("10"))
+				.buildUpdate()));
+		assertEquals(expected, actual);
+	}
 
 }

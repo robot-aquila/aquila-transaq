@@ -46,6 +46,7 @@ public class TQMessageRouter {
 						throw new XMLStreamException("Malformed message");
 					}
 					TQMessageProcessor processor = registry.get(processor_id);
+					processor.processRawMessage(message);
 					processor.processMessage(reader);
 				} finally {
 					reader.close();

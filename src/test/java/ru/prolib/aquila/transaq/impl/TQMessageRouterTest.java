@@ -2,6 +2,9 @@ package ru.prolib.aquila.transaq.impl;
 
 import static org.junit.Assert.*;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -35,19 +38,30 @@ public class TQMessageRouterTest {
 	}
 
 	@Test
-	public void testDispatchMessage_OK() {
+	public void testDispatchMessage_OK() throws Exception {
+		CountDownLatch finished = new CountDownLatch(2);
 		expect(registryMock.get("foobar")).andReturn(new TQMessageProcessor() {
+			
+			@Override
+			public void processRawMessage(String message) {
+				assertEquals("<foobar>zulu-charlie</foobar>", message);
+				finished.countDown();
+			}
+			
 			@Override
 			public void processMessage(XMLStreamReader reader) throws XMLStreamException {
 				assertEquals("foobar", reader.getLocalName());
 				assertEquals("zulu-charlie", new TQParser().readCharacters(reader));
+				finished.countDown();
 			}
+			
 		});
 		control.replay();
 		
 		service.dispatchMessage("<foobar>zulu-charlie</foobar>");
 		
 		control.verify();
+		assertTrue(finished.await(1, TimeUnit.SECONDS));
 	}
 
 	@Test
@@ -63,6 +77,7 @@ public class TQMessageRouterTest {
 	@Test
 	public void testDispatchMessage_ProcessorThrows() throws Exception {
 		expect(registryMock.get("foobar")).andReturn(procMock1);
+		procMock1.processRawMessage(eq("<foobar>zulu-charlie</foobar>"));
 		procMock1.processMessage(anyObject());
 		expectLastCall().andThrow(new Exception("Test error"));
 		control.replay();

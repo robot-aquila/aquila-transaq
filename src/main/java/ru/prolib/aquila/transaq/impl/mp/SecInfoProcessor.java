@@ -17,7 +17,12 @@ public class SecInfoProcessor implements TQMessageProcessor {
 	
 	@Override
 	public void processMessage(XMLStreamReader reader) throws Exception {
-		reactor.updateSecurity(parser.readSecInfo(reader));
+		reactor.updateSecurity1(parser.readSecInfo(reader));
+	}
+
+	@Override
+	public void processRawMessage(String message) throws Exception {
+		
 	}
 
 }

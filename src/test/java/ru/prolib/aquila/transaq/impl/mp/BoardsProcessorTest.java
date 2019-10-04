@@ -11,9 +11,9 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
-import ru.prolib.aquila.transaq.entity.Board;
 import ru.prolib.aquila.transaq.impl.TQParser;
 import ru.prolib.aquila.transaq.impl.TQReactor;
+import ru.prolib.aquila.transaq.impl.TQStateUpdate;
 
 public class BoardsProcessorTest {
 	private IMocksControl control;
@@ -31,14 +31,18 @@ public class BoardsProcessorTest {
 		service = new BoardsProcessor(reactorMock, parserMock);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testProcessMessage() throws Exception {
-		List<Board> boards = new ArrayList<>();
-		boards.add(control.createMock(Board.class));
-		boards.add(control.createMock(Board.class));
-		boards.add(control.createMock(Board.class));
-		expect(parserMock.readBoards(readerMock)).andReturn(boards);
-		reactorMock.updateBoards(boards);
+		TQStateUpdate<String> upMock1, upMock2, upMock3;
+		List<TQStateUpdate<String>> updates = new ArrayList<>();
+		updates.add(upMock1 = control.createMock(TQStateUpdate.class));
+		updates.add(upMock2 = control.createMock(TQStateUpdate.class));
+		updates.add(upMock3 = control.createMock(TQStateUpdate.class));
+		expect(parserMock.readBoards(readerMock)).andReturn(updates);
+		reactorMock.updateBoard(upMock1);
+		reactorMock.updateBoard(upMock2);
+		reactorMock.updateBoard(upMock3);
 		control.replay();
 		
 		service.processMessage(readerMock);

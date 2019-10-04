@@ -9,8 +9,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ru.prolib.aquila.transaq.impl.TQReactor;
+import ru.prolib.aquila.transaq.impl.TQSecID1;
 import ru.prolib.aquila.transaq.impl.TQParser;
-import ru.prolib.aquila.transaq.impl.TQSecurityUpdate1;
+import ru.prolib.aquila.transaq.impl.TQStateUpdate;
 
 public class SecInfoProcessorTest {
 	private IMocksControl control;
@@ -29,9 +30,10 @@ public class SecInfoProcessorTest {
 	@Test
 	public void testProcessMessage() throws Exception {
 		XMLStreamReader readerMock = control.createMock(XMLStreamReader.class);
-		TQSecurityUpdate1 suMock = control.createMock(TQSecurityUpdate1.class);
+		@SuppressWarnings("unchecked")
+		TQStateUpdate<TQSecID1> suMock = control.createMock(TQStateUpdate.class);
 		expect(parserMock.readSecInfo(readerMock)).andReturn(suMock);
-		reactorMock.updateSecurity(suMock);
+		reactorMock.updateSecurity1(suMock);
 		control.replay();
 		
 		service.processMessage(readerMock);

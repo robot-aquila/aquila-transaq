@@ -1,42 +1,37 @@
 package ru.prolib.aquila.transaq.impl;
 
-import java.util.List;
-import ru.prolib.aquila.transaq.entity.Board;
-import ru.prolib.aquila.transaq.entity.CandleKind;
-import ru.prolib.aquila.transaq.entity.Market;
-
 public class TQReactor {
 	private final TQDirectory dir;
 	private final TQSecurityHandlerRegistry shr;
 	private final TQSecurityHandlerFactory shf;
 	
 	public TQReactor(TQDirectory directory,
-						 TQSecurityHandlerRegistry sh_registry,
-						 TQSecurityHandlerFactory sh_factory)
+					 TQSecurityHandlerRegistry sh_registry,
+					 TQSecurityHandlerFactory sh_factory)
 	{
 		this.dir = directory;
 		this.shr = sh_registry;
 		this.shf = sh_factory;
 	}
 
-	public void updateMarkets(List<Market> markets) {
-		dir.updateMarkets(markets);
+	public void updateMarket(TQStateUpdate<Integer> update) {
+		dir.updateMarket(update);
 	}
 
-	public void updateBoards(List<Board> boards) {
-		dir.updateBoards(boards);
+	public void updateBoard(TQStateUpdate<String> update) {
+		dir.updateBoard(update);
 	}
 
-	public void updateCandleKinds(List<CandleKind> candle_kinds) {
-		dir.updateCandleKinds(candle_kinds);
+	public void updateCandleKind(TQStateUpdate<Integer> update) {
+		dir.updateCKind(update);
 	}
 
-	public void updateSecurity(TQSecurityUpdate1 update) {
-		shr.getHandler(update.getSecID()).update(update.getUpdate());
+	public void updateSecurity1(TQStateUpdate<TQSecID1> update) {
+		shr.getHandler(update.getID()).update(update.getUpdate());
 	}
 
-	public void updateSecurity(TQSecurityUpdate3 update) {
-		TQSecID_F sec_id = update.getSecID();
+	public void updateSecurityF(TQStateUpdate<TQSecID_F> update) {
+		TQSecID_F sec_id = update.getID();
 		TQSecurityHandler x = shr.getHandlerOrNull(sec_id);
 		if ( x == null ) {
 			x = shf.createHandler(sec_id);

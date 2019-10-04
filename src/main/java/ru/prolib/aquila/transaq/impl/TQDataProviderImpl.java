@@ -17,8 +17,12 @@ public class TQDataProviderImpl implements DataProvider {
 		this.factory = factory;
 	}
 	
-	public TQDataProviderImpl(Section config) {
-		this(new TQConnectorFactory(config));
+	public TQDataProviderImpl(Section config, TQDirectory directory) {
+		this(new TQConnectorFactory(config, directory));
+	}
+	
+	public TQDirectory getDirectory() {
+		return factory.getDirectory();
 	}
 
 	@Override

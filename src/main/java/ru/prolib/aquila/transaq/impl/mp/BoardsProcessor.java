@@ -5,6 +5,7 @@ import javax.xml.stream.XMLStreamReader;
 import ru.prolib.aquila.transaq.impl.TQMessageProcessor;
 import ru.prolib.aquila.transaq.impl.TQParser;
 import ru.prolib.aquila.transaq.impl.TQReactor;
+import ru.prolib.aquila.transaq.impl.TQStateUpdate;
 
 public class BoardsProcessor implements TQMessageProcessor {
 	private final TQReactor reactor;
@@ -21,6 +22,14 @@ public class BoardsProcessor implements TQMessageProcessor {
 
 	@Override
 	public void processMessage(XMLStreamReader reader) throws Exception {
-		reactor.updateBoards(parser.readBoards(reader));
+		for ( TQStateUpdate<String> update : parser.readBoards(reader) ) {
+			reactor.updateBoard(update);
+		}
 	}
+
+	@Override
+	public void processRawMessage(String message) throws Exception {
+		
+	}
+
 }
