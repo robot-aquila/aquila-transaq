@@ -27,11 +27,13 @@ public class TQReactor {
 	}
 
 	public void updateSecurity1(TQStateUpdate<TQSecID1> update) {
+		dir.updateSecurityParams(update);
 		shr.getHandler(update.getID()).update(update.getUpdate());
 	}
 
 	public void updateSecurityF(TQStateUpdate<TQSecID_F> update) {
 		TQSecID_F sec_id = update.getID();
+		dir.updateSecurityParams(new TQStateUpdate<>(new TQSecID1(sec_id), update.getUpdate()));
 		TQSecurityHandler x = shr.getHandlerOrNull(sec_id);
 		if ( x == null ) {
 			x = shf.createHandler(sec_id);

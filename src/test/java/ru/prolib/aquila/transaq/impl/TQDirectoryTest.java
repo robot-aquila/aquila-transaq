@@ -12,12 +12,14 @@ import ru.prolib.aquila.core.BusinessEntities.osc.OSCRepository;
 import ru.prolib.aquila.transaq.entity.Board;
 import ru.prolib.aquila.transaq.entity.CKind;
 import ru.prolib.aquila.transaq.entity.Market;
+import ru.prolib.aquila.transaq.entity.SecurityParams;
 
 public class TQDirectoryTest {
 	private IMocksControl control;
 	private OSCRepository<Integer, CKind> ckindsMock;
 	private OSCRepository<Integer, Market> marketsMock;
 	private OSCRepository<String, Board> boardsMock;
+	private OSCRepository<TQSecID1, SecurityParams> secParamsRepoMock;
 	private DeltaUpdate duMock;
 	private TQDirectory service;
 
@@ -28,8 +30,9 @@ public class TQDirectoryTest {
 		boardsMock = control.createMock(OSCRepository.class);
 		marketsMock = control.createMock(OSCRepository.class);
 		ckindsMock = control.createMock(OSCRepository.class);
+		secParamsRepoMock = control.createMock(OSCRepository.class);
 		duMock = control.createMock(DeltaUpdate.class);
-		service = new TQDirectory(ckindsMock, marketsMock, boardsMock);
+		service = new TQDirectory(ckindsMock, marketsMock, boardsMock, secParamsRepoMock);
 	}
 	
 	@Test
@@ -72,6 +75,19 @@ public class TQDirectoryTest {
 	}
 	
 	@Test
+	public void testUpdateSecurityParams() {
+		TQStateUpdate<TQSecID1> update = new TQStateUpdate<>(new TQSecID1("foo", 314), duMock);
+		SecurityParams secParamsMock = control.createMock(SecurityParams.class);
+		expect(secParamsRepoMock.getOrCreate(new TQSecID1("foo", 314))).andReturn(secParamsMock);
+		secParamsMock.consume(duMock);
+		control.replay();
+		
+		service.updateSecurityParams(update);
+		
+		control.verify();
+	}
+	
+	@Test
 	public void testGetMarketName() {
 		Market marketMock = control.createMock(Market.class);
 		expect(marketsMock.getOrThrow(71)).andReturn(marketMock);
@@ -96,6 +112,11 @@ public class TQDirectoryTest {
 	@Test
 	public void testGetBoardRepository() {
 		assertSame(boardsMock, service.getBoardRepository());
+	}
+	
+	@Test
+	public void testGetSecurityParamsRepository() {
+		assertSame(secParamsRepoMock, service.getSecurityParamsRepository());
 	}
 
 }
