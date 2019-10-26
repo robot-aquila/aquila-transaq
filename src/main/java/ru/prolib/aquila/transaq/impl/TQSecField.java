@@ -1,6 +1,7 @@
 package ru.prolib.aquila.transaq.impl;
 
 public class TQSecField {
+	// <securities>
 	public static final int SECID				= 5200; // int
 	public static final int SECCODE				= 5201; // string
 	public static final int MARKETID			= 5202; // int
@@ -27,9 +28,9 @@ public class TQSecField {
 	public static final int SELL_DEPOSIT		= 5231; // CDecimal
 	public static final int BGO_C				= 5232; // CDecimal
 	public static final int BGO_NC				= 5233; // CDecimal
-	public static final int ACCRUED_INT			= 5234; // CDecimal?
-	public static final int COUPON_VALUE		= 5235; // CDecimal?
-	public static final int COUPON_DATE			= 5236; // date?
+	public static final int ACCRUED_INT			= 5234; // CDecimal
+	public static final int COUPON_VALUE		= 5235; // CDecimal
+	public static final int COUPON_DATE			= 5236; // LocalDateTime
 	public static final int COUPON_PERIOD		= 5237; // int
 	public static final int FACE_VALUE			= 5238; // CDecimal
 	public static final int PUT_CALL			= 5239; // string
