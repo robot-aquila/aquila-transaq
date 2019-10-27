@@ -9,6 +9,8 @@ import ru.prolib.aquila.transaq.entity.CKind;
 import ru.prolib.aquila.transaq.entity.CKindFactory;
 import ru.prolib.aquila.transaq.entity.Market;
 import ru.prolib.aquila.transaq.entity.MarketFactory;
+import ru.prolib.aquila.transaq.entity.SecurityBoardParams;
+import ru.prolib.aquila.transaq.entity.SecurityBoardParamsFactory;
 import ru.prolib.aquila.transaq.entity.SecurityParams;
 import ru.prolib.aquila.transaq.entity.SecurityParamsFactory;
 
@@ -17,25 +19,29 @@ public class TQDirectory {
 	private final OSCRepository<Integer, Market> markets;
 	private final OSCRepository<String, Board> boards;
 	private final OSCRepository<TQSecID1, SecurityParams> secParams;
+	private final OSCRepository<TQSecID2, SecurityBoardParams> secBoardParams;
 	
 	TQDirectory(
 			OSCRepository<Integer, CKind> ckinds,
 			OSCRepository<Integer, Market> markets,
 			OSCRepository<String, Board> boards,
-			OSCRepository<TQSecID1, SecurityParams> secParams
+			OSCRepository<TQSecID1, SecurityParams> secParams,
+			OSCRepository<TQSecID2, SecurityBoardParams> secBoardParams
 		)
 	{
 		this.ckinds = ckinds;
 		this.markets = markets;
 		this.boards = boards;
 		this.secParams = secParams;
+		this.secBoardParams = secBoardParams;
 	}
 	
 	public TQDirectory(EventQueue queue) {
 		this(new OSCRepositoryImpl<>(new CKindFactory(queue), "CKINDS"),
 			 new OSCRepositoryImpl<>(new MarketFactory(queue), "MARKETS"),
 			 new OSCRepositoryImpl<>(new BoardFactory(queue), "BOARDS"),
-			 new OSCRepositoryImpl<>(new SecurityParamsFactory(queue), "SECURITY_PARAMS")
+			 new OSCRepositoryImpl<>(new SecurityParamsFactory(queue), "SEC_PARAMS"),
+			 new OSCRepositoryImpl<>(new SecurityBoardParamsFactory(queue), "SEC_BRD_PARAMS")
 		);
 	}
 	
@@ -55,6 +61,10 @@ public class TQDirectory {
 		return secParams;
 	}
 	
+	public OSCRepository<TQSecID2, SecurityBoardParams> getSecurityBoardParamsRepository() {
+		return secBoardParams;
+	}
+	
 	public void updateCKind(TQStateUpdate<Integer> ckind_update) {
 		ckinds.getOrCreate(ckind_update.getID()).consume(ckind_update.getUpdate());
 	}
@@ -69,6 +79,10 @@ public class TQDirectory {
 	
 	public void updateSecurityParams(TQStateUpdate<TQSecID1> sec_params_update) {
 		secParams.getOrCreate(sec_params_update.getID()).consume(sec_params_update.getUpdate());
+	}
+	
+	public void updateSecurityBoardParams(TQStateUpdate<TQSecID2> sbp_update) {
+		secBoardParams.getOrCreate(sbp_update.getID()).consume(sbp_update.getUpdate());
 	}
 
 	public String getMarketName(int market_id) {

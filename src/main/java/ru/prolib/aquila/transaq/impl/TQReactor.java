@@ -43,5 +43,9 @@ public class TQReactor {
 			x.update(update.getUpdate());
 		}
 	}
+	
+	public void updateSecurityBoard(TQStateUpdate<TQSecID2> update) {
+		dir.updateSecurityBoardParams(update);
+	}
 
 }

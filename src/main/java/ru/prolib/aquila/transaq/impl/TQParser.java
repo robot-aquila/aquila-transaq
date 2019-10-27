@@ -19,6 +19,11 @@ import ru.prolib.aquila.core.BusinessEntities.CDecimal;
 import ru.prolib.aquila.core.BusinessEntities.CDecimalBD;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.transaq.entity.SecType;
+import ru.prolib.aquila.transaq.impl.TQField.FBoard;
+import ru.prolib.aquila.transaq.impl.TQField.FCKind;
+import ru.prolib.aquila.transaq.impl.TQField.FMarket;
+import ru.prolib.aquila.transaq.impl.TQField.FSecurity;
+import ru.prolib.aquila.transaq.impl.TQField.FSecurityBoard;
 
 public class TQParser {
 	private static final Logger logger;
@@ -146,8 +151,8 @@ public class TQParser {
 		try {
 			int market_id = Integer.parseInt(str_id);
 			return new TQStateUpdate<Integer>(market_id, new DeltaUpdateBuilder()
-					.withToken(TQMarketField.ID, market_id)
-					.withToken(TQMarketField.NAME, str_name)
+					.withToken(FMarket.ID, market_id)
+					.withToken(FMarket.NAME, str_name)
 					.buildUpdate()
 				);
 		} catch ( NumberFormatException e ) {
@@ -206,10 +211,10 @@ public class TQParser {
 						str_name = str_code + " [N/A]";
 					}
 					return new TQStateUpdate<>(str_code, new DeltaUpdateBuilder()
-							.withToken(TQBoardField.CODE, str_code)
-							.withToken(TQBoardField.MARKET_ID, market)
-							.withToken(TQBoardField.NAME, str_name)
-							.withToken(TQBoardField.TYPE, type)
+							.withToken(FBoard.CODE, str_code)
+							.withToken(FBoard.MARKET_ID, market)
+							.withToken(FBoard.NAME, str_name)
+							.withToken(FBoard.TYPE, type)
 							.buildUpdate()
 						);
 				}
@@ -269,9 +274,9 @@ public class TQParser {
 						name = id + " [N/A]";
 					}
 					return new TQStateUpdate<Integer>(id, new DeltaUpdateBuilder()
-							.withToken(TQCKindField.CKIND_ID, id)
-							.withToken(TQCKindField.CKIND_PERIOD, period)
-							.withToken(TQCKindField.CKIND_NAME, name)
+							.withToken(FCKind.CKIND_ID, id)
+							.withToken(FCKind.CKIND_PERIOD, period)
+							.withToken(FCKind.CKIND_NAME, name)
 							.buildUpdate()
 						);
 				}
@@ -311,38 +316,38 @@ public class TQParser {
 		String sec_code = null, short_name = null;
 		SecType sec_type = null;
 		DeltaUpdateBuilder builder = new DeltaUpdateBuilder()
-				.withToken(TQSecField.SECID, getAttributeInt(reader, "secid"))
-				.withToken(TQSecField.ACTIVE, getAttributeBool(reader, "active"));
+				.withToken(FSecurity.SECID, getAttributeInt(reader, "secid"))
+				.withToken(FSecurity.ACTIVE, getAttributeBool(reader, "active"));
 		while ( reader.hasNext() ) {
 			switch ( reader.next() ) {
 			case XMLStreamReader.START_ELEMENT:
 				switch ( reader.getLocalName() ) {
 				case "seccode":
-					builder.withToken(TQSecField.SECCODE, sec_code = readCharacters(reader));
+					builder.withToken(FSecurity.SECCODE, sec_code = readCharacters(reader));
 					break;
 				case "instrclass":
-					builder.withToken(TQSecField.SECCLASS, readCharacters(reader));
+					builder.withToken(FSecurity.SECCLASS, readCharacters(reader));
 					break;
 				case "board":
-					builder.withToken(TQSecField.DEFAULT_BOARDCODE, readCharacters(reader));
+					builder.withToken(FSecurity.DEFAULT_BOARDCODE, readCharacters(reader));
 					break;
 				case "market":
-					builder.withToken(TQSecField.MARKETID, market_id = readInt(reader));
+					builder.withToken(FSecurity.MARKETID, market_id = readInt(reader));
 					break;
 				case "shortname":
-					builder.withToken(TQSecField.SHORT_NAME, short_name = readCharacters(reader));
+					builder.withToken(FSecurity.SHORT_NAME, short_name = readCharacters(reader));
 					break;
 				case "decimals":
-					builder.withToken(TQSecField.DECIMALS, readInt(reader));
+					builder.withToken(FSecurity.DECIMALS, readInt(reader));
 					break;
 				case "minstep":
-					builder.withToken(TQSecField.MINSTEP, readDecimal(reader));
+					builder.withToken(FSecurity.MINSTEP, readDecimal(reader));
 					break;
 				case "lotsize":
-					builder.withToken(TQSecField.LOTSIZE, readDecimal(reader));
+					builder.withToken(FSecurity.LOTSIZE, readDecimal(reader));
 					break;
 				case "point_cost":
-					builder.withToken(TQSecField.POINT_COST, readDecimal(reader));
+					builder.withToken(FSecurity.POINT_COST, readDecimal(reader));
 					break;
 				case "opmask":
 					int opmask = 0;
@@ -352,7 +357,7 @@ public class TQParser {
 					opmask |= getAttributeBool(reader, "fok", "yes") ? OPMASK_FOK : 0;
 					opmask |= getAttributeBool(reader, "ioc", "yes") ? OPMASK_IOC : 0;
 					reader.nextTag();
-					builder.withToken(TQSecField.OPMASK, opmask);
+					builder.withToken(FSecurity.OPMASK, opmask);
 					break;
 				case "sectype":
 					String str_sec_type = readCharacters(reader);
@@ -367,13 +372,13 @@ public class TQParser {
 							throw e;
 						}
 					}
-					builder.withToken(TQSecField.SECTYPE, sec_type);
+					builder.withToken(FSecurity.SECTYPE, sec_type);
 					break;
 				case "sec_tz":
-					builder.withToken(TQSecField.SECTZ, readCharacters(reader));
+					builder.withToken(FSecurity.SECTZ, readCharacters(reader));
 					break;
 				case "quotestype":
-					builder.withToken(TQSecField.QUOTESTYPE, readInt(reader));
+					builder.withToken(FSecurity.QUOTESTYPE, readInt(reader));
 					break;
 				}
 				break;
@@ -427,70 +432,70 @@ public class TQParser {
 		Integer market_id = null;
 		String sec_code = null;
 		DeltaUpdateBuilder builder = new DeltaUpdateBuilder()
-				.withToken(TQSecField.SECID, getAttributeInt(reader, "secid"));
+				.withToken(FSecurity.SECID, getAttributeInt(reader, "secid"));
 		while ( reader.hasNext() ) {
 			switch ( reader.next() ) {
 			case XMLStreamReader.START_ELEMENT:
 				switch ( reader.getLocalName() ) {
 				case "secname":
-					builder.withToken(TQSecField.SECNAME, readCharacters(reader));
+					builder.withToken(FSecurity.SECNAME, readCharacters(reader));
 					break;
 				case "seccode":
-					builder.withToken(TQSecField.SECCODE, sec_code = readCharacters(reader));
+					builder.withToken(FSecurity.SECCODE, sec_code = readCharacters(reader));
 					break;
 				case "market":
-					builder.withToken(TQSecField.MARKETID,  market_id = readInt(reader));
+					builder.withToken(FSecurity.MARKETID,  market_id = readInt(reader));
 					break;
 				case "pname":
-					builder.withToken(TQSecField.PNAME, readCharacters(reader));
+					builder.withToken(FSecurity.PNAME, readCharacters(reader));
 					break;
 				case "mat_date":
-					builder.withToken(TQSecField.MAT_DATE, readDate(reader));
+					builder.withToken(FSecurity.MAT_DATE, readDate(reader));
 					break;
 				case "clearing_price":
-					builder.withToken(TQSecField.CLEARING_PRICE, readDecimal(reader));
+					builder.withToken(FSecurity.CLEARING_PRICE, readDecimal(reader));
 					break;
 				case "minprice":
-					builder.withToken(TQSecField.MINPRICE, readDecimal(reader));
+					builder.withToken(FSecurity.MINPRICE, readDecimal(reader));
 					break;
 				case "maxprice":
-					builder.withToken(TQSecField.MAXPRICE, readDecimal(reader));
+					builder.withToken(FSecurity.MAXPRICE, readDecimal(reader));
 					break;
 				case "buy_deposit":
-					builder.withToken(TQSecField.BUY_DEPOSIT, readDecimal(reader));
+					builder.withToken(FSecurity.BUY_DEPOSIT, readDecimal(reader));
 					break;
 				case "sell_deposit":
-					builder.withToken(TQSecField.SELL_DEPOSIT, readDecimal(reader));
+					builder.withToken(FSecurity.SELL_DEPOSIT, readDecimal(reader));
 					break;
 				case "bgo_c":
-					builder.withToken(TQSecField.BGO_C, readDecimal(reader));
+					builder.withToken(FSecurity.BGO_C, readDecimal(reader));
 					break;
 				case "bgo_nc":
-					builder.withToken(TQSecField.BGO_NC, readDecimal(reader));
+					builder.withToken(FSecurity.BGO_NC, readDecimal(reader));
 					break;
 				case "accruedint":
-					builder.withToken(TQSecField.ACCRUED_INT, readDecimal(reader));
+					builder.withToken(FSecurity.ACCRUED_INT, readDecimal(reader));
 					break;
 				case "coupon_value":
-					builder.withToken(TQSecField.COUPON_VALUE, readDecimal(reader));
+					builder.withToken(FSecurity.COUPON_VALUE, readDecimal(reader));
 					break;
 				case "coupon_date":
-					builder.withToken(TQSecField.COUPON_DATE, readDate(reader));
+					builder.withToken(FSecurity.COUPON_DATE, readDate(reader));
 					break;
 				case "coupon_period":
-					builder.withToken(TQSecField.COUPON_PERIOD, readInt(reader));
+					builder.withToken(FSecurity.COUPON_PERIOD, readInt(reader));
 					break;
 				case "facevalue":
-					builder.withToken(TQSecField.FACE_VALUE, readDecimal(reader));
+					builder.withToken(FSecurity.FACE_VALUE, readDecimal(reader));
 					break;
 				case "put_call":
-					builder.withToken(TQSecField.PUT_CALL, readCharacters(reader));
+					builder.withToken(FSecurity.PUT_CALL, readCharacters(reader));
 					break;
 				case "opt_type":
-					builder.withToken(TQSecField.OPT_TYPE, readCharacters(reader));
+					builder.withToken(FSecurity.OPT_TYPE, readCharacters(reader));
 					break;
 				case "lot_volume":
-					builder.withToken(TQSecField.LOT_VOLUME, readInt(reader));
+					builder.withToken(FSecurity.LOT_VOLUME, readInt(reader));
 					break;
 				default:
 					break;
@@ -521,37 +526,37 @@ public class TQParser {
 			case XMLStreamReader.START_ELEMENT:
 				switch ( reader.getLocalName() ) {
 				case "secid":
-					builder.withToken(TQSecField.SECID, readInt(reader));
+					builder.withToken(FSecurity.SECID, readInt(reader));
 					break;
 				case "market":
-					builder.withToken(TQSecField.MARKETID, market_id = readInt(reader));
+					builder.withToken(FSecurity.MARKETID, market_id = readInt(reader));
 					break;
 				case "seccode":
-					builder.withToken(TQSecField.SECCODE, sec_code = readCharacters(reader));
+					builder.withToken(FSecurity.SECCODE, sec_code = readCharacters(reader));
 					break;
 				case "minprice":
-					builder.withToken(TQSecField.MINPRICE, readDecimal(reader));
+					builder.withToken(FSecurity.MINPRICE, readDecimal(reader));
 					break;
 				case "maxprice":
-					builder.withToken(TQSecField.MAXPRICE, readDecimal(reader));
+					builder.withToken(FSecurity.MAXPRICE, readDecimal(reader));
 					break;
 				case "buy_deposit":
-					builder.withToken(TQSecField.BUY_DEPOSIT, readDecimal(reader));
+					builder.withToken(FSecurity.BUY_DEPOSIT, readDecimal(reader));
 					break;
 				case "sell_deposit":
-					builder.withToken(TQSecField.SELL_DEPOSIT, readDecimal(reader));
+					builder.withToken(FSecurity.SELL_DEPOSIT, readDecimal(reader));
 					break;
 				case "bgo_c":
-					builder.withToken(TQSecField.BGO_C, readDecimal(reader));
+					builder.withToken(FSecurity.BGO_C, readDecimal(reader));
 					break;
 				case "bgo_nc":
-					builder.withToken(TQSecField.BGO_NC, readDecimal(reader));
+					builder.withToken(FSecurity.BGO_NC, readDecimal(reader));
 					break;
 				case "bgo_buy":
-					builder.withToken(TQSecField.BGO_BUY, readDecimal(reader));
+					builder.withToken(FSecurity.BGO_BUY, readDecimal(reader));
 					break;
 				case "point_cost":
-					builder.withToken(TQSecField.POINT_COST, readDecimal(reader));
+					builder.withToken(FSecurity.POINT_COST, readDecimal(reader));
 					break;
 				}
 				break;
@@ -572,26 +577,26 @@ public class TQParser {
 		Integer market_id = null;
 		String sec_code = null, board_code = null;
 		DeltaUpdateBuilder builder = new DeltaUpdateBuilder()
-				.withToken(TQSecField.SECCODE, sec_code = getAttribute(reader, "seccode"))
-				.withToken(TQBoardField.CODE, board_code = getAttribute(reader, "board"));
+				.withToken(FSecurityBoard.SECCODE, sec_code = getAttribute(reader, "seccode"))
+				.withToken(FSecurityBoard.BOARD, board_code = getAttribute(reader, "board"));
 		while ( reader.hasNext() ) {
 			switch ( reader.next() ) {
 			case XMLStreamReader.START_ELEMENT:
 				switch ( reader.getLocalName() ) {
 				case "market":
-					builder.withToken(TQSecField.MARKETID, market_id = readInt(reader));
+					builder.withToken(FSecurityBoard.MARKET, market_id = readInt(reader));
 					break;
 				case "decimals":
-					builder.withToken(TQSecField.DECIMALS, readInt(reader));
+					builder.withToken(FSecurityBoard.DECIMALS, readInt(reader));
 					break;
 				case "minstep":
-					builder.withToken(TQSecField.MINSTEP, readDecimal(reader));
+					builder.withToken(FSecurityBoard.MINSTEP, readDecimal(reader));
 					break;
 				case "lotsize":
-					builder.withToken(TQSecField.LOTSIZE, readDecimal(reader));
+					builder.withToken(FSecurityBoard.LOTSIZE, readDecimal(reader));
 					break;
 				case "point_cost":
-					builder.withToken(TQSecField.POINT_COST, readDecimal(reader));
+					builder.withToken(FSecurityBoard.POINT_COST, readDecimal(reader));
 					break;
 				}
 				break;

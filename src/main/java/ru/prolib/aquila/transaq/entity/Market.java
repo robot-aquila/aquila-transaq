@@ -2,7 +2,7 @@ package ru.prolib.aquila.transaq.entity;
 
 import ru.prolib.aquila.core.BusinessEntities.ObservableStateContainerImpl;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCParams;
-import ru.prolib.aquila.transaq.impl.TQMarketField;
+import ru.prolib.aquila.transaq.impl.TQField.FMarket;
 
 public class Market extends ObservableStateContainerImpl {
 	
@@ -11,11 +11,11 @@ public class Market extends ObservableStateContainerImpl {
 	}
 	
 	public int getID() {
-		return this.getInteger(TQMarketField.ID);
+		return this.getInteger(FMarket.ID);
 	}
 	
 	public String getName() {
-		return this.getString(TQMarketField.NAME);
+		return this.getString(FMarket.NAME);
 	}
 	
 }

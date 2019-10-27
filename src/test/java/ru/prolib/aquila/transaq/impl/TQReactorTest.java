@@ -111,5 +111,18 @@ public class TQReactorTest {
 		
 		control.verify();
 	}
+	
+	@Test
+	public void testUpdateSecurityBoard() {
+		TQSecID2 sec_id = new TQSecID2("foo", "bar");
+		DeltaUpdate duMock = control.createMock(DeltaUpdate.class);
+		TQStateUpdate<TQSecID2> update = new TQStateUpdate<>(sec_id, duMock);
+		dirMock.updateSecurityBoardParams(update);
+		control.replay();
+		
+		service.updateSecurityBoard(update);
+		
+		control.verify();
+	}
 
 }

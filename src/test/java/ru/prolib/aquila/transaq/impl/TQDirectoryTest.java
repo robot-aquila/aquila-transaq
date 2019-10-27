@@ -12,6 +12,7 @@ import ru.prolib.aquila.core.BusinessEntities.osc.OSCRepository;
 import ru.prolib.aquila.transaq.entity.Board;
 import ru.prolib.aquila.transaq.entity.CKind;
 import ru.prolib.aquila.transaq.entity.Market;
+import ru.prolib.aquila.transaq.entity.SecurityBoardParams;
 import ru.prolib.aquila.transaq.entity.SecurityParams;
 
 public class TQDirectoryTest {
@@ -20,6 +21,7 @@ public class TQDirectoryTest {
 	private OSCRepository<Integer, Market> marketsMock;
 	private OSCRepository<String, Board> boardsMock;
 	private OSCRepository<TQSecID1, SecurityParams> secParamsRepoMock;
+	private OSCRepository<TQSecID2, SecurityBoardParams> secBoardParamsMock;
 	private DeltaUpdate duMock;
 	private TQDirectory service;
 
@@ -31,8 +33,9 @@ public class TQDirectoryTest {
 		marketsMock = control.createMock(OSCRepository.class);
 		ckindsMock = control.createMock(OSCRepository.class);
 		secParamsRepoMock = control.createMock(OSCRepository.class);
+		secBoardParamsMock = control.createMock(OSCRepository.class);
 		duMock = control.createMock(DeltaUpdate.class);
-		service = new TQDirectory(ckindsMock, marketsMock, boardsMock, secParamsRepoMock);
+		service = new TQDirectory(ckindsMock, marketsMock, boardsMock, secParamsRepoMock, secBoardParamsMock);
 	}
 	
 	@Test
@@ -88,6 +91,19 @@ public class TQDirectoryTest {
 	}
 	
 	@Test
+	public void testUpdateSecurityBoardParams() {
+		TQStateUpdate<TQSecID2> update = new TQStateUpdate<>(new TQSecID2("foo", "bar"), duMock);
+		SecurityBoardParams sbpMock = control.createMock(SecurityBoardParams.class);
+		expect(secBoardParamsMock.getOrCreate(new TQSecID2("foo", "bar"))).andReturn(sbpMock);
+		sbpMock.consume(duMock);
+		control.replay();
+		
+		service.updateSecurityBoardParams(update);
+		
+		control.verify();
+	}
+	
+	@Test
 	public void testGetMarketName() {
 		Market marketMock = control.createMock(Market.class);
 		expect(marketsMock.getOrThrow(71)).andReturn(marketMock);
@@ -117,6 +133,11 @@ public class TQDirectoryTest {
 	@Test
 	public void testGetSecurityParamsRepository() {
 		assertSame(secParamsRepoMock, service.getSecurityParamsRepository());
+	}
+	
+	@Test
+	public void testGetSecurityBoardParamsRepository() {
+		assertSame(secBoardParamsMock, service.getSecurityBoardParamsRepository());
 	}
 
 }

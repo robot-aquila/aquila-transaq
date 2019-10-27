@@ -11,7 +11,7 @@ import ru.prolib.aquila.core.EventQueue;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCControllerStub;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCRepository;
-import ru.prolib.aquila.transaq.impl.TQMarketField;
+import ru.prolib.aquila.transaq.impl.TQField.FMarket;
 
 public class MarketTest {
 	private IMocksControl control;
@@ -31,8 +31,8 @@ public class MarketTest {
 	@Test
 	public void testCtor2() {
 		service.consume(new DeltaUpdateBuilder()
-				.withToken(TQMarketField.ID, 215)
-				.withToken(TQMarketField.NAME, "foobar")
+				.withToken(FMarket.ID, 215)
+				.withToken(FMarket.NAME, "foobar")
 				.buildUpdate()
 			);
 		

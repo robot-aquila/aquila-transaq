@@ -11,7 +11,7 @@ import ru.prolib.aquila.core.EventQueue;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCControllerStub;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCRepository;
-import ru.prolib.aquila.transaq.impl.TQBoardField;
+import ru.prolib.aquila.transaq.impl.TQField.FBoard;
 
 public class BoardTest {
 	private IMocksControl control;
@@ -31,10 +31,10 @@ public class BoardTest {
 	@Test
 	public void testCtor4() {
 		service.consume(new DeltaUpdateBuilder()
-				.withToken(TQBoardField.CODE, "AUCT")
-				.withToken(TQBoardField.NAME, "Auction")
-				.withToken(TQBoardField.MARKET_ID, 1)
-				.withToken(TQBoardField.TYPE, 2)
+				.withToken(FBoard.CODE, "AUCT")
+				.withToken(FBoard.NAME, "Auction")
+				.withToken(FBoard.MARKET_ID, 1)
+				.withToken(FBoard.TYPE, 2)
 				.buildUpdate()
 			);
 		

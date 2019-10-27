@@ -92,9 +92,9 @@
 	</pit>
 	<pit seccode="PRTK" board ="TQBR">
 		<market>1</market>
-		<decimals>1</decimals>
+		<decimals>2</decimals>
 		<minstep>0.1</minstep>
 		<lotsize>10</lotsize>
-		<point_cost>10</point_cost>
+		<point_cost>12.34</point_cost>
 	</pit>
 </pits>

@@ -2,7 +2,7 @@ package ru.prolib.aquila.transaq.entity;
 
 import ru.prolib.aquila.core.BusinessEntities.ObservableStateContainerImpl;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCParams;
-import ru.prolib.aquila.transaq.impl.TQBoardField;
+import ru.prolib.aquila.transaq.impl.TQField.FBoard;
 
 public class Board extends ObservableStateContainerImpl {
 	
@@ -11,19 +11,19 @@ public class Board extends ObservableStateContainerImpl {
 	}
 	
 	public String getCode() {
-		return this.getString(TQBoardField.CODE);
+		return this.getString(FBoard.CODE);
 	}
 	
 	public String getName() {
-		return this.getString(TQBoardField.NAME);
+		return this.getString(FBoard.NAME);
 	}
 	
 	public int getMarketID() {
-		return this.getInteger(TQBoardField.MARKET_ID);
+		return this.getInteger(FBoard.MARKET_ID);
 	}
 	
 	public int getTypeID() {
-		return this.getInteger(TQBoardField.TYPE);
+		return this.getInteger(FBoard.TYPE);
 	}
 
 }

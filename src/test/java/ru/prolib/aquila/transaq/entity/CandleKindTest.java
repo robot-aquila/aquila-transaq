@@ -11,7 +11,7 @@ import ru.prolib.aquila.core.EventQueue;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCControllerStub;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCRepository;
-import ru.prolib.aquila.transaq.impl.TQCKindField;
+import ru.prolib.aquila.transaq.impl.TQField.FCKind;
 
 public class CandleKindTest {
 	private IMocksControl control;
@@ -31,9 +31,9 @@ public class CandleKindTest {
 	@Test
 	public void testCtor3() {
 		service.consume(new DeltaUpdateBuilder()
-				.withToken(TQCKindField.CKIND_ID, 25)
-				.withToken(TQCKindField.CKIND_PERIOD, 60)
-				.withToken(TQCKindField.CKIND_NAME, "60 minutes")
+				.withToken(FCKind.CKIND_ID, 25)
+				.withToken(FCKind.CKIND_PERIOD, 60)
+				.withToken(FCKind.CKIND_NAME, "60 minutes")
 				.buildUpdate()
 			);
 		

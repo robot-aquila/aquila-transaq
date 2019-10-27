@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import ru.prolib.aquila.core.BusinessEntities.CDecimal;
 import ru.prolib.aquila.core.BusinessEntities.ObservableStateContainerImpl;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCParams;
-import ru.prolib.aquila.transaq.impl.TQSecField;
+import ru.prolib.aquila.transaq.impl.TQField.FSecurity;
 
 public class SecurityParams extends ObservableStateContainerImpl {
 
@@ -14,135 +14,135 @@ public class SecurityParams extends ObservableStateContainerImpl {
 	}
 
 	public String getSecCode() {
-		return this.getString(TQSecField.SECCODE);
+		return this.getString(FSecurity.SECCODE);
 	}
 	
 	public int getMarketID() {
-		return this.getInteger(TQSecField.MARKETID);
+		return this.getInteger(FSecurity.MARKETID);
 	}
 	
 	public boolean isActive() {
-		return this.getBoolean(TQSecField.ACTIVE);
+		return this.getBoolean(FSecurity.ACTIVE);
 	}
 	
 	public String getSecClass() {
-		return this.getString(TQSecField.SECCLASS);
+		return this.getString(FSecurity.SECCLASS);
 	}
 	
 	public String getDefaultBoard() {
-		return this.getString(TQSecField.DEFAULT_BOARDCODE);
+		return this.getString(FSecurity.DEFAULT_BOARDCODE);
 	}
 	
 	public String getShortName() {
-		return this.getString(TQSecField.SHORT_NAME);
+		return this.getString(FSecurity.SHORT_NAME);
 	}
 	
 	public int getDecimals() {
-		return this.getInteger(TQSecField.DECIMALS);
+		return this.getInteger(FSecurity.DECIMALS);
 	}
 	
 	public CDecimal getMinStep() {
-		return this.getCDecimal(TQSecField.MINSTEP);
+		return this.getCDecimal(FSecurity.MINSTEP);
 	}
 	
 	public CDecimal getLotSize() {
-		return this.getCDecimal(TQSecField.LOTSIZE);
+		return this.getCDecimal(FSecurity.LOTSIZE);
 	}
 	
 	public CDecimal getPointCost() {
-		return this.getCDecimal(TQSecField.POINT_COST);
+		return this.getCDecimal(FSecurity.POINT_COST);
 	}
 	
 	public int getOpMask() {
-		return this.getInteger(TQSecField.OPMASK);
+		return this.getInteger(FSecurity.OPMASK);
 	}
 	
 	public SecType getSecType() {
-		return (SecType) this.getObject(TQSecField.SECTYPE);
+		return (SecType) this.getObject(FSecurity.SECTYPE);
 	}
 	
 	public String getSecTZ() {
-		return this.getString(TQSecField.SECTZ);
+		return this.getString(FSecurity.SECTZ);
 	}
 	
 	public int getQuotesType() {
-		return this.getInteger(TQSecField.QUOTESTYPE);
+		return this.getInteger(FSecurity.QUOTESTYPE);
 	}
 	
 	public String getSecName() {
-		return this.getString(TQSecField.SECNAME);
+		return this.getString(FSecurity.SECNAME);
 	}
 	
 	public String getPName() {
-		return this.getString(TQSecField.PNAME);
+		return this.getString(FSecurity.PNAME);
 	}
 	
 	public LocalDateTime getMatDate() {
-		return (LocalDateTime) this.getObject(TQSecField.MAT_DATE);
+		return (LocalDateTime) this.getObject(FSecurity.MAT_DATE);
 	}
 	
 	public CDecimal getClearingPrice() {
-		return this.getCDecimal(TQSecField.CLEARING_PRICE);
+		return this.getCDecimal(FSecurity.CLEARING_PRICE);
 	}
 	
 	public CDecimal getMinPrice() {
-		return this.getCDecimal(TQSecField.MINPRICE);
+		return this.getCDecimal(FSecurity.MINPRICE);
 	}
 	
 	public CDecimal getMaxPrice() {
-		return this.getCDecimal(TQSecField.MAXPRICE);
+		return this.getCDecimal(FSecurity.MAXPRICE);
 	}
 	
 	public CDecimal getBuyDeposit() {
-		return this.getCDecimal(TQSecField.BUY_DEPOSIT);
+		return this.getCDecimal(FSecurity.BUY_DEPOSIT);
 	}
 	
 	public CDecimal getSellDeposit() {
-		return this.getCDecimal(TQSecField.SELL_DEPOSIT);
+		return this.getCDecimal(FSecurity.SELL_DEPOSIT);
 	}
 	
 	public CDecimal getBGO_C() {
-		return this.getCDecimal(TQSecField.BGO_C);
+		return this.getCDecimal(FSecurity.BGO_C);
 	}
 	
 	public CDecimal getBGO_NC() {
-		return this.getCDecimal(TQSecField.BGO_NC);
+		return this.getCDecimal(FSecurity.BGO_NC);
 	}
 	
 	public CDecimal getAccruedInt() {
-		return this.getCDecimal(TQSecField.ACCRUED_INT);
+		return this.getCDecimal(FSecurity.ACCRUED_INT);
 	}
 	
 	public CDecimal getCouponValue() {
-		return this.getCDecimal(TQSecField.COUPON_VALUE);
+		return this.getCDecimal(FSecurity.COUPON_VALUE);
 	}
 	
 	public LocalDateTime getCouponDate() {
-		return (LocalDateTime) this.getObject(TQSecField.COUPON_DATE);
+		return (LocalDateTime) this.getObject(FSecurity.COUPON_DATE);
 	}
 	
 	public int getCouponPeriod() {
-		return this.getInteger(TQSecField.COUPON_PERIOD);
+		return this.getInteger(FSecurity.COUPON_PERIOD);
 	}
 	
 	public CDecimal getFaceValue() {
-		return this.getCDecimal(TQSecField.FACE_VALUE);
+		return this.getCDecimal(FSecurity.FACE_VALUE);
 	}
 	
 	public String getPutCall() {
-		return this.getString(TQSecField.PUT_CALL);
+		return this.getString(FSecurity.PUT_CALL);
 	}
 	
 	public String getOptType() {
-		return this.getString(TQSecField.OPT_TYPE);
+		return this.getString(FSecurity.OPT_TYPE);
 	}
 	
 	public int getLotVolume() {
-		return this.getInteger(TQSecField.LOT_VOLUME);
+		return this.getInteger(FSecurity.LOT_VOLUME);
 	}
 	
 	public CDecimal getBGO_BUY() {
-		return this.getCDecimal(TQSecField.BGO_BUY);
+		return this.getCDecimal(FSecurity.BGO_BUY);
 	}
 	
 }
