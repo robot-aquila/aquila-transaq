@@ -9,21 +9,28 @@ import org.junit.Test;
 import ru.prolib.aquila.core.BusinessEntities.Account;
 import ru.prolib.aquila.core.BusinessEntities.EditableTerminal;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
+import ru.prolib.aquila.transaq.engine.Engine;
+import ru.prolib.aquila.transaq.engine.EngineBuilder;
+import ru.prolib.aquila.transaq.engine.ServiceLocator;
 
 public class TQDataProviderImplTest {
 	private IMocksControl control;
 	private EditableTerminal terminalMock;
-	private TQConnectorFactory factoryMock;
 	private TQConnector connMock;
+	private Engine engineMock;
+	private EngineBuilder engBuilderMock;
+	private ServiceLocator engServicesMock;
 	private TQDataProviderImpl service;
 
 	@Before
 	public void setUp() throws Exception {
 		control = createStrictControl();
 		terminalMock = control.createMock(EditableTerminal.class);
-		factoryMock = control.createMock(TQConnectorFactory.class);
 		connMock = control.createMock(TQConnector.class);
-		service = new TQDataProviderImpl(factoryMock);
+		engineMock = control.createMock(Engine.class);
+		engBuilderMock = control.createMock(EngineBuilder.class);
+		engServicesMock = control.createMock(ServiceLocator.class);
+		service = new TQDataProviderImpl(connMock, engineMock, engBuilderMock, engServicesMock);
 	}
 	
 	@Test (expected=UnsupportedOperationException.class)
@@ -51,8 +58,7 @@ public class TQDataProviderImplTest {
 
 	@Test
 	public void testSubscribeRemoteObject() throws Exception {
-		expect(factoryMock.createInstance(terminalMock)).andReturn(connMock);
-		connMock.init();
+		engBuilderMock.initSecondary(engServicesMock, terminalMock);
 		connMock.connect();
 		control.replay();
 		
@@ -63,15 +69,7 @@ public class TQDataProviderImplTest {
 	
 	@Test
 	public void testUnsubscribeRemoteObject() throws Exception {
-		expect(factoryMock.createInstance(terminalMock)).andReturn(connMock);
-		connMock.init();
-		connMock.connect();
-		control.replay();
-		service.subscribeRemoteObjects(terminalMock);
-		control.resetToStrict();
-		
 		connMock.disconnect();
-		connMock.close();
 		control.replay();
 		
 		service.unsubscribeRemoteObjects(terminalMock);
@@ -107,10 +105,21 @@ public class TQDataProviderImplTest {
 	}
 	
 	@Test
-	public void gtestUnsubscribe_Account() throws Exception {
+	public void testUnsubscribe_Account() throws Exception {
 		control.replay();
 		
 		service.unsubscribe(new Account("gamma"), terminalMock);
+		
+		control.verify();
+	}
+	
+	@Test
+	public void testClose() {
+		connMock.close();
+		engineMock.shutdown();
+		control.replay();
+		
+		service.close();
 		
 		control.verify();
 	}

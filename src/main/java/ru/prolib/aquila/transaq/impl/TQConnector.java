@@ -15,9 +15,9 @@ public class TQConnector {
 	
 	private final Section config;
 	private final JTransaqServer server;
-	private final TQHandler handler;
+	private final TransaqHandler handler;
 	
-	public TQConnector(Section config, JTransaqServer server, TQHandler handler) {
+	public TQConnector(Section config, JTransaqServer server, TransaqHandler handler) {
 		this.config = config;
 		this.server = server;
 		this.handler = handler;

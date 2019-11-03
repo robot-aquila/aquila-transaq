@@ -1,28 +1,31 @@
 package ru.prolib.aquila.transaq.impl;
 
-import org.ini4j.Profile.Section;
-
 import ru.prolib.aquila.core.BusinessEntities.Account;
 import ru.prolib.aquila.core.BusinessEntities.EditableOrder;
 import ru.prolib.aquila.core.BusinessEntities.EditableTerminal;
 import ru.prolib.aquila.core.BusinessEntities.OrderException;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.core.data.DataProvider;
+import ru.prolib.aquila.transaq.engine.Engine;
+import ru.prolib.aquila.transaq.engine.EngineBuilder;
+import ru.prolib.aquila.transaq.engine.ServiceLocator;
 
 public class TQDataProviderImpl implements DataProvider {
-	private final TQConnectorFactory factory;
-	private TQConnector connector;
+	private final TQConnector connector;
+	private final Engine engine;
+	private final EngineBuilder engineBuilder;
+	private final ServiceLocator engineServices;
 	
-	public TQDataProviderImpl(TQConnectorFactory factory) {
-		this.factory = factory;
-	}
-	
-	public TQDataProviderImpl(Section config, TQDirectory directory) {
-		this(new TQConnectorFactory(config, directory));
-	}
-	
-	public TQDirectory getDirectory() {
-		return factory.getDirectory();
+	public TQDataProviderImpl(
+			TQConnector connector,
+			Engine engine,
+			EngineBuilder engine_builder,
+			ServiceLocator engine_services)
+	{
+		this.connector = connector;
+		this.engine = engine;
+		this.engineBuilder = engine_builder;
+		this.engineServices = engine_services;
 	}
 
 	@Override
@@ -43,8 +46,7 @@ public class TQDataProviderImpl implements DataProvider {
 	@Override
 	public void subscribeRemoteObjects(EditableTerminal terminal) {
 		try {
-			connector = factory.createInstance(terminal);
-			connector.init();
+			engineBuilder.initSecondary(engineServices, terminal);
 			connector.connect();
 		} catch ( Exception e ) {
 			throw new RuntimeException("Establishing connection failed: ", e);
@@ -54,7 +56,6 @@ public class TQDataProviderImpl implements DataProvider {
 	@Override
 	public void unsubscribeRemoteObjects(EditableTerminal terminal) {
 		connector.disconnect();
-		connector.close();
 	}
 
 	@Override
@@ -75,6 +76,12 @@ public class TQDataProviderImpl implements DataProvider {
 	@Override
 	public void unsubscribe(Account account, EditableTerminal terminal) {
 		
+	}
+	
+	@Override
+	public void close() {
+		connector.close();
+		engine.shutdown();
 	}
 
 }

@@ -14,14 +14,14 @@ public class TQConnectorTest {
 	private JTransaqServer serverMock;
 	private Section configMock;
 	private TQConnector service;
-	private TQHandler handlerMock;
+	private TransaqHandler handlerMock;
 
 	@Before
 	public void setUp() throws Exception {
 		control = createStrictControl();
 		serverMock = control.createMock(JTransaqServer.class);
 		configMock = control.createMock(Section.class);
-		handlerMock = control.createMock(TQHandler.class);
+		handlerMock = control.createMock(TransaqHandler.class);
 		service = new TQConnector(configMock, serverMock, handlerMock);
 	}
 	
