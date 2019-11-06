@@ -17,8 +17,7 @@ import ru.prolib.aquila.transaq.engine.ServiceLocator;
 public class TQDataProviderImplTest {
 	private IMocksControl control;
 	private EditableTerminal terminalMock;
-	private TQConnector connMock;
-	private Engine engineMock;
+	private Engine engMock;
 	private EngineBuilder engBuilderMock;
 	private ServiceLocator engServicesMock;
 	private TQDataProviderImpl service;
@@ -27,11 +26,10 @@ public class TQDataProviderImplTest {
 	public void setUp() throws Exception {
 		control = createStrictControl();
 		terminalMock = control.createMock(EditableTerminal.class);
-		connMock = control.createMock(TQConnector.class);
-		engineMock = control.createMock(Engine.class);
+		engMock = control.createMock(Engine.class);
 		engBuilderMock = control.createMock(EngineBuilder.class);
 		engServicesMock = control.createMock(ServiceLocator.class);
-		service = new TQDataProviderImpl(connMock, engineMock, engBuilderMock, engServicesMock);
+		service = new TQDataProviderImpl(engMock, engBuilderMock, engServicesMock);
 	}
 	
 	@Test (expected=UnsupportedOperationException.class)
@@ -60,7 +58,7 @@ public class TQDataProviderImplTest {
 	@Test
 	public void testSubscribeRemoteObject() throws Exception {
 		engBuilderMock.initSecondary(engServicesMock, terminalMock);
-		connMock.connect();
+		engMock.connect();
 		control.replay();
 		
 		service.subscribeRemoteObjects(terminalMock);
@@ -70,7 +68,7 @@ public class TQDataProviderImplTest {
 	
 	@Test
 	public void testUnsubscribeRemoteObject() throws Exception {
-		connMock.disconnect();
+		engMock.disconnect();
 		control.replay();
 		
 		service.unsubscribeRemoteObjects(terminalMock);
@@ -80,6 +78,7 @@ public class TQDataProviderImplTest {
 	
 	@Test
 	public void testSubscribe_Symbol() throws Exception {
+		engMock.subscribeSymbol(new Symbol("foo"), MDLevel.L1_BBO);
 		control.replay();
 		
 		service.subscribe(new Symbol("foo"), MDLevel.L1_BBO, terminalMock);
@@ -89,6 +88,7 @@ public class TQDataProviderImplTest {
 	
 	@Test
 	public void testUnsubscribe_Symbol() throws Exception {
+		engMock.unsubscribeSymbol(new Symbol("bar"), MDLevel.L1);
 		control.replay();
 		
 		service.unsubscribe(new Symbol("bar"), MDLevel.L1, terminalMock);
@@ -116,8 +116,7 @@ public class TQDataProviderImplTest {
 	
 	@Test
 	public void testClose() {
-		connMock.close();
-		engineMock.shutdown();
+		engMock.shutdown();
 		control.replay();
 		
 		service.close();

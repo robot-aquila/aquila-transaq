@@ -12,18 +12,15 @@ import ru.prolib.aquila.transaq.engine.EngineBuilder;
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
 
 public class TQDataProviderImpl implements DataProvider {
-	private final TQConnector connector;
 	private final Engine engine;
 	private final EngineBuilder engineBuilder;
 	private final ServiceLocator engineServices;
 	
 	public TQDataProviderImpl(
-			TQConnector connector,
 			Engine engine,
 			EngineBuilder engine_builder,
 			ServiceLocator engine_services)
 	{
-		this.connector = connector;
 		this.engine = engine;
 		this.engineBuilder = engine_builder;
 		this.engineServices = engine_services;
@@ -46,27 +43,23 @@ public class TQDataProviderImpl implements DataProvider {
 	
 	@Override
 	public void subscribeRemoteObjects(EditableTerminal terminal) {
-		try {
-			engineBuilder.initSecondary(engineServices, terminal);
-			connector.connect();
-		} catch ( Exception e ) {
-			throw new RuntimeException("Establishing connection failed: ", e);
-		}
+		engineBuilder.initSecondary(engineServices, terminal);
+		engine.connect();
 	}
 
 	@Override
 	public void unsubscribeRemoteObjects(EditableTerminal terminal) {
-		connector.disconnect();
+		engine.disconnect();
 	}
 
 	@Override
 	public void subscribe(Symbol symbol, MDLevel level, EditableTerminal terminal) {
-		
+		engine.subscribeSymbol(symbol, level);
 	}
 
 	@Override
 	public void unsubscribe(Symbol symbol, MDLevel level, EditableTerminal terminal) {
-		
+		engine.unsubscribeSymbol(symbol, level);
 	}
 
 	@Override
@@ -81,7 +74,6 @@ public class TQDataProviderImpl implements DataProvider {
 	
 	@Override
 	public void close() {
-		connector.close();
 		engine.shutdown();
 	}
 

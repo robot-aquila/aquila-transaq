@@ -1,5 +1,7 @@
 package ru.prolib.aquila.transaq.engine;
 
+import ru.prolib.aquila.transaq.engine.mp.MessageRouter;
+import ru.prolib.aquila.transaq.impl.TQConnector;
 import ru.prolib.aquila.transaq.impl.TQDirectory;
 import ru.prolib.aquila.transaq.impl.TQParser;
 import ru.prolib.aquila.transaq.impl.TQReactor;
@@ -8,6 +10,8 @@ public class ServiceLocator {
 	private TQParser parser;
 	private TQReactor reactor;
 	private TQDirectory directory;
+	private MessageRouter msgRouter;
+	private TQConnector connector;
 	
 	public synchronized TQParser getParser() {
 		if ( parser == null ) {
@@ -40,6 +44,28 @@ public class ServiceLocator {
 	
 	public synchronized void setDirectory(TQDirectory directory) {
 		this.directory = directory;
+	}
+	
+	public synchronized MessageRouter getMessageRouter() {
+		if ( msgRouter == null ) {
+			throw new IllegalStateException("Message router was not defined");
+		}
+		return msgRouter;
+	}
+	
+	public synchronized void setMessageRouter(MessageRouter msg_router) {
+		this.msgRouter = msg_router;
+	}
+	
+	public synchronized TQConnector getConnector() {
+		if ( connector == null ) {
+			throw new IllegalStateException("Connector was not defined");
+		}
+		return connector;
+	}
+	
+	public synchronized void setConnector(TQConnector connector) {
+		this.connector = connector;
 	}
 
 }

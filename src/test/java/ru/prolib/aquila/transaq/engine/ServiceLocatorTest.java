@@ -9,6 +9,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import ru.prolib.aquila.transaq.engine.mp.MessageRouter;
+import ru.prolib.aquila.transaq.impl.TQConnector;
 import ru.prolib.aquila.transaq.impl.TQDirectory;
 import ru.prolib.aquila.transaq.impl.TQParser;
 import ru.prolib.aquila.transaq.impl.TQReactor;
@@ -20,6 +22,8 @@ public class ServiceLocatorTest {
 	private TQParser parserMock;
 	private TQReactor reactorMock;
 	private TQDirectory dirMock;
+	private MessageRouter mrouterMock;
+	private TQConnector connMock;
 	private ServiceLocator service;
 
 	@Before
@@ -28,6 +32,8 @@ public class ServiceLocatorTest {
 		parserMock = control.createMock(TQParser.class);
 		reactorMock = control.createMock(TQReactor.class);
 		dirMock = control.createMock(TQDirectory.class);
+		mrouterMock = control.createMock(MessageRouter.class);
+		connMock = control.createMock(TQConnector.class);
 		service = new ServiceLocator();
 	}
 	
@@ -84,6 +90,44 @@ public class ServiceLocatorTest {
 		control.replay();
 		
 		assertSame(dirMock, service.getDirectory());
+		
+		control.verify();
+	}
+	
+	@Test
+	public void testGetMessageRouter_ThrowsIfNotDefined() {
+		eex.expect(IllegalStateException.class);
+		eex.expectMessage("Message router was not defined");
+		control.replay();
+		
+		service.getMessageRouter();
+	}
+	
+	@Test
+	public void testGetMessageRouter() {
+		service.setMessageRouter(mrouterMock);
+		control.replay();
+		
+		assertSame(mrouterMock, service.getMessageRouter());
+		
+		control.verify();
+	}
+	
+	@Test
+	public void testGetConnector_ThrowsIfNotDefined() {
+		eex.expect(IllegalStateException.class);
+		eex.expectMessage("Connector was not defined");
+		control.replay();
+		
+		service.getConnector();
+	}
+	
+	@Test
+	public void testGetConnector() {
+		service.setConnector(connMock);
+		control.replay();
+		
+		assertSame(connMock, service.getConnector());
 		
 		control.verify();
 	}

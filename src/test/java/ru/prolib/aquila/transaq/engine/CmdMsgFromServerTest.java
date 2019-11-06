@@ -20,6 +20,7 @@ public class CmdMsgFromServerTest {
 	@Test
 	public void testGetters() {
 		assertEquals(CmdType.MSG_FROM_SERVER, service.getType());
+		assertFalse(service.getResult().isDone());
 		assertEquals("kalimba de luna", service.getMessage());
 	}
 	

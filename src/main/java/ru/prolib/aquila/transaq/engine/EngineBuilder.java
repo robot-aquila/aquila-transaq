@@ -33,7 +33,7 @@ public class EngineBuilder {
 	public Pair<ServiceLocator, Engine> build() {
 		ServiceLocator services = new ServiceLocator();
 		BlockingQueue<Cmd> cmd_queue = new LinkedBlockingQueue<>();
-		Thread t = new Thread(new EngineCmdProcessor(cmd_queue, standardRouter(services)));
+		Thread t = new Thread(new EngineCmdProcessor(cmd_queue, services));
 		t.setDaemon(true);
 		t.setName("TRANSAQ-ENGINE");
 		t.start();
@@ -63,6 +63,7 @@ public class EngineBuilder {
 
 	
 	public void initPrimary(ServiceLocator services, EventQueue eventQueue) {
+		services.setMessageRouter(standardRouter(services));
 		services.setDirectory(new TQDirectory(eventQueue));
 		services.setParser(TQParser.getInstance());
 	}

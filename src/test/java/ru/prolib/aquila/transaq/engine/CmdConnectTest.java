@@ -5,26 +5,23 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import ru.prolib.aquila.transaq.engine.CmdShutdown;
-import ru.prolib.aquila.transaq.engine.CmdType;
-
-public class CmdShutdownTest {
-	private CmdShutdown service;
+public class CmdConnectTest {
+	private CmdConnect service;
 
 	@Before
 	public void setUp() throws Exception {
-		service = new CmdShutdown();
+		service = new CmdConnect();
 	}
-
+	
 	@Test
 	public void testGetters() {
-		assertEquals(CmdType.SHUTDOWN, service.getType());
+		assertEquals(CmdType.CONNECT, service.getType());
 		assertFalse(service.getResult().isDone());
 	}
 	
 	@Test
 	public void testHashCode() {
-		int expected = 618243986;
+		int expected = 761524314;
 		
 		assertEquals(expected, service.hashCode());
 	}
@@ -34,7 +31,7 @@ public class CmdShutdownTest {
 		assertFalse(service.equals(null));
 		assertFalse(service.equals(this));
 		assertTrue(service.equals(service));
-		assertTrue(service.equals(new CmdShutdown()));
+		assertTrue(service.equals(new CmdConnect()));
 	}
 
 }
