@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import ru.prolib.aquila.core.BusinessEntities.Account;
 import ru.prolib.aquila.core.BusinessEntities.EditableTerminal;
+import ru.prolib.aquila.core.BusinessEntities.MDLevel;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.transaq.engine.Engine;
 import ru.prolib.aquila.transaq.engine.EngineBuilder;
@@ -81,7 +82,7 @@ public class TQDataProviderImplTest {
 	public void testSubscribe_Symbol() throws Exception {
 		control.replay();
 		
-		service.subscribe(new Symbol("foo"), terminalMock);
+		service.subscribe(new Symbol("foo"), MDLevel.L1_BBO, terminalMock);
 		
 		control.verify();
 	}
@@ -90,7 +91,7 @@ public class TQDataProviderImplTest {
 	public void testUnsubscribe_Symbol() throws Exception {
 		control.replay();
 		
-		service.unsubscribe(new Symbol("bar"), terminalMock);
+		service.unsubscribe(new Symbol("bar"), MDLevel.L1, terminalMock);
 		
 		control.verify();
 	}
