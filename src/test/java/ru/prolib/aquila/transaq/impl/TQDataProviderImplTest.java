@@ -1,6 +1,7 @@
 package ru.prolib.aquila.transaq.impl;
 
 import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
 
 import org.easymock.IMocksControl;
 import org.junit.Before;
@@ -9,6 +10,8 @@ import org.junit.Test;
 import ru.prolib.aquila.core.BusinessEntities.Account;
 import ru.prolib.aquila.core.BusinessEntities.EditableTerminal;
 import ru.prolib.aquila.core.BusinessEntities.MDLevel;
+import ru.prolib.aquila.core.BusinessEntities.SubscrHandler;
+import ru.prolib.aquila.core.BusinessEntities.SubscrHandlerStub;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.transaq.engine.Engine;
 import ru.prolib.aquila.transaq.engine.EngineBuilder;
@@ -81,37 +84,21 @@ public class TQDataProviderImplTest {
 		engMock.subscribeSymbol(new Symbol("foo"), MDLevel.L1_BBO);
 		control.replay();
 		
-		service.subscribe(new Symbol("foo"), MDLevel.L1_BBO, terminalMock);
+		SubscrHandler actual = service.subscribe(new Symbol("foo"), MDLevel.L1_BBO, terminalMock);
 		
 		control.verify();
-	}
-	
-	@Test
-	public void testUnsubscribe_Symbol() throws Exception {
-		engMock.unsubscribeSymbol(new Symbol("bar"), MDLevel.L1);
-		control.replay();
-		
-		service.unsubscribe(new Symbol("bar"), MDLevel.L1, terminalMock);
-		
-		control.verify();
+		SubscrHandler expected = new TQSymbolSubscrHandler(engMock, new Symbol("foo"), MDLevel.L1_BBO);
+		assertEquals(expected, actual);
 	}
 	
 	@Test
 	public void testSubscribe_Account() throws Exception {
 		control.replay();
 		
-		service.subscribe(new Account("charlie"), terminalMock);
+		SubscrHandler actual = service.subscribe(new Account("charlie"), terminalMock);
 		
 		control.verify();
-	}
-	
-	@Test
-	public void testUnsubscribe_Account() throws Exception {
-		control.replay();
-		
-		service.unsubscribe(new Account("gamma"), terminalMock);
-		
-		control.verify();
+		assertEquals(SubscrHandlerStub.class, actual.getClass());
 	}
 	
 	@Test

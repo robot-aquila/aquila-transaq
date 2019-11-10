@@ -5,6 +5,8 @@ import ru.prolib.aquila.core.BusinessEntities.EditableOrder;
 import ru.prolib.aquila.core.BusinessEntities.EditableTerminal;
 import ru.prolib.aquila.core.BusinessEntities.MDLevel;
 import ru.prolib.aquila.core.BusinessEntities.OrderException;
+import ru.prolib.aquila.core.BusinessEntities.SubscrHandler;
+import ru.prolib.aquila.core.BusinessEntities.SubscrHandlerStub;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.core.data.DataProvider;
 import ru.prolib.aquila.transaq.engine.Engine;
@@ -53,23 +55,14 @@ public class TQDataProviderImpl implements DataProvider {
 	}
 
 	@Override
-	public void subscribe(Symbol symbol, MDLevel level, EditableTerminal terminal) {
+	public SubscrHandler subscribe(Symbol symbol, MDLevel level, EditableTerminal terminal) {
 		engine.subscribeSymbol(symbol, level);
+		return new TQSymbolSubscrHandler(engine, symbol, level);
 	}
 
 	@Override
-	public void unsubscribe(Symbol symbol, MDLevel level, EditableTerminal terminal) {
-		engine.unsubscribeSymbol(symbol, level);
-	}
-
-	@Override
-	public void subscribe(Account account, EditableTerminal terminal) {
-		
-	}
-
-	@Override
-	public void unsubscribe(Account account, EditableTerminal terminal) {
-		
+	public SubscrHandler subscribe(Account account, EditableTerminal terminal) {
+		return new SubscrHandlerStub();
 	}
 	
 	@Override
