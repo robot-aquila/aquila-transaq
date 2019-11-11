@@ -1,0 +1,81 @@
+<quotations>
+	<quotation secid="2426">
+		<board>TQBR</board>
+		<seccode>SBER</seccode>
+		<last>241.23</last>
+		<quantity>33</quantity>
+		<time>16:02:16.000</time>
+		<change>1.06</change>
+		<priceminusprevwaprice>1.05</priceminusprevwaprice>
+		<bid>241.22</bid>
+		<biddepth>451</biddepth>
+		<biddeptht>391535</biddeptht>
+		<numbids>2847</numbids>
+		<offer>241.26</offer>
+		<offerdepth>250</offerdepth>
+		<offerdeptht>495471</offerdeptht>
+		<numoffers>2583</numoffers>
+		<voltoday>2120430</voltoday>
+		<numtrades>36543</numtrades>
+		<valtoday>5106.936</valtoday>
+	</quotation>
+	<quotation secid="41082">
+		<board>FUT</board>
+		<seccode>RIZ9</seccode>
+		<quantity>1</quantity>
+		<bid>145250</bid>
+		<biddepth>1</biddepth>
+		<biddeptht>13842</biddeptht>
+		<numbids>2130</numbids>
+		<offer>145260</offer>
+		<offerdepth>28</offerdepth>
+		<offerdeptht>9820</offerdeptht>
+		<numoffers>1890</numoffers>
+		<voltoday>205233</voltoday>
+		<numtrades>105563</numtrades>
+		<valtoday>38234.816</valtoday>
+	</quotation>
+	<quotation secid="12345">
+		<board>XXX</board>
+		<seccode>ZZZ</seccode>
+		<point_cost>12.345</point_cost>
+		<accruedintvalue>625.112</accruedintvalue>
+		<open>776.123</open>
+		<waprice>887.141</waprice>
+		<biddepth>42</biddepth>
+		<biddeptht>672</biddeptht>
+		<numbids>82</numbids>
+		<offerdepth>63</offerdepth>
+		<offerdeptht>23</offerdeptht>
+		<bid>648.940</bid>
+		<offer>423.512</offer>
+		<numoffers>12</numoffers>
+		<numtrades>554</numtrades>
+		<voltoday>111</voltoday>
+		<openpositions>882</openpositions>
+		<deltapositions>485</deltapositions>
+		<last>508.124</last>
+		<quantity>8082</quantity>
+		<time>18:03:25</time>
+		<change>4.15</change>
+		<priceminusprevwaprice>526.133</priceminusprevwaprice>
+		<valtoday>982619.23</valtoday>
+		<yield>726.03</yield>
+		<yieldatwaprice>76182.82</yieldatwaprice>
+		<marketpricetoday>9928.81</marketpricetoday>
+		<highbid>821.11</highbid>
+		<lowoffer>112.56</lowoffer>
+		<high>822.27</high>
+		<low>751.12</low>
+		<closeprice>8722.196</closeprice>
+		<closeyield>817.09</closeyield>
+		<status>some status 1</status>
+		<tradingstatus>some status 2</tradingstatus>
+		<buydeposit>9281.543</buydeposit>
+		<selldeposit>8372.711</selldeposit>
+		<volatility>91.0</volatility>
+		<theoreticalprice>991.115</theoreticalprice>
+		<bgo_buy>812.761</bgo_buy>
+		<lcurrentprice>883.443</lcurrentprice>		
+	</quotation>
+</quotations>

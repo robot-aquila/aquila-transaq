@@ -31,6 +31,7 @@ import ru.prolib.aquila.transaq.entity.SecType;
 import ru.prolib.aquila.transaq.impl.TQField.FBoard;
 import ru.prolib.aquila.transaq.impl.TQField.FCKind;
 import ru.prolib.aquila.transaq.impl.TQField.FMarket;
+import ru.prolib.aquila.transaq.impl.TQField.FQuotation;
 import ru.prolib.aquila.transaq.impl.TQField.FSecurity;
 import ru.prolib.aquila.transaq.impl.TQField.FSecurityBoard;
 import ru.prolib.aquila.transaq.impl.TQParser;
@@ -59,11 +60,12 @@ public class TQParserTest {
 					.append("<date1>01.06.2019 07:46:15.882</date1>")
 					.append("<date2>31.12.1978 14:20:12</date2>")
 					.append("<date3>11:37:15</date3>")
+					.append("<date4>09:15:32.026</date4>")
 				.append("</foo>")
 				.toString();
 		InputStream is = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
 		XMLStreamReader sr = factory.createXMLStreamReader(is);
-		LocalDateTime actual1 = null, actual2 = null, actual3 = null;
+		LocalDateTime actual1 = null, actual2 = null, actual3 = null, actual4 = null;
 		while ( sr.hasNext() ) {
 			switch ( sr.next() ) {
 			case XMLStreamReader.START_ELEMENT:
@@ -77,6 +79,9 @@ public class TQParserTest {
 				case "date3":
 					actual3 = service.readDate(sr);
 					break;
+				case "date4":
+					actual4 = service.readDate(sr);
+					break;
 				}
 				break;
 			}
@@ -84,6 +89,7 @@ public class TQParserTest {
 		assertEquals(LocalDateTime.of(2019,  6,  1,  7, 46, 15, 882000000), actual1);
 		assertEquals(LocalDateTime.of(1978, 12, 31, 14, 20, 12), actual2);
 		assertEquals(LocalDateTime.of(LocalDate.now(), LocalTime.of(11, 37, 15)), actual3);
+		assertEquals(LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 15, 32, 26000000)), actual4);
 	}
 	
 	@Test
@@ -833,6 +839,107 @@ public class TQParserTest {
 				.withToken(FSecurityBoard.MINSTEP, of("0.1"))
 				.withToken(FSecurityBoard.LOTSIZE, of("10"))
 				.withToken(FSecurityBoard.POINT_COST, of("12.34"))
+				.buildUpdate()));
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	public void testReadQuotations() throws Exception {
+		InputStream is = new FileInputStream(new File("fixture/quotations1.xml"));
+		XMLStreamReader sr = factory.createXMLStreamReader(is);
+		List<TQStateUpdate<TQSecID2>> actual = null;
+		while ( sr.hasNext() ) {
+			switch ( sr.next() ) {
+			case XMLStreamReader.START_DOCUMENT:
+			case XMLStreamReader.START_ELEMENT:
+				if ( "quotations".equals(sr.getLocalName()) ) {
+					actual = service.readQuotations(sr);
+				}
+				break;
+			}
+		}
+		List<TQStateUpdate<TQSecID2>> expected = new ArrayList<>();
+		expected.add(new TQStateUpdate<>(new TQSecID2("SBER", "TQBR"), new DeltaUpdateBuilder()
+				.withToken(FQuotation.SECID, 2426)
+				.withToken(FQuotation.BOARD, "TQBR")
+				.withToken(FQuotation.SECCODE, "SBER")
+				.withToken(FQuotation.LAST, of("241.23"))
+				.withToken(FQuotation.QUANTITY, 33)
+				.withToken(FQuotation.TIME, LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 2, 16)))
+				.withToken(FQuotation.CHANGE, of("1.06"))
+				.withToken(FQuotation.PRICE_MINUS_PREV_WA_PRICE, of("1.05"))
+				.withToken(FQuotation.BID, of("241.22"))
+				.withToken(FQuotation.BID_DEPTH, 451)
+				.withToken(FQuotation.BID_DEPTH_T, 391535)
+				.withToken(FQuotation.NUM_BIDS, 2847)
+				.withToken(FQuotation.OFFER, of("241.26"))
+				.withToken(FQuotation.OFFER_DEPTH, 250)
+				.withToken(FQuotation.OFFER_DEPTH_T, 495471)
+				.withToken(FQuotation.NUM_OFFERS, 2583)
+				.withToken(FQuotation.VOL_TODAY, 2120430)
+				.withToken(FQuotation.NUM_TRADES, 36543)
+				.withToken(FQuotation.VAL_TODAY, of("5106.936"))
+				.buildUpdate()));
+		expected.add(new TQStateUpdate<>(new TQSecID2("RIZ9", "FUT"), new DeltaUpdateBuilder()
+				.withToken(FQuotation.SECID, 41082)
+				.withToken(FQuotation.BOARD, "FUT")
+				.withToken(FQuotation.SECCODE, "RIZ9")
+				.withToken(FQuotation.QUANTITY, 1)
+				.withToken(FQuotation.BID, of("145250"))
+				.withToken(FQuotation.BID_DEPTH, 1)
+				.withToken(FQuotation.BID_DEPTH_T, 13842)
+				.withToken(FQuotation.NUM_BIDS, 2130)
+				.withToken(FQuotation.OFFER, of("145260"))
+				.withToken(FQuotation.OFFER_DEPTH, 28)
+				.withToken(FQuotation.OFFER_DEPTH_T, 9820)
+				.withToken(FQuotation.NUM_OFFERS, 1890)
+				.withToken(FQuotation.VOL_TODAY, 205233)
+				.withToken(FQuotation.NUM_TRADES, 105563)
+				.withToken(FQuotation.VAL_TODAY, of("38234.816"))
+				.buildUpdate()));
+		expected.add(new TQStateUpdate<>(new TQSecID2("ZZZ", "XXX"), new DeltaUpdateBuilder()
+				.withToken(FQuotation.SECID, 12345)
+				.withToken(FQuotation.BOARD, "XXX")
+				.withToken(FQuotation.SECCODE, "ZZZ")
+				.withToken(FQuotation.POINT_COST, of("12.345"))
+				.withToken(FQuotation.ACCRUED_INT_VALUE, of("625.112"))
+				.withToken(FQuotation.OPEN, of("776.123"))
+				.withToken(FQuotation.WA_PRICE, of("887.141"))
+				.withToken(FQuotation.BID_DEPTH, 42)
+				.withToken(FQuotation.BID_DEPTH_T, 672)
+				.withToken(FQuotation.NUM_BIDS, 82)
+				.withToken(FQuotation.OFFER_DEPTH, 63)
+				.withToken(FQuotation.OFFER_DEPTH_T, 23)
+				.withToken(FQuotation.BID, of("648.940"))
+				.withToken(FQuotation.OFFER, of("423.512"))
+				.withToken(FQuotation.NUM_OFFERS, 12)
+				.withToken(FQuotation.NUM_TRADES, 554)
+				.withToken(FQuotation.VOL_TODAY, 111)
+				.withToken(FQuotation.OPEN_POSITIONS, 882)
+				.withToken(FQuotation.DELTA_POSITIONS, 485)
+				.withToken(FQuotation.LAST, of("508.124"))
+				.withToken(FQuotation.QUANTITY, 8082)
+				.withToken(FQuotation.TIME, LocalDateTime.of(LocalDate.now(), LocalTime.of(18, 3, 25)))
+				.withToken(FQuotation.CHANGE, of("4.15"))
+				.withToken(FQuotation.PRICE_MINUS_PREV_WA_PRICE, of("526.133"))
+				.withToken(FQuotation.VAL_TODAY, of("982619.23"))
+				.withToken(FQuotation.YIELD, of("726.03"))
+				.withToken(FQuotation.YIELD_AT_WA_PRICE, of("76182.82"))
+				.withToken(FQuotation.MARKET_PRICE_TODAY, of("9928.81"))
+				.withToken(FQuotation.HIGH_BID, of("821.11"))
+				.withToken(FQuotation.LOW_OFFER, of("112.56"))
+				.withToken(FQuotation.HIGH, of("822.27"))
+				.withToken(FQuotation.LOW, of("751.12"))
+				.withToken(FQuotation.CLOSE_PRICE, of("8722.196"))
+				.withToken(FQuotation.CLOSE_YIELD, of("817.09"))
+				.withToken(FQuotation.STATUS, "some status 1")
+				.withToken(FQuotation.TRADING_STATUS, "some status 2")
+				.withToken(FQuotation.BUY_DEPOSIT, of("9281.543"))
+				.withToken(FQuotation.SELL_DEPOSIT, of("8372.711"))
+				.withToken(FQuotation.VOLATILITY, of("91.0"))
+				.withToken(FQuotation.THEORETICAL_PRICE, of("991.115"))
+				.withToken(FQuotation.BGO_BUY, of("812.761"))
+				.withToken(FQuotation.L_CURRENT_PRICE, of("883.443"))
 				.buildUpdate()));
 		assertEquals(expected, actual);
 	}

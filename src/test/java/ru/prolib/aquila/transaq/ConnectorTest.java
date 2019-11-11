@@ -1,6 +1,8 @@
 package ru.prolib.aquila.transaq;
 
 import java.io.File;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.ini4j.Profile.Section;
@@ -12,6 +14,8 @@ import org.junit.Test;
 
 import ru.prolib.JTransaq.JTransaqHandler;
 import ru.prolib.JTransaq.JTransaqServer;
+import ru.prolib.aquila.transaq.impl.TQConnector;
+import ru.prolib.aquila.transaq.impl.TQSecID2;
 
 public class ConnectorTest {
 	
@@ -65,6 +69,29 @@ public class ConnectorTest {
 		Thread.sleep(20000L);
 		
 		server.UnInitialize();
+	}
+	
+	@Ignore
+	@Test
+	public void testConnect2() throws Exception {
+		XHandler handler = new XHandler();
+		Wini ini = new Wini(new File("fixture/transaq.ini"));
+		Section config = ini.get("transaq-test");
+		JTransaqServer server = new JTransaqServer(handler);
+		TQConnector conn = new TQConnector(config, server, handler);
+		conn.init();
+		conn.connect();
+		Thread.sleep(5000L);
+		try {
+			Set<TQSecID2> symbols = new LinkedHashSet<>();
+			symbols.add(new TQSecID2("SBER", "TQBR"));
+			symbols.add(new TQSecID2("RIZ9", "FUT"));
+			conn.subscribe(symbols, TQConnector.SUBSCR_TYPE_QUOTATIONS);
+			Thread.sleep(20000L);
+		} finally {
+			conn.disconnect();
+			conn.close();
+		}
 	}
 
 }

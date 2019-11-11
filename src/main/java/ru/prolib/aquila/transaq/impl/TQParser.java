@@ -22,6 +22,7 @@ import ru.prolib.aquila.transaq.entity.SecType;
 import ru.prolib.aquila.transaq.impl.TQField.FBoard;
 import ru.prolib.aquila.transaq.impl.TQField.FCKind;
 import ru.prolib.aquila.transaq.impl.TQField.FMarket;
+import ru.prolib.aquila.transaq.impl.TQField.FQuotation;
 import ru.prolib.aquila.transaq.impl.TQField.FSecurity;
 import ru.prolib.aquila.transaq.impl.TQField.FSecurityBoard;
 
@@ -134,6 +135,12 @@ public class TQParser {
 			return LocalDateTime.of(
 					LocalDate.now(),
 					LocalTime.parse(str_date, DateTimeFormatter.ofPattern("HH:mm:ss"))
+				);
+		}
+		if ( len == 12  ) {
+			return LocalDateTime.of(
+					LocalDate.now(),
+					LocalTime.parse(str_date, DateTimeFormatter.ofPattern("HH:mm:ss.SSS"))
 				);
 		}
 		if ( len > 19 && ".".equals(str_date.substring(len - 4, len - 3)) ) {
@@ -631,6 +638,177 @@ public class TQParser {
 			case XMLStreamReader.END_ELEMENT:
 				switch ( reader.getLocalName() ) {
 				case "pits":
+					return result;
+				}
+				break;
+			}
+		}
+		throw new XMLStreamException("Premature end of file");
+	}
+	
+	private TQStateUpdate<TQSecID2> readQuotation(XMLStreamReader reader) throws XMLStreamException {
+		String sec_code = null, board_code = null;
+		DeltaUpdateBuilder builder = new DeltaUpdateBuilder()
+				.withToken(FQuotation.SECID, getAttributeInt(reader, "secid"));
+		while ( reader.hasNext() ) {
+			switch ( reader.next() ) {
+			case XMLStreamReader.START_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "board":
+					builder.withToken(FQuotation.BOARD, board_code = readCharacters(reader));
+					break;
+				case "seccode":
+					builder.withToken(FQuotation.SECCODE, sec_code = readCharacters(reader));
+					break;
+				case "point_cost":
+					builder.withToken(FQuotation.POINT_COST, readDecimal(reader));
+					break;
+				case "accruedintvalue":
+					builder.withToken(FQuotation.ACCRUED_INT_VALUE, readDecimal(reader));
+					break;
+				case "open":
+					builder.withToken(FQuotation.OPEN, readDecimal(reader));
+					break;
+				case "waprice":
+					builder.withToken(FQuotation.WA_PRICE, readDecimal(reader));
+					break;
+				case "biddepth":
+					builder.withToken(FQuotation.BID_DEPTH, readInt(reader));
+					break;
+				case "biddeptht":
+					builder.withToken(FQuotation.BID_DEPTH_T, readInt(reader));
+					break;
+				case "numbids":
+					builder.withToken(FQuotation.NUM_BIDS, readInt(reader));
+					break;
+				case "offerdepth":
+					builder.withToken(FQuotation.OFFER_DEPTH, readInt(reader));
+					break;
+				case "offerdeptht":
+					builder.withToken(FQuotation.OFFER_DEPTH_T, readInt(reader));
+					break;
+				case "bid":
+					builder.withToken(FQuotation.BID, readDecimal(reader));
+					break;
+				case "offer":
+					builder.withToken(FQuotation.OFFER, readDecimal(reader));
+					break;
+				case "numoffers":
+					builder.withToken(FQuotation.NUM_OFFERS, readInt(reader));
+					break;
+				case "numtrades":
+					builder.withToken(FQuotation.NUM_TRADES, readInt(reader));
+					break;
+				case "voltoday":
+					builder.withToken(FQuotation.VOL_TODAY, readInt(reader));
+					break;
+				case "openpositions":
+					builder.withToken(FQuotation.OPEN_POSITIONS, readInt(reader));
+					break;
+				case "deltapositions":
+					builder.withToken(FQuotation.DELTA_POSITIONS, readInt(reader));
+					break;
+				case "last":
+					builder.withToken(FQuotation.LAST, readDecimal(reader));
+					break;
+				case "quantity":
+					builder.withToken(FQuotation.QUANTITY, readInt(reader));
+					break;
+				case "time":
+					builder.withToken(FQuotation.TIME, readDate(reader));
+					break;
+				case "change":
+					builder.withToken(FQuotation.CHANGE, readDecimal(reader));
+					break;
+				case "priceminusprevwaprice":
+					builder.withToken(FQuotation.PRICE_MINUS_PREV_WA_PRICE, readDecimal(reader));
+					break;
+				case "valtoday":
+					builder.withToken(FQuotation.VAL_TODAY, readDecimal(reader));
+					break;
+				case "yield":
+					builder.withToken(FQuotation.YIELD, readDecimal(reader));
+					break;
+				case "yieldatwaprice":
+					builder.withToken(FQuotation.YIELD_AT_WA_PRICE, readDecimal(reader));
+					break;
+				case "marketpricetoday":
+					builder.withToken(FQuotation.MARKET_PRICE_TODAY, readDecimal(reader));
+					break;
+				case "highbid":
+					builder.withToken(FQuotation.HIGH_BID, readDecimal(reader));
+					break;
+				case "lowoffer":
+					builder.withToken(FQuotation.LOW_OFFER, readDecimal(reader));
+					break;
+				case "high":
+					builder.withToken(FQuotation.HIGH, readDecimal(reader));
+					break;
+				case "low":
+					builder.withToken(FQuotation.LOW, readDecimal(reader));
+					break;
+				case "closeprice":
+					builder.withToken(FQuotation.CLOSE_PRICE, readDecimal(reader));
+					break;
+				case "closeyield":
+					builder.withToken(FQuotation.CLOSE_YIELD, readDecimal(reader));
+					break;
+				case "status":
+					builder.withToken(FQuotation.STATUS, readCharacters(reader));
+					break;
+				case "tradingstatus":
+					builder.withToken(FQuotation.TRADING_STATUS, readCharacters(reader));
+					break;
+				case "buydeposit":
+					builder.withToken(FQuotation.BUY_DEPOSIT, readDecimal(reader));
+					break;
+				case "selldeposit":
+					builder.withToken(FQuotation.SELL_DEPOSIT, readDecimal(reader));
+					break;
+				case "volatility":
+					builder.withToken(FQuotation.VOLATILITY, readDecimal(reader));
+					break;
+				case "theoreticalprice":
+					builder.withToken(FQuotation.THEORETICAL_PRICE, readDecimal(reader));
+					break;
+				case "bgo_buy":
+					builder.withToken(FQuotation.BGO_BUY, readDecimal(reader));
+					break;
+				case "lcurrentprice":
+					builder.withToken(FQuotation.L_CURRENT_PRICE, readDecimal(reader));
+					break;
+				}
+				break;
+			case XMLStreamReader.END_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "quotation":
+					checkNotNull(sec_code, "seccode");
+					checkNotNull(board_code, "board");
+					return new TQStateUpdate<>(new TQSecID2(sec_code, board_code), builder.buildUpdate());
+				}
+				break;
+			}
+		}
+		throw new XMLStreamException("Premature end of file");
+	}
+	
+	public List<TQStateUpdate<TQSecID2>> readQuotations(XMLStreamReader reader) throws XMLStreamException {
+		if ( ! "quotations".equals(reader.getLocalName()) ) {
+			throw new IllegalStateException("Unexpected current element: " + reader.getLocalName()); 
+		}
+		List<TQStateUpdate<TQSecID2>> result = new ArrayList<>();
+		while ( reader.hasNext() ) {
+			switch ( reader.next() ) {
+			case XMLStreamReader.START_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "quotation":
+					result.add(readQuotation(reader));
+					break;
+				}
+				break;
+			case XMLStreamReader.END_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "quotations":
 					return result;
 				}
 				break;

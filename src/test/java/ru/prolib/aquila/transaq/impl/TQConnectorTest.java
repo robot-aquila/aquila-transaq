@@ -2,11 +2,15 @@ package ru.prolib.aquila.transaq.impl;
 
 import static org.easymock.EasyMock.*;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.easymock.IMocksControl;
 import org.ini4j.Profile.Section;
 import org.junit.Before;
 import org.junit.Test;
 
+import ru.prolib.JTransaq.JTransaqHandler;
 import ru.prolib.JTransaq.JTransaqServer;
 
 public class TQConnectorTest {
@@ -14,14 +18,14 @@ public class TQConnectorTest {
 	private JTransaqServer serverMock;
 	private Section configMock;
 	private TQConnector service;
-	private TransaqHandler handlerMock;
+	private JTransaqHandler handlerMock;
 
 	@Before
 	public void setUp() throws Exception {
 		control = createStrictControl();
 		serverMock = control.createMock(JTransaqServer.class);
 		configMock = control.createMock(Section.class);
-		handlerMock = control.createMock(TransaqHandler.class);
+		handlerMock = control.createMock(JTransaqHandler.class);
 		service = new TQConnector(configMock, serverMock, handlerMock);
 	}
 	
@@ -84,6 +88,134 @@ public class TQConnectorTest {
 		control.replay();
 		
 		service.close();
+		
+		control.verify();
+	}
+	
+	@Test
+	public void testSubscribe() throws Exception {
+		Set<TQSecID2> symbols = new LinkedHashSet<>();
+		symbols.add(new TQSecID2("foo", "EX1"));
+		symbols.add(new TQSecID2("bar", "EX2"));
+		symbols.add(new TQSecID2("buz", "EX3"));
+		serverMock.SendCommand(
+				"<command id=\"subscribe\">\n" +
+		
+				"\t<alltrades>\n" +
+				"\t\t<security>\n" +
+				"\t\t\t<board>EX1</board>\n" +
+				"\t\t\t<seccode>foo</seccode>\n" +
+				"\t\t</security>\n" +
+				"\t\t<security>\n" +
+				"\t\t\t<board>EX2</board>\n" +
+				"\t\t\t<seccode>bar</seccode>\n" +
+				"\t\t</security>\n" +
+				"\t\t<security>\n" +
+				"\t\t\t<board>EX3</board>\n" +
+				"\t\t\t<seccode>buz</seccode>\n" +
+				"\t\t</security>\n" +
+				"\t</alltrades>\n" +
+				
+				"\t<quotations>\n" +
+				"\t\t<security>\n" +
+				"\t\t\t<board>EX1</board>\n" +
+				"\t\t\t<seccode>foo</seccode>\n" +
+				"\t\t</security>\n" +
+				"\t\t<security>\n" +
+				"\t\t\t<board>EX2</board>\n" +
+				"\t\t\t<seccode>bar</seccode>\n" +
+				"\t\t</security>\n" +
+				"\t\t<security>\n" +
+				"\t\t\t<board>EX3</board>\n" +
+				"\t\t\t<seccode>buz</seccode>\n" +
+				"\t\t</security>\n" +
+				"\t</quotations>\n" +
+				
+				"\t<quotes>\n" +
+				"\t\t<security>\n" +
+				"\t\t\t<board>EX1</board>\n" +
+				"\t\t\t<seccode>foo</seccode>\n" +
+				"\t\t</security>\n" +
+				"\t\t<security>\n" +
+				"\t\t\t<board>EX2</board>\n" +
+				"\t\t\t<seccode>bar</seccode>\n" +
+				"\t\t</security>\n" +
+				"\t\t<security>\n" +
+				"\t\t\t<board>EX3</board>\n" +
+				"\t\t\t<seccode>buz</seccode>\n" +
+				"\t\t</security>\n" +
+				"\t</quotes>\n" +
+				
+				"</command>"
+			);
+		control.replay();
+		
+		service.subscribe(symbols, TQConnector.SUBSCR_TYPE_ALL_TRADES |
+				TQConnector.SUBSCR_TYPE_QUOTATIONS | TQConnector.SUBSCR_TYPE_QUOTES);
+		
+		control.verify();
+	}
+	
+	@Test
+	public void testUnsubscribe() throws Exception {
+		Set<TQSecID2> symbols = new LinkedHashSet<>();
+		symbols.add(new TQSecID2("foo", "EX1"));
+		symbols.add(new TQSecID2("bar", "EX2"));
+		symbols.add(new TQSecID2("buz", "EX3"));
+		serverMock.SendCommand(
+				"<command id=\"unsubscribe\">\n" +
+		
+				"\t<alltrades>\n" +
+				"\t\t<security>\n" +
+				"\t\t\t<board>EX1</board>\n" +
+				"\t\t\t<seccode>foo</seccode>\n" +
+				"\t\t</security>\n" +
+				"\t\t<security>\n" +
+				"\t\t\t<board>EX2</board>\n" +
+				"\t\t\t<seccode>bar</seccode>\n" +
+				"\t\t</security>\n" +
+				"\t\t<security>\n" +
+				"\t\t\t<board>EX3</board>\n" +
+				"\t\t\t<seccode>buz</seccode>\n" +
+				"\t\t</security>\n" +
+				"\t</alltrades>\n" +
+				
+				"\t<quotations>\n" +
+				"\t\t<security>\n" +
+				"\t\t\t<board>EX1</board>\n" +
+				"\t\t\t<seccode>foo</seccode>\n" +
+				"\t\t</security>\n" +
+				"\t\t<security>\n" +
+				"\t\t\t<board>EX2</board>\n" +
+				"\t\t\t<seccode>bar</seccode>\n" +
+				"\t\t</security>\n" +
+				"\t\t<security>\n" +
+				"\t\t\t<board>EX3</board>\n" +
+				"\t\t\t<seccode>buz</seccode>\n" +
+				"\t\t</security>\n" +
+				"\t</quotations>\n" +
+				
+				"\t<quotes>\n" +
+				"\t\t<security>\n" +
+				"\t\t\t<board>EX1</board>\n" +
+				"\t\t\t<seccode>foo</seccode>\n" +
+				"\t\t</security>\n" +
+				"\t\t<security>\n" +
+				"\t\t\t<board>EX2</board>\n" +
+				"\t\t\t<seccode>bar</seccode>\n" +
+				"\t\t</security>\n" +
+				"\t\t<security>\n" +
+				"\t\t\t<board>EX3</board>\n" +
+				"\t\t\t<seccode>buz</seccode>\n" +
+				"\t\t</security>\n" +
+				"\t</quotes>\n" +
+				
+				"</command>"
+			);
+		control.replay();
+		
+		service.unsubscribe(symbols, TQConnector.SUBSCR_TYPE_ALL_TRADES |
+				TQConnector.SUBSCR_TYPE_QUOTATIONS | TQConnector.SUBSCR_TYPE_QUOTES);
 		
 		control.verify();
 	}
