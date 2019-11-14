@@ -196,7 +196,7 @@ public class TQServiceMenu implements ActionListener {
 		JTable table = new JTable(table_model);
 		table.setShowGrid(true);
 		table.setRowSorter(new TableRowSorter<>(table_model));
-		return table;		
+		return table;	
 	}
 	
 	public JTable createMarketTable(OSCRepository<Integer, Market> repository) {
