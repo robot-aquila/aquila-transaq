@@ -35,6 +35,7 @@ public class EngineCmdProcessorTest {
 	private ServiceLocator serviceLocator;
 	private TQConnector connMock;
 	private MessageRouter mrouterMock;
+	private SecurityDataService sdsMock;
 	private EngineCmdProcessor service;
 	private Thread thread;
 	private Cmd cmd;
@@ -47,6 +48,7 @@ public class EngineCmdProcessorTest {
 		serviceLocator = new ServiceLocator();
 		serviceLocator.setConnector(connMock = control.createMock(TQConnector.class));
 		serviceLocator.setMessageRouter(mrouterMock = control.createMock(MessageRouter.class));
+		serviceLocator.setSecurityDataService(sdsMock = control.createMock(SecurityDataService.class));
 		service = new EngineCmdProcessor(queue, serviceLocator);
 		thread = new Thread(service);
 		thread.start();
@@ -104,6 +106,7 @@ public class EngineCmdProcessorTest {
 	
 	@Test
 	public void testSubscrSymbol() throws Exception {
+		sdsMock.subscribe(symbol, MDLevel.L1_BBO);
 		control.replay();
 		
 		queue.put(cmd = new CmdSubscrSymbol(symbol, MDLevel.L1_BBO));
@@ -114,6 +117,7 @@ public class EngineCmdProcessorTest {
 
 	@Test
 	public void testUnsubscrSymbol() throws Exception {
+		sdsMock.unsubscribe(symbol, MDLevel.L1);
 		control.replay();
 		
 		queue.put(cmd = new CmdUnsubscrSymbol(symbol, MDLevel.L1));

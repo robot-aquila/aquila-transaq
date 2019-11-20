@@ -30,10 +30,13 @@ public class EngineCmdProcessor implements Runnable {
 			while ( shutdown == false && (cmd = cmdQueue.take()) != null ) {
 				switch ( cmd.getType() ) {
 				case SHUTDOWN:
+				{
 					services.getConnector().close();
 					shutdown = true;
 					break;
+				}
 				case CONNECT:
+				{
 					try {
 						// TODO: This should start some controller to track connection state.
 						services.getConnector().connect();
@@ -41,21 +44,35 @@ public class EngineCmdProcessor implements Runnable {
 						logger.error("Connect failed: ", e);
 					}
 					break;
+				}
 				case DISCONNECT:
+				{
 					services.getConnector().disconnect();
 					break;
+				}
 				case MSG_FROM_SERVER:
+				{
 					services.getMessageRouter().dispatchMessage(((CmdMsgFromServer)cmd).getMessage());
 					break;
-				case SUBSCR_SYMBOL:
-					// TODO: 
-					break;
-				case UNSUBSCR_SYMBOL:
-					// TODO: 
-					break;
-				default:
-					throw new IllegalArgumentException("Unidentified command: " + cmd);	
 				}
+				case SUBSCR_SYMBOL:
+				{
+					CmdSubscrSymbol _cmd = (CmdSubscrSymbol) cmd;
+					services.getSecurityDataService().subscribe(_cmd.getSymbol(), _cmd.getLevel());
+					break;
+				}
+				case UNSUBSCR_SYMBOL:
+				{
+					CmdUnsubscrSymbol _cmd = (CmdUnsubscrSymbol) cmd;
+					services.getSecurityDataService().unsubscribe(_cmd.getSymbol(), _cmd.getLevel());
+					break;
+				}
+				default:
+				{
+					IllegalArgumentException e = new IllegalArgumentException("Unidentified command: " + cmd); 
+					cmd.getResult().completeExceptionally(e);
+					throw e;
+				}}
 				cmd.getResult().complete(true);
 			}
 		} catch ( InterruptedException e ) {

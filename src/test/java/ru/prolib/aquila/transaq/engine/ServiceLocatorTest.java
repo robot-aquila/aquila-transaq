@@ -24,6 +24,7 @@ public class ServiceLocatorTest {
 	private TQDirectory dirMock;
 	private MessageRouter mrouterMock;
 	private TQConnector connMock;
+	private SecurityDataService sdsMock;
 	private ServiceLocator service;
 
 	@Before
@@ -34,6 +35,7 @@ public class ServiceLocatorTest {
 		dirMock = control.createMock(TQDirectory.class);
 		mrouterMock = control.createMock(MessageRouter.class);
 		connMock = control.createMock(TQConnector.class);
+		sdsMock = control.createMock(SecurityDataService.class);
 		service = new ServiceLocator();
 	}
 	
@@ -129,6 +131,25 @@ public class ServiceLocatorTest {
 		
 		assertSame(connMock, service.getConnector());
 		
+		control.verify();
+	}
+	
+	@Test
+	public void testGetSecurityDataService_ThrowsIfNotDefined() {
+		eex.expect(IllegalStateException.class);
+		eex.expectMessage("Security data service was not defined");
+		control.replay();
+		
+		service.getSecurityDataService();
+	}
+	
+	@Test
+	public void testGetSecurityDataService() {
+		service.setSecurityDataService(sdsMock);
+		control.replay();
+		
+		assertSame(sdsMock, service.getSecurityDataService());
+
 		control.verify();
 	}
 

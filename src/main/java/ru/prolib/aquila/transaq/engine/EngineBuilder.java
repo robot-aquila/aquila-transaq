@@ -75,6 +75,7 @@ public class EngineBuilder {
 				new TQSecurityHandlerFactory(terminal, new TQFieldAssembler(services.getDirectory()))
 			);
 		services.setReactor(reactor);
+		services.setSecurityDataService(new SecurityDataServiceImpl());
 	}
 
 }

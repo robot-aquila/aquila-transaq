@@ -12,6 +12,7 @@ public class ServiceLocator {
 	private TQDirectory directory;
 	private MessageRouter msgRouter;
 	private TQConnector connector;
+	private SecurityDataService securityDataService;
 	
 	public synchronized TQParser getParser() {
 		if ( parser == null ) {
@@ -66,6 +67,17 @@ public class ServiceLocator {
 	
 	public synchronized void setConnector(TQConnector connector) {
 		this.connector = connector;
+	}
+	
+	public synchronized SecurityDataService getSecurityDataService() {
+		if ( securityDataService == null ) {
+			throw new IllegalStateException("Security data service was not defined");
+		}
+		return securityDataService;
+	}
+	
+	public synchronized void setSecurityDataService(SecurityDataService service) {
+		this.securityDataService = service;
 	}
 
 }
