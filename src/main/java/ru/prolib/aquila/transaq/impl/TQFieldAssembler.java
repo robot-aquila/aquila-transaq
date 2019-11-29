@@ -12,7 +12,9 @@ import ru.prolib.aquila.core.BusinessEntities.SecurityField;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.core.BusinessEntities.SymbolType;
 import ru.prolib.aquila.core.BusinessEntities.UpdatableStateContainer;
+import ru.prolib.aquila.transaq.entity.Board;
 import ru.prolib.aquila.transaq.entity.SecType;
+import ru.prolib.aquila.transaq.entity.SecurityBoardParams;
 import ru.prolib.aquila.transaq.impl.TQField.FSecurity;
 
 public class TQFieldAssembler {
@@ -46,7 +48,17 @@ public class TQFieldAssembler {
 		if ( id.getType() == SecType.FUT ) {
 			secCode = id.getShortName();
 		}
-		return new Symbol(secCode, dir.getMarketName(id.getMarketID()), CDecimalBD.RUB, type);
+		return new Symbol(secCode, id.getDefaultBoard(), CDecimalBD.RUB, type);
+	}
+	
+	/**
+	 * Convert symbol to transaq security ID.
+	 * <p>
+	 * @param symbol - symbol
+	 * @return - transaq equivalent
+	 */
+	public TQSecID2 toSecID2(Symbol symbol) {		
+		throw new UnsupportedOperationException("Not yet implemented");
 	}
 
 	public int toSecDisplayName(UpdatableStateContainer tq_sec_state, DeltaUpdateBuilder aq_sec_upd_builder) {

@@ -5,7 +5,7 @@ import java.util.concurrent.BlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ru.prolib.aquila.transaq.impl.TQConnectorException;
+import ru.prolib.aquila.transaq.impl.TransaqException;
 
 public class EngineCmdProcessor implements Runnable {
 	private static final Logger logger;
@@ -40,7 +40,7 @@ public class EngineCmdProcessor implements Runnable {
 					try {
 						// TODO: This should start some controller to track connection state.
 						services.getConnector().connect();
-					} catch ( TQConnectorException e ) {
+					} catch ( TransaqException e ) {
 						logger.error("Connect failed: ", e);
 					}
 					break;
@@ -58,13 +58,13 @@ public class EngineCmdProcessor implements Runnable {
 				case SUBSCR_SYMBOL:
 				{
 					CmdSubscrSymbol _cmd = (CmdSubscrSymbol) cmd;
-					services.getSecurityDataService().subscribe(_cmd.getSymbol(), _cmd.getLevel());
+					services.getSymbolDataService().subscribe(_cmd.getSymbol(), _cmd.getLevel());
 					break;
 				}
 				case UNSUBSCR_SYMBOL:
 				{
 					CmdUnsubscrSymbol _cmd = (CmdUnsubscrSymbol) cmd;
-					services.getSecurityDataService().unsubscribe(_cmd.getSymbol(), _cmd.getLevel());
+					services.getSymbolDataService().unsubscribe(_cmd.getSymbol(), _cmd.getLevel());
 					break;
 				}
 				default:

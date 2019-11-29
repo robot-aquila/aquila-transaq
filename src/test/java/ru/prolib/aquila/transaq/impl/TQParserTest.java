@@ -342,7 +342,7 @@ public class TQParserTest {
 		}
 		List<TQStateUpdate<TQSecID_F>> expected = new ArrayList<>();
 		expected.add(new TQStateUpdate<>(
-			new TQSecID_F("IRGZ", 1, "IrkutskEnrg", SecType.SHARE),
+			new TQSecID_F("IRGZ", 1, "TQBR", "IrkutskEnrg", SecType.SHARE),
 			new DeltaUpdateBuilder()
 				.withToken(FSecurity.SECID, 0)
 				.withToken(FSecurity.ACTIVE, true)
@@ -362,7 +362,7 @@ public class TQParserTest {
 				.buildUpdate())
 			);
 		expected.add(new TQStateUpdate<>(
-			new TQSecID_F("RU000A0ZZ505", 1, "Russian Agricultural Bank 09T1", SecType.BOND),
+			new TQSecID_F("RU000A0ZZ505", 1, "EQOB", "Russian Agricultural Bank 09T1", SecType.BOND),
 			new DeltaUpdateBuilder()
 				.withToken(FSecurity.SECID, 3)
 				.withToken(FSecurity.ACTIVE, true)
@@ -382,7 +382,7 @@ public class TQParserTest {
 				.buildUpdate())
 			);
 		expected.add(new TQStateUpdate<>(
-			new TQSecID_F("RIM9", 4, "RTS-6.19", SecType.FUT),
+			new TQSecID_F("RIM9", 4, "FUT", "RTS-6.19", SecType.FUT),
 			new DeltaUpdateBuilder()
 				.withToken(FSecurity.SECID, 41190)
 				.withToken(FSecurity.ACTIVE, true)
@@ -434,7 +434,7 @@ public class TQParserTest {
 		}
 		List<TQStateUpdate<TQSecID_F>> expected = new ArrayList<>();
 		expected.add(new TQStateUpdate<>(
-			new TQSecID_F("IRGZ", 1, "IrkutskEnrg", SecType.QUOTES),
+			new TQSecID_F("IRGZ", 1, "TQBR", "IrkutskEnrg", SecType.QUOTES),
 			new DeltaUpdateBuilder()
 				.withToken(FSecurity.SECID, 0)
 				.withToken(FSecurity.ACTIVE, true)
@@ -473,7 +473,7 @@ public class TQParserTest {
 		}
 		List<TQStateUpdate<TQSecID_F>> expected = new ArrayList<>();
 		expected.add(new TQStateUpdate<>(
-			new TQSecID_F("IRGZ", 1, "IrkutskEnrg", SecType.SHARE),
+			new TQSecID_F("IRGZ", 1, "TQBR", "IrkutskEnrg", SecType.SHARE),
 			new DeltaUpdateBuilder()
 				.withToken(FSecurity.SECID, 0)
 				.withToken(FSecurity.ACTIVE, true)

@@ -1,18 +1,23 @@
 package ru.prolib.aquila.transaq.engine;
 
+import ru.prolib.aquila.core.EventQueue;
+import ru.prolib.aquila.core.BusinessEntities.EditableTerminal;
 import ru.prolib.aquila.transaq.engine.mp.MessageRouter;
-import ru.prolib.aquila.transaq.impl.TQConnector;
 import ru.prolib.aquila.transaq.impl.TQDirectory;
+import ru.prolib.aquila.transaq.impl.TQFieldAssembler;
 import ru.prolib.aquila.transaq.impl.TQParser;
 import ru.prolib.aquila.transaq.impl.TQReactor;
 
 public class ServiceLocator {
+	private EventQueue queue;
 	private TQParser parser;
 	private TQReactor reactor;
 	private TQDirectory directory;
 	private MessageRouter msgRouter;
-	private TQConnector connector;
-	private SecurityDataService securityDataService;
+	private Connector connector;
+	private TQFieldAssembler assembler;
+	private SymbolDataService symbolDataService;
+	private EditableTerminal terminal;
 	
 	public synchronized TQParser getParser() {
 		if ( parser == null ) {
@@ -58,26 +63,59 @@ public class ServiceLocator {
 		this.msgRouter = msg_router;
 	}
 	
-	public synchronized TQConnector getConnector() {
+	public synchronized Connector getConnector() {
 		if ( connector == null ) {
 			throw new IllegalStateException("Connector was not defined");
 		}
 		return connector;
 	}
 	
-	public synchronized void setConnector(TQConnector connector) {
+	public synchronized void setConnector(Connector connector) {
 		this.connector = connector;
 	}
 	
-	public synchronized SecurityDataService getSecurityDataService() {
-		if ( securityDataService == null ) {
-			throw new IllegalStateException("Security data service was not defined");
+	public synchronized SymbolDataService getSymbolDataService() {
+		if ( symbolDataService == null ) {
+			throw new IllegalStateException("Symbol data service was not defined");
 		}
-		return securityDataService;
+		return symbolDataService;
 	}
 	
-	public synchronized void setSecurityDataService(SecurityDataService service) {
-		this.securityDataService = service;
+	public synchronized void setSymbolDataService(SymbolDataService service) {
+		this.symbolDataService = service;
+	}
+	
+	public synchronized TQFieldAssembler getAssembler() {
+		if ( assembler == null ) {
+			throw new IllegalStateException("Field assembler was not defined");
+		}
+		return assembler;
+	}
+	
+	public synchronized void setAssembler(TQFieldAssembler assembler) {
+		this.assembler = assembler;
+	}
+	
+	public synchronized EditableTerminal getTerminal() {
+		if ( terminal == null ) {
+			throw new IllegalStateException("Terminal was not defined");
+		}
+		return terminal;
+	}
+	
+	public synchronized void setTerminal(EditableTerminal terminal) {
+		this.terminal = terminal;
+	}
+	
+	public synchronized EventQueue getEventQueue() {
+		if ( queue == null ) {
+			throw new IllegalStateException("Event queue was not defined");
+		}
+		return queue;
+	}
+	
+	public synchronized void setEventQueue(EventQueue service) {
+		this.queue = service;
 	}
 
 }

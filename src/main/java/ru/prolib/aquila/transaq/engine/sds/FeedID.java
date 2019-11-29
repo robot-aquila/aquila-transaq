@@ -1,4 +1,4 @@
-package ru.prolib.aquila.transaq.engine;
+package ru.prolib.aquila.transaq.engine.sds;
 
 public enum FeedID {
 	SYMBOL_PRIMARY,

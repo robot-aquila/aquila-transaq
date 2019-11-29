@@ -1,12 +1,7 @@
 package ru.prolib.aquila.transaq.engine;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
-import org.apache.commons.lang3.tuple.Pair;
-
-import ru.prolib.aquila.core.EventQueue;
 import ru.prolib.aquila.core.BusinessEntities.EditableTerminal;
+import ru.prolib.aquila.core.BusinessEntities.SymbolSubscrRepository;
 import ru.prolib.aquila.transaq.engine.mp.BoardsProcessor;
 import ru.prolib.aquila.transaq.engine.mp.CandleKindsProcessor;
 import ru.prolib.aquila.transaq.engine.mp.ClientProcessor;
@@ -21,6 +16,9 @@ import ru.prolib.aquila.transaq.engine.mp.RawMessageDumper;
 import ru.prolib.aquila.transaq.engine.mp.SecInfoProcessor;
 import ru.prolib.aquila.transaq.engine.mp.SecInfoUpdProcessor;
 import ru.prolib.aquila.transaq.engine.mp.SecuritiesMessageProcessor;
+import ru.prolib.aquila.transaq.engine.sds.SymbolDataServiceImpl;
+import ru.prolib.aquila.transaq.engine.sds.SymbolStateFactory;
+import ru.prolib.aquila.transaq.engine.sds.SymbolStateRepository;
 import ru.prolib.aquila.transaq.impl.TQDirectory;
 import ru.prolib.aquila.transaq.impl.TQFieldAssembler;
 import ru.prolib.aquila.transaq.impl.TQParser;
@@ -28,17 +26,7 @@ import ru.prolib.aquila.transaq.impl.TQReactor;
 import ru.prolib.aquila.transaq.impl.TQSecurityHandlerFactory;
 import ru.prolib.aquila.transaq.impl.TQSecurityHandlerRegistry;
 
-public class EngineBuilder {
-	
-	public Pair<ServiceLocator, Engine> build() {
-		ServiceLocator services = new ServiceLocator();
-		BlockingQueue<Cmd> cmd_queue = new LinkedBlockingQueue<>();
-		Thread t = new Thread(new EngineCmdProcessor(cmd_queue, services));
-		t.setDaemon(true);
-		t.setName("TRANSAQ-ENGINE");
-		t.start();
-		return Pair.of(services, new EngineImpl(cmd_queue));
-	}
+public class EngineBuilderRoutines {
 
 	MessageRouter standardRouter(ServiceLocator services) {
 		return new MessageRouterImpl(new ProcessorRegistryBuilder()
@@ -60,22 +48,28 @@ public class EngineBuilder {
 				
 				.build());
 	}
-
 	
-	public void initPrimary(ServiceLocator services, EventQueue eventQueue) {
+	public void initPrimary(ServiceLocator services) {
 		services.setMessageRouter(standardRouter(services));
-		services.setDirectory(new TQDirectory(eventQueue));
+		services.setDirectory(new TQDirectory(services.getEventQueue()));
 		services.setParser(TQParser.getInstance());
+		services.setAssembler(new TQFieldAssembler(services.getDirectory()));
 	}
 	
 	public void initSecondary(ServiceLocator services, EditableTerminal terminal) {
 		TQReactor reactor = new TQReactor(
 				services.getDirectory(),
 				new TQSecurityHandlerRegistry(),
-				new TQSecurityHandlerFactory(terminal, new TQFieldAssembler(services.getDirectory()))
+				new TQSecurityHandlerFactory(terminal, services.getAssembler())
 			);
 		services.setReactor(reactor);
-		services.setSecurityDataService(new SecurityDataServiceImpl());
+		services.setTerminal(terminal);
+		services.setSymbolDataService(new SymbolDataServiceImpl(
+				services,
+				new SymbolStateFactory(services),
+				new SymbolStateRepository(),
+				new SymbolSubscrRepository(services.getEventQueue(), "TRANSAQ-SUBSCR")
+			));
 	}
 
 }

@@ -19,7 +19,7 @@ import org.junit.Test;
 import ru.prolib.aquila.core.BusinessEntities.MDLevel;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.transaq.engine.mp.MessageRouter;
-import ru.prolib.aquila.transaq.impl.TQConnector;
+import ru.prolib.aquila.transaq.impl.StdConnector;
 
 public class EngineCmdProcessorTest {
 	private static Symbol symbol = new Symbol("kappa");
@@ -33,9 +33,9 @@ public class EngineCmdProcessorTest {
 	private IMocksControl control;
 	private BlockingQueue<Cmd> queue;
 	private ServiceLocator serviceLocator;
-	private TQConnector connMock;
+	private StdConnector connMock;
 	private MessageRouter mrouterMock;
-	private SecurityDataService sdsMock;
+	private SymbolDataService sdsMock;
 	private EngineCmdProcessor service;
 	private Thread thread;
 	private Cmd cmd;
@@ -46,9 +46,9 @@ public class EngineCmdProcessorTest {
 		control = createStrictControl();
 		queue = new LinkedBlockingQueue<>(1);
 		serviceLocator = new ServiceLocator();
-		serviceLocator.setConnector(connMock = control.createMock(TQConnector.class));
+		serviceLocator.setConnector(connMock = control.createMock(StdConnector.class));
 		serviceLocator.setMessageRouter(mrouterMock = control.createMock(MessageRouter.class));
-		serviceLocator.setSecurityDataService(sdsMock = control.createMock(SecurityDataService.class));
+		serviceLocator.setSymbolDataService(sdsMock = control.createMock(SymbolDataService.class));
 		service = new EngineCmdProcessor(queue, serviceLocator);
 		thread = new Thread(service);
 		thread.start();

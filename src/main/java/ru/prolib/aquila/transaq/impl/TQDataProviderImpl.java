@@ -10,22 +10,26 @@ import ru.prolib.aquila.core.BusinessEntities.SubscrHandlerStub;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.core.data.DataProvider;
 import ru.prolib.aquila.transaq.engine.Engine;
-import ru.prolib.aquila.transaq.engine.EngineBuilder;
+import ru.prolib.aquila.transaq.engine.EngineBuilderRoutines;
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
 
 public class TQDataProviderImpl implements DataProvider {
 	private final Engine engine;
-	private final EngineBuilder engineBuilder;
+	private final EngineBuilderRoutines engineBuilder;
 	private final ServiceLocator engineServices;
 	
 	public TQDataProviderImpl(
 			Engine engine,
-			EngineBuilder engine_builder,
+			EngineBuilderRoutines engine_builder,
 			ServiceLocator engine_services)
 	{
 		this.engine = engine;
 		this.engineBuilder = engine_builder;
 		this.engineServices = engine_services;
+	}
+	
+	public ServiceLocator getServices() {
+		return engineServices;
 	}
 
 	@Override

@@ -8,8 +8,9 @@ import org.slf4j.LoggerFactory;
 
 import ru.prolib.JTransaq.JTransaqHandler;
 import ru.prolib.JTransaq.JTransaqServer;
+import ru.prolib.aquila.transaq.engine.Connector;
 
-public class TQConnector {
+public class StdConnector implements Connector {
 	public static final int SUBSCR_TYPE_QUOTATIONS = 0x01;
 	public static final int SUBSCR_TYPE_ALL_TRADES = 0x02;
 	public static final int SUBSCR_TYPE_QUOTES = 0x04;
@@ -17,38 +18,40 @@ public class TQConnector {
 	private static final Logger logger;
 	
 	static {
-		logger = LoggerFactory.getLogger(TQConnector.class);
+		logger = LoggerFactory.getLogger(StdConnector.class);
 	}
 	
 	private final Section config;
 	private final JTransaqServer server;
 	private final JTransaqHandler handler;
 	
-	public TQConnector(Section config, JTransaqServer server, JTransaqHandler handler) {
+	public StdConnector(Section config, JTransaqServer server, JTransaqHandler handler) {
 		this.config = config;
 		this.server = server;
 		this.handler = handler;
 	}
 	
-	private String cfg_var(String key) throws TQConnectorException {
+	private String cfg_var(String key) throws TransaqException {
 		String x = config.get(key);
 		if ( x == null ) {
-			throw new TQConnectorException("Parameter was not defined: " + key);
+			throw new TransaqException("Parameter was not defined: " + key);
 		}
 		return x;
 	}
 	
-	public void init() throws TQConnectorException {
+	@Override
+	public void init() throws TransaqException {
 		try {
 			server.Initialize(cfg_var("log_path"), Integer.parseInt(cfg_var("log_level")));
-		} catch ( TQConnectorException e ) {
+		} catch ( TransaqException e ) {
 			throw e;
 		} catch ( Exception e ) {
-			throw new TQConnectorException("Initialization failed", e);
+			throw new TransaqException("Initialization failed", e);
 		}
 	}
 	
-	public void connect() throws TQConnectorException {
+	@Override
+	public void connect() throws TransaqException {
 		try {
 			server.SendCommand("<command id=\"connect\">"
 					+ "<login>" + cfg_var("login") + "</login>"
@@ -64,13 +67,14 @@ public class TQConnector {
 					+ "<push_u_limits>5</push_u_limits>"
 					+ "<push_pos_equity>5</push_pos_equity>"
 					+ "</command>");
-		} catch ( TQConnectorException e ) {
+		} catch ( TransaqException e ) {
 			throw e;
 		} catch ( Exception e ) {
-			throw new TQConnectorException("Failed to connect: ", e);
+			throw new TransaqException("Failed to connect: ", e);
 		}
 	}
 	
+	@Override
 	public void disconnect() {
 		try {
 			server.SendCommand("<command id=\"disconnect\"/>");
@@ -79,6 +83,7 @@ public class TQConnector {
 		}
 	}
 	
+	@Override
 	public void close() {
 		try {
 			server.UnInitialize();
@@ -89,7 +94,7 @@ public class TQConnector {
 		handler.delete();
 	}
 	
-	private void manageSubscriptions(Set<TQSecID2> symbols, int subscr_type, String command) throws TQConnectorException {
+	private void manageSubscriptions(Set<TQSecID2> symbols, int subscr_type, String command) throws TransaqException {
 		String str_symbols = "";
 		for ( TQSecID2 symbol : symbols ) {
 			str_symbols +=
@@ -111,10 +116,10 @@ public class TQConnector {
 		x += "</command>";
 		try {
 			server.SendCommand(x);
-		} catch ( TQConnectorException e ) {
+		} catch ( TransaqException e ) {
 			throw e;
 		} catch ( Exception e ) {
-			throw new TQConnectorException("Failed to connect: ", e);
+			throw new TransaqException("Failed to connect: ", e);
 		}
 	}
 	
@@ -124,10 +129,16 @@ public class TQConnector {
 	 * @param symbols - list of symbols to subscribe
 	 * @param subscr_type - {@link #SUBSCR_TYPE_QUOTATIONS}, {@link #SUBSCR_TYPE_ALL_TRADES},
 	 * {@link #SUBSCR_TYPE_QUOTES}. Can be combined using bitwise OR.
-	 * @throws TQConnectorException - an error occurred
+	 * @throws TransaqException - an error occurred
 	 */
-	public void subscribe(Set<TQSecID2> symbols, int subscr_type) throws TQConnectorException {
+	@Deprecated
+	public void subscribe(Set<TQSecID2> symbols, int subscr_type) throws TransaqException {
 		manageSubscriptions(symbols, subscr_type, "subscribe");
+	}
+	
+	@Override
+	public void subscribe(Set<TQSecID2> quotations, Set<TQSecID2> trades, Set<TQSecID2> quotes) {
+		throw new UnsupportedOperationException("Not yet implemented");
 	}
 	
 	/**
@@ -135,10 +146,16 @@ public class TQConnector {
 	 * <p>
 	 * @param symbols - list of symbols to unsubscribe
 	 * @param subscr_type - subscription data type. See {@link #subscribe(Set, int)} for details. 
-	 * @throws TQConnectorException - an error occurred
+	 * @throws TransaqException - an error occurred
 	 */
-	public void unsubscribe(Set<TQSecID2> symbols, int subscr_type) throws TQConnectorException {
+	@Deprecated
+	public void unsubscribe(Set<TQSecID2> symbols, int subscr_type) throws TransaqException {
 		manageSubscriptions(symbols, subscr_type, "unsubscribe");
+	}
+	
+	@Override
+	public void unsubscribe(Set<TQSecID2> quotations, Set<TQSecID2> trades, Set<TQSecID2> quotes) {
+		throw new UnsupportedOperationException("Not yet implemented");
 	}
 	
 }

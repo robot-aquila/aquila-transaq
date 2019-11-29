@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import ru.prolib.JTransaq.JTransaqHandler;
 import ru.prolib.JTransaq.JTransaqServer;
-import ru.prolib.aquila.transaq.impl.TQConnector;
+import ru.prolib.aquila.transaq.impl.StdConnector;
 import ru.prolib.aquila.transaq.impl.TQSecID2;
 
 public class ConnectorTest {
@@ -78,7 +78,7 @@ public class ConnectorTest {
 		Wini ini = new Wini(new File("fixture/transaq.ini"));
 		Section config = ini.get("transaq-test");
 		JTransaqServer server = new JTransaqServer(handler);
-		TQConnector conn = new TQConnector(config, server, handler);
+		StdConnector conn = new StdConnector(config, server, handler);
 		conn.init();
 		conn.connect();
 		Thread.sleep(5000L);
@@ -86,7 +86,7 @@ public class ConnectorTest {
 			Set<TQSecID2> symbols = new LinkedHashSet<>();
 			symbols.add(new TQSecID2("SBER", "TQBR"));
 			symbols.add(new TQSecID2("RIZ9", "FUT"));
-			conn.subscribe(symbols, TQConnector.SUBSCR_TYPE_QUOTATIONS);
+			conn.subscribe(symbols, StdConnector.SUBSCR_TYPE_QUOTATIONS);
 			Thread.sleep(20000L);
 		} finally {
 			conn.disconnect();

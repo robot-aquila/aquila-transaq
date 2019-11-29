@@ -64,11 +64,11 @@ public class TQReactorTest {
 	}
 	
 	@Test
-	public void testUpdateSecurity_U1() {
+	public void testUpdateSecurity1_U1() {
 		TQSecID1 sec_id = new TQSecID1("foo", 26);
 		DeltaUpdate duMock = control.createMock(DeltaUpdate.class);
 		TQStateUpdate<TQSecID1> update = new TQStateUpdate<>(sec_id, duMock);
-		dirMock.updateSecurityParams(update);
+		dirMock.updateSecurityParamsP(update);
 		expect(shrMock.getHandler(sec_id)).andReturn(shMock1);
 		shMock1.update(duMock);
 		control.replay();
@@ -79,12 +79,11 @@ public class TQReactorTest {
 	}
 
 	@Test
-	public void testUpdateSecurity_U3_NewHandler() {
-		TQSecID_F sec_id3 = new TQSecID_F("foo", 7, "bar", SecType.BOND);
+	public void testUpdateSecurityF_U3_NewHandler() {
+		TQSecID_F sec_id3 = new TQSecID_F("foo", 7, "OPT", "bar", SecType.BOND);
 		DeltaUpdate duMock = control.createMock(DeltaUpdate.class);
 		TQStateUpdate<TQSecID_F> update = new TQStateUpdate<>(sec_id3, duMock);
-		TQStateUpdate<TQSecID1> update1 = new TQStateUpdate<>(new TQSecID1("foo", 7), duMock);
-		dirMock.updateSecurityParams(update1);
+		dirMock.updateSecurityParamsF(update);
 		expect(shrMock.getHandlerOrNull(sec_id3)).andReturn(null);
 		expect(shfMock.createHandler(sec_id3)).andReturn(shMock1);
 		shMock1.update(duMock);
@@ -97,12 +96,11 @@ public class TQReactorTest {
 	}
 
 	@Test
-	public void testUpdateSecurity_U3_ExistingHandler() {
-		TQSecID_F sec_id3 = new TQSecID_F("buz", 8, "bar", SecType.GKO);
+	public void testUpdateSecurityF_U3_ExistingHandler() {
+		TQSecID_F sec_id3 = new TQSecID_F("buz", 8, "BOSS", "bar", SecType.GKO);
 		DeltaUpdate duMock = control.createMock(DeltaUpdate.class);
 		TQStateUpdate<TQSecID_F> update = new TQStateUpdate<>(sec_id3, duMock);
-		TQStateUpdate<TQSecID1> update1 = new TQStateUpdate<>(new TQSecID1("buz", 8), duMock);
-		dirMock.updateSecurityParams(update1);
+		dirMock.updateSecurityParamsF(update);
 		expect(shrMock.getHandlerOrNull(sec_id3)).andReturn(shMock1);
 		shMock1.update(duMock);
 		control.replay();

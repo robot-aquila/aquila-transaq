@@ -320,7 +320,7 @@ public class TQParser {
 	
 	private TQStateUpdate<TQSecID_F> readSecurity(XMLStreamReader reader) throws XMLStreamException {
 		Integer market_id = null;
-		String sec_code = null, short_name = null;
+		String sec_code = null, short_name = null, default_board = null;
 		SecType sec_type = null;
 		DeltaUpdateBuilder builder = new DeltaUpdateBuilder()
 				.withToken(FSecurity.SECID, getAttributeInt(reader, "secid"))
@@ -336,7 +336,7 @@ public class TQParser {
 					builder.withToken(FSecurity.SECCLASS, readCharacters(reader));
 					break;
 				case "board":
-					builder.withToken(FSecurity.DEFAULT_BOARDCODE, readCharacters(reader));
+					builder.withToken(FSecurity.DEFAULT_BOARDCODE, default_board = readCharacters(reader));
 					break;
 				case "market":
 					builder.withToken(FSecurity.MARKETID, market_id = readInt(reader));
@@ -396,8 +396,9 @@ public class TQParser {
 					checkNotNull(market_id, "market");
 					checkNotNull(short_name, "shortname");
 					checkNotNull(sec_type, "sectype");
+					checkNotNull(default_board, "board");
 					return new TQStateUpdate<>(
-							new TQSecID_F(sec_code, market_id, short_name, sec_type),
+							new TQSecID_F(sec_code, market_id, default_board, short_name, sec_type),
 							builder.buildUpdate()
 						);
 				}

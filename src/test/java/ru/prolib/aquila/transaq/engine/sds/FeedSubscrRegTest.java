@@ -1,4 +1,4 @@
-package ru.prolib.aquila.transaq.engine;
+package ru.prolib.aquila.transaq.engine.sds;
 
 import static org.junit.Assert.*;
 
@@ -7,6 +7,9 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import ru.prolib.aquila.transaq.engine.sds.FeedSubscrReg;
+import ru.prolib.aquila.transaq.engine.sds.FeedSubscrStatus;
 
 public class FeedSubscrRegTest {
 	private FeedSubscrReg service;

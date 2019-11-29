@@ -1,6 +1,7 @@
 package ru.prolib.aquila.transaq.impl;
 
 import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -13,11 +14,11 @@ import org.junit.Test;
 import ru.prolib.JTransaq.JTransaqHandler;
 import ru.prolib.JTransaq.JTransaqServer;
 
-public class TQConnectorTest {
+public class StdConnectorTest {
 	private IMocksControl control;
 	private JTransaqServer serverMock;
 	private Section configMock;
-	private TQConnector service;
+	private StdConnector service;
 	private JTransaqHandler handlerMock;
 
 	@Before
@@ -26,7 +27,7 @@ public class TQConnectorTest {
 		serverMock = control.createMock(JTransaqServer.class);
 		configMock = control.createMock(Section.class);
 		handlerMock = control.createMock(JTransaqHandler.class);
-		service = new TQConnector(configMock, serverMock, handlerMock);
+		service = new StdConnector(configMock, serverMock, handlerMock);
 	}
 	
 	@Test
@@ -150,8 +151,8 @@ public class TQConnectorTest {
 			);
 		control.replay();
 		
-		service.subscribe(symbols, TQConnector.SUBSCR_TYPE_ALL_TRADES |
-				TQConnector.SUBSCR_TYPE_QUOTATIONS | TQConnector.SUBSCR_TYPE_QUOTES);
+		service.subscribe(symbols, StdConnector.SUBSCR_TYPE_ALL_TRADES |
+				StdConnector.SUBSCR_TYPE_QUOTATIONS | StdConnector.SUBSCR_TYPE_QUOTES);
 		
 		control.verify();
 	}
@@ -214,10 +215,20 @@ public class TQConnectorTest {
 			);
 		control.replay();
 		
-		service.unsubscribe(symbols, TQConnector.SUBSCR_TYPE_ALL_TRADES |
-				TQConnector.SUBSCR_TYPE_QUOTATIONS | TQConnector.SUBSCR_TYPE_QUOTES);
+		service.unsubscribe(symbols, StdConnector.SUBSCR_TYPE_ALL_TRADES |
+				StdConnector.SUBSCR_TYPE_QUOTATIONS | StdConnector.SUBSCR_TYPE_QUOTES);
 		
 		control.verify();
+	}
+	
+	@Test
+	public void testSubscribe3() {
+		fail("Not yet implemented");
+	}
+	
+	@Test
+	public void testUnsubscribe3() {
+		fail();
 	}
 
 }

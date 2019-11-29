@@ -10,12 +10,16 @@ import ru.prolib.aquila.transaq.entity.SecType;
 public class TQSecID_F {
 	private final String secCode;
 	private final int marketID;
+	private final String defBoard;
 	private final String shortName;
 	private final SecType type;
 	
-	public TQSecID_F(String sec_code, int market_id, String short_name, SecType type) {
+	public TQSecID_F(String sec_code, int market_id, String default_board, String short_name, SecType type) {
 		if ( sec_code == null || sec_code.length() == 0 ) {
 			throw new IllegalArgumentException("Invalid security code: " + sec_code);
+		}
+		if ( default_board == null || default_board.length() == 0 ) {
+			throw new IllegalArgumentException("Invalid board code: " + default_board);
 		}
 		if ( short_name == null || short_name.length() == 0 ) {
 			throw new IllegalArgumentException("Invalid short name: " + short_name);
@@ -25,6 +29,7 @@ public class TQSecID_F {
 		}
 		this.secCode = sec_code;
 		this.marketID = market_id;
+		this.defBoard = default_board;
 		this.shortName = short_name;
 		this.type = type;
 	}
@@ -35,6 +40,10 @@ public class TQSecID_F {
 	
 	public int getMarketID() {
 		return marketID;
+	}
+	
+	public String getDefaultBoard() {
+		return defBoard;
 	}
 	
 	public String getShortName() {
@@ -55,6 +64,7 @@ public class TQSecID_F {
 		return new HashCodeBuilder(234103, 1515)
 				.append(secCode)
 				.append(marketID)
+				.append(defBoard)
 				.append(shortName)
 				.append(type)
 				.build();
@@ -72,6 +82,7 @@ public class TQSecID_F {
 		return new EqualsBuilder()
 				.append(o.secCode, secCode)
 				.append(o.marketID, marketID)
+				.append(o.defBoard, defBoard)
 				.append(o.shortName, shortName)
 				.append(o.type, type)
 				.build();

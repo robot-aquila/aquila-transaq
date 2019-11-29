@@ -31,7 +31,7 @@ public class TQSecurityHandlerTest {
 		asmMock = control.createMock(TQFieldAssembler.class);
 		updateMock = control.createMock(DeltaUpdate.class);
 		service = new TQSecurityHandler(
-				new TQSecID_F("foo", 2, "bar", SecType.BOND),
+				new TQSecID_F("foo", 2, "FORTS", "bar", SecType.BOND),
 				new Symbol("F:RTS-6.19@FORTS:RUB"),
 				consMock,
 				stateMock, 

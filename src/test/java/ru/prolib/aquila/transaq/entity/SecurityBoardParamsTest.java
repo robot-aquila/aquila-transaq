@@ -19,7 +19,9 @@ import org.junit.Test;
 
 import ru.prolib.aquila.core.EventQueue;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCRepository;
+import ru.prolib.aquila.transaq.engine.sds.SymbolTID;
 import ru.prolib.aquila.transaq.impl.TQParser;
+import ru.prolib.aquila.transaq.impl.TQSecID1;
 import ru.prolib.aquila.transaq.impl.TQSecID2;
 import ru.prolib.aquila.transaq.impl.TQStateUpdate;
 
@@ -36,7 +38,7 @@ public class SecurityBoardParamsTest {
 	}
 
 	private IMocksControl control;
-	private OSCRepository<TQSecID2, SecurityBoardParams> repoMock;
+	private OSCRepository<SymbolTID, SecurityBoardParams> repoMock;
 	private EventQueue queueMock;
 	private SecurityBoardParams service;
 
@@ -46,7 +48,7 @@ public class SecurityBoardParamsTest {
 		control = createStrictControl();
 		repoMock = control.createMock(OSCRepository.class);
 		queueMock = control.createMock(EventQueue.class);
-		service = new SecurityBoardParamsFactory(queueMock).produce(repoMock, new TQSecID2("foo", "bar"));
+		service = new SecurityBoardParamsFactory(queueMock).produce(repoMock, new SymbolTID("foo", 5, "bar"));
 	}
 	
 	private XMLStreamReader startReading(String filename, String expected_elem) throws Exception {
@@ -80,6 +82,8 @@ public class SecurityBoardParamsTest {
 		assertEquals(of("0.1"), service.getMinStep());
 		assertEquals(of("10"), service.getLotSize());
 		assertEquals(of("12.34"), service.getPointCost());
+		assertEquals(new TQSecID1("PRTK", 1), service.toSecID1());
+		assertEquals(new TQSecID2("PRTK", "TQBR"), service.toSecID2());
 	}
 
 }

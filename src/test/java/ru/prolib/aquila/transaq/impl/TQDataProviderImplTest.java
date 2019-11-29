@@ -14,14 +14,14 @@ import ru.prolib.aquila.core.BusinessEntities.SubscrHandler;
 import ru.prolib.aquila.core.BusinessEntities.SubscrHandlerStub;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.transaq.engine.Engine;
-import ru.prolib.aquila.transaq.engine.EngineBuilder;
+import ru.prolib.aquila.transaq.engine.EngineBuilderRoutines;
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
 
 public class TQDataProviderImplTest {
 	private IMocksControl control;
 	private EditableTerminal terminalMock;
 	private Engine engMock;
-	private EngineBuilder engBuilderMock;
+	private EngineBuilderRoutines engBuilderMock;
 	private ServiceLocator engServicesMock;
 	private TQDataProviderImpl service;
 
@@ -30,7 +30,7 @@ public class TQDataProviderImplTest {
 		control = createStrictControl();
 		terminalMock = control.createMock(EditableTerminal.class);
 		engMock = control.createMock(Engine.class);
-		engBuilderMock = control.createMock(EngineBuilder.class);
+		engBuilderMock = control.createMock(EngineBuilderRoutines.class);
 		engServicesMock = control.createMock(ServiceLocator.class);
 		service = new TQDataProviderImpl(engMock, engBuilderMock, engServicesMock);
 	}

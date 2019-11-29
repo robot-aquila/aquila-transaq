@@ -20,8 +20,8 @@ import org.junit.Test;
 
 import ru.prolib.aquila.core.EventQueue;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCRepository;
+import ru.prolib.aquila.transaq.engine.sds.SymbolGID;
 import ru.prolib.aquila.transaq.impl.TQParser;
-import ru.prolib.aquila.transaq.impl.TQSecID1;
 import ru.prolib.aquila.transaq.impl.TQSecID_F;
 import ru.prolib.aquila.transaq.impl.TQStateUpdate;
 
@@ -38,7 +38,7 @@ public class SecurityParamsTest {
 	}
 	
 	private IMocksControl control;
-	private OSCRepository<TQSecID1, SecurityParams> repoMock;
+	private OSCRepository<SymbolGID, SecurityParams> repoMock;
 	private EventQueue queueMock;
 
 	private SecurityParams service;
@@ -49,7 +49,7 @@ public class SecurityParamsTest {
 		control = createStrictControl();
 		repoMock = control.createMock(OSCRepository.class);
 		queueMock = control.createMock(EventQueue.class);
-		service = new SecurityParamsFactory(queueMock).produce(repoMock, new TQSecID1("KKK", 7));
+		service = new SecurityParamsFactory(queueMock).produce(repoMock, new SymbolGID("KKK", 7));
 	}
 	
 	private XMLStreamReader startReading(String filename, String expected_elem) throws Exception {

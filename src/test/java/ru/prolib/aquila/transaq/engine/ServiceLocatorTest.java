@@ -9,9 +9,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import ru.prolib.aquila.core.EventQueue;
+import ru.prolib.aquila.core.BusinessEntities.EditableTerminal;
 import ru.prolib.aquila.transaq.engine.mp.MessageRouter;
-import ru.prolib.aquila.transaq.impl.TQConnector;
 import ru.prolib.aquila.transaq.impl.TQDirectory;
+import ru.prolib.aquila.transaq.impl.TQFieldAssembler;
 import ru.prolib.aquila.transaq.impl.TQParser;
 import ru.prolib.aquila.transaq.impl.TQReactor;
 
@@ -23,8 +25,11 @@ public class ServiceLocatorTest {
 	private TQReactor reactorMock;
 	private TQDirectory dirMock;
 	private MessageRouter mrouterMock;
-	private TQConnector connMock;
-	private SecurityDataService sdsMock;
+	private Connector connMock;
+	private TQFieldAssembler asmMock;
+	private SymbolDataService sdsMock;
+	private EditableTerminal termMock;
+	private EventQueue queueMock;
 	private ServiceLocator service;
 
 	@Before
@@ -34,8 +39,11 @@ public class ServiceLocatorTest {
 		reactorMock = control.createMock(TQReactor.class);
 		dirMock = control.createMock(TQDirectory.class);
 		mrouterMock = control.createMock(MessageRouter.class);
-		connMock = control.createMock(TQConnector.class);
-		sdsMock = control.createMock(SecurityDataService.class);
+		connMock = control.createMock(Connector.class);
+		sdsMock = control.createMock(SymbolDataService.class);
+		asmMock = control.createMock(TQFieldAssembler.class);
+		termMock = control.createMock(EditableTerminal.class);
+		queueMock = control.createMock(EventQueue.class);
 		service = new ServiceLocator();
 	}
 	
@@ -135,22 +143,79 @@ public class ServiceLocatorTest {
 	}
 	
 	@Test
-	public void testGetSecurityDataService_ThrowsIfNotDefined() {
+	public void testGetSymbolDataService_ThrowsIfNotDefined() {
 		eex.expect(IllegalStateException.class);
-		eex.expectMessage("Security data service was not defined");
+		eex.expectMessage("Symbol data service was not defined");
 		control.replay();
 		
-		service.getSecurityDataService();
+		service.getSymbolDataService();
 	}
 	
 	@Test
-	public void testGetSecurityDataService() {
-		service.setSecurityDataService(sdsMock);
+	public void testGetSymbolDataService() {
+		service.setSymbolDataService(sdsMock);
 		control.replay();
 		
-		assertSame(sdsMock, service.getSecurityDataService());
+		assertSame(sdsMock, service.getSymbolDataService());
 
 		control.verify();
 	}
-
+	
+	@Test
+	public void testGetAssembler_ThrowsIfNotDefined() {
+		eex.expect(IllegalStateException.class);
+		eex.expectMessage("Field assembler was not defined");
+		control.replay();
+		
+		service.getAssembler();
+	}
+	
+	@Test
+	public void testGetAssembler() {
+		service.setAssembler(asmMock);
+		control.replay();
+		
+		assertSame(asmMock, service.getAssembler());
+		
+		control.verify();
+	}
+	
+	@Test
+	public void testGetTerminal_ThrowsIfNotDefined() {
+		eex.expect(IllegalStateException.class);
+		eex.expectMessage("Terminal was not defined");
+		control.replay();
+		
+		service.getTerminal();
+	}
+	
+	@Test
+	public void testGetTerminal() {
+		service.setTerminal(termMock);
+		control.replay();
+		
+		assertSame(termMock, service.getTerminal());
+		
+		control.verify();
+	}
+	
+	@Test
+	public void testGetEventQueue_ThrowsIfNotDefined() {
+		eex.expect(IllegalStateException.class);
+		eex.expectMessage("Event queue was not defined");
+		control.replay();
+		
+		service.getEventQueue();
+	}
+	
+	@Test
+	public void testGetEventQueue() {
+		service.setEventQueue(queueMock);
+		control.replay();
+		
+		assertSame(queueMock, service.getEventQueue());
+		
+		control.verify();
+	}
+	
 }
