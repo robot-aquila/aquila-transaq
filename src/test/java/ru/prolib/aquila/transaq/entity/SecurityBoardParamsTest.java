@@ -21,9 +21,9 @@ import ru.prolib.aquila.core.EventQueue;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCRepository;
 import ru.prolib.aquila.transaq.engine.sds.SymbolTID;
 import ru.prolib.aquila.transaq.impl.TQParser;
-import ru.prolib.aquila.transaq.impl.TQSecID1;
-import ru.prolib.aquila.transaq.impl.TQSecID2;
 import ru.prolib.aquila.transaq.impl.TQStateUpdate;
+import ru.prolib.aquila.transaq.remote.TQSecIDT;
+import ru.prolib.aquila.transaq.remote.TQSecIDG;
 
 public class SecurityBoardParamsTest {
 	private static XMLInputFactory factory;
@@ -70,7 +70,7 @@ public class SecurityBoardParamsTest {
 	@Test
 	public void testGetters() throws Exception {
 		XMLStreamReader sr = startReading("fixture/pits.xml", "pits");
-		for ( TQStateUpdate<TQSecID2> su : parser.readPits(sr) ) {
+		for ( TQStateUpdate<TQSecIDT> su : parser.readPits(sr) ) {
 			service.consume(su.getUpdate());
 		}
 		sr.close();
@@ -82,8 +82,8 @@ public class SecurityBoardParamsTest {
 		assertEquals(of("0.1"), service.getMinStep());
 		assertEquals(of("10"), service.getLotSize());
 		assertEquals(of("12.34"), service.getPointCost());
-		assertEquals(new TQSecID1("PRTK", 1), service.toSecID1());
-		assertEquals(new TQSecID2("PRTK", "TQBR"), service.toSecID2());
+		assertEquals(new TQSecIDG("PRTK", 1), service.toSecID1());
+		assertEquals(new TQSecIDT("PRTK", "TQBR"), service.toSecID2());
 	}
 
 }

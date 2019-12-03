@@ -8,86 +8,27 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ru.prolib.aquila.core.EventQueue;
-import ru.prolib.aquila.core.EventQueueImpl;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdate;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.core.BusinessEntities.SecurityField;
-import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.core.BusinessEntities.UpdatableStateContainer;
 import ru.prolib.aquila.core.BusinessEntities.UpdatableStateContainerImpl;
-import ru.prolib.aquila.transaq.entity.SecType;
-import ru.prolib.aquila.transaq.impl.TQField.FMarket;
 import ru.prolib.aquila.transaq.impl.TQField.FSecurity;
 
 public class TQFieldAssemblerTest {
-	private static EventQueue queue;
-	
-	@BeforeClass
-	public static void setUpBeforeClass() {
-		queue = new EventQueueImpl();
-	}
-	
-	private TQDirectory dir;
 	private TQFieldAssembler service;
 	private UpdatableStateContainer sec_state;
 	private DeltaUpdateBuilder builder;
 
 	@Before
 	public void setUp() throws Exception {
-		dir = new TQDirectory(queue);
-		service = new TQFieldAssembler(dir);
-
-		// TODO: Remove later. This settings shouldn't affect anymore.
-		//dir.updateMarket(new TQStateUpdate<Integer>(0, new DeltaUpdateBuilder()
-		//		.withToken(FMarket.ID, 0)
-		//		.withToken(FMarket.NAME, "foo")
-		//		.buildUpdate()
-		//	));
-		//dir.updateMarket(new TQStateUpdate<Integer>(1, new DeltaUpdateBuilder()
-		//		.withToken(FMarket.ID, 1)
-		//		.withToken(FMarket.NAME, "bar")
-		//		.buildUpdate()
-		//	));
-		//dir.updateMarket(new TQStateUpdate<Integer>(2, new DeltaUpdateBuilder()
-		//		.withToken(FMarket.ID, 2)
-		//		.withToken(FMarket.NAME, "zoo")
-		//		.buildUpdate()
-		//	));
-		
+		service = new TQFieldAssembler();
 		sec_state = new UpdatableStateContainerImpl("X");
 		builder = new DeltaUpdateBuilder();
 	}
 
-	@Test
-	public void testToSymbol_F() {
-		assertEquals(new Symbol("U:boo@GAP:RUB"), service.toSymbol(new TQSecID_F("boo", 1, "GAP", "BAA", SecType.ADR)));
-		assertEquals(new Symbol("B:lol@ZOB:RUB"), service.toSymbol(new TQSecID_F("lol", 2, "ZOB", "KAA", SecType.BOND)));
-		assertEquals(new Symbol("C:JPY@FX:RUB"), service.toSymbol(new TQSecID_F("JPY", 0, "FX", "JAPAN", SecType.CURRENCY)));
-		assertEquals(new Symbol("U:gaz@MAP:RUB"), service.toSymbol(new TQSecID_F("gaz", 2,"MAP", "GGG", SecType.ERROR))); 
-		assertEquals(new Symbol("C:CAD@FX:RUB"), service.toSymbol(new TQSecID_F("CAD", 0, "FX", "CANADA", SecType.ETS_CURRENCY)));
-		assertEquals(new Symbol("U:GGR@MAP:RUB"), service.toSymbol(new TQSecID_F("GGR", 2, "MAP", "GAGR", SecType.ETS_SWAP)));
-		assertEquals(new Symbol("F:GAZ@FUT:RUB"), service.toSymbol(new TQSecID_F("GAZ", 0, "FUT", "<G>", SecType.FOB)));
-		assertEquals(new Symbol("F:RTS-9.19@FUT:RUB"), service.toSymbol(new TQSecID_F("RIZ", 1, "FUT", "RTS-9.19", SecType.FUT)));
-		assertEquals(new Symbol("B:ZAP@ZOB:RUB"), service.toSymbol(new TQSecID_F("ZAP", 2, "ZOB", "Zorg", SecType.GKO)));
-		assertEquals(new Symbol("U:zzz@RAB:RUB"), service.toSymbol(new TQSecID_F("zzz", 1, "RAB", "aaa", SecType.IDX)));
-		assertEquals(new Symbol("U:bak@foo:RUB"), service.toSymbol(new TQSecID_F("bak", 0, "foo", "Barter", SecType.MCT)));
-		assertEquals(new Symbol("U:GOLD@LOL:RUB"), service.toSymbol(new TQSecID_F("GOLD", 2, "LOL", "Gold", SecType.METAL)));
-		assertEquals(new Symbol("U:AAPL@RTX:RUB"), service.toSymbol(new TQSecID_F("AAPL", 1, "RTX", "Apple", SecType.NYSE)));
-		assertEquals(new Symbol("U:BR@COM:RUB"), service.toSymbol(new TQSecID_F("BR", 2, "COM", "Brent", SecType.OIL)));
-		assertEquals(new Symbol("O:GZR-1@FUT:RUB"), service.toSymbol(new TQSecID_F("GZR-1", 1, "FUT", "Grizzly", SecType.OPT)));
-		assertEquals(new Symbol("U:bubble@foo:RUB"), service.toSymbol(new TQSecID_F("bubble", 0, "foo", "Bx", SecType.QUOTES)));
-		assertEquals(new Symbol("S:SBER@TQBR:RUB"), service.toSymbol(new TQSecID_F("SBER", 2, "TQBR", "Sberbank", SecType.SHARE)));
-	}
-	
-	@Test
-	public void testToSecID() {
-		fail();
-	}
-	
 	@Test
 	public void testToSecDisplayName() {
 		sec_state.update(FSecurity.SHORT_NAME, "zulu24");

@@ -5,15 +5,16 @@ import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateConsumer;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.core.BusinessEntities.UpdatableStateContainer;
+import ru.prolib.aquila.transaq.remote.TQSecIDF;
 
 public class TQSecurityHandler {
-	private final TQSecID_F id;
+	private final TQSecIDF id;
 	private final Symbol symbol;
 	private final DeltaUpdateConsumer consumer;
 	private final UpdatableStateContainer state;
 	private final TQFieldAssembler assembler;
 	
-	public TQSecurityHandler(TQSecID_F id,
+	public TQSecurityHandler(TQSecIDF id,
 			Symbol symbol,
 			DeltaUpdateConsumer consumer,
 			UpdatableStateContainer state,
@@ -26,7 +27,7 @@ public class TQSecurityHandler {
 		this.assembler = assembler;
 	}
 	
-	public TQSecID_F getSecID3() {
+	public TQSecIDF getSecID3() {
 		return id;
 	}
 	

@@ -4,8 +4,8 @@ import ru.prolib.aquila.core.BusinessEntities.CDecimal;
 import ru.prolib.aquila.core.BusinessEntities.ObservableStateContainerImpl;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCParams;
 import ru.prolib.aquila.transaq.impl.TQField.FSecurityBoard;
-import ru.prolib.aquila.transaq.impl.TQSecID1;
-import ru.prolib.aquila.transaq.impl.TQSecID2;
+import ru.prolib.aquila.transaq.remote.TQSecIDT;
+import ru.prolib.aquila.transaq.remote.TQSecIDG;
 
 public class SecurityBoardParams extends ObservableStateContainerImpl {
 	
@@ -41,12 +41,12 @@ public class SecurityBoardParams extends ObservableStateContainerImpl {
 		return this.getCDecimal(FSecurityBoard.POINT_COST);
 	}
 	
-	public TQSecID1 toSecID1() {
-		return new TQSecID1(getSecCode(), getMarketID());
+	public TQSecIDG toSecID1() {
+		return new TQSecIDG(getSecCode(), getMarketID());
 	}
 	
-	public TQSecID2 toSecID2() {
-		return new TQSecID2(getSecCode(), getBoardCode());
+	public TQSecIDT toSecID2() {
+		return new TQSecIDT(getSecCode(), getBoardCode());
 	}
 
 }

@@ -14,8 +14,8 @@ import org.junit.Test;
 
 import ru.prolib.JTransaq.JTransaqHandler;
 import ru.prolib.JTransaq.JTransaqServer;
-import ru.prolib.aquila.transaq.impl.StdConnector;
-import ru.prolib.aquila.transaq.impl.TQSecID2;
+import ru.prolib.aquila.transaq.remote.StdConnector;
+import ru.prolib.aquila.transaq.remote.TQSecIDT;
 
 public class ConnectorTest {
 	
@@ -83,9 +83,9 @@ public class ConnectorTest {
 		conn.connect();
 		Thread.sleep(5000L);
 		try {
-			Set<TQSecID2> symbols = new LinkedHashSet<>();
-			symbols.add(new TQSecID2("SBER", "TQBR"));
-			symbols.add(new TQSecID2("RIZ9", "FUT"));
+			Set<TQSecIDT> symbols = new LinkedHashSet<>();
+			symbols.add(new TQSecIDT("SBER", "TQBR"));
+			symbols.add(new TQSecIDT("RIZ9", "FUT"));
 			conn.subscribe(symbols, StdConnector.SUBSCR_TYPE_QUOTATIONS);
 			Thread.sleep(20000L);
 		} finally {

@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ru.prolib.aquila.core.BusinessEntities.MDLevel;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
@@ -15,12 +17,15 @@ import ru.prolib.aquila.core.BusinessEntities.SymbolSubscrCounter.Field;
 import ru.prolib.aquila.core.BusinessEntities.SymbolSubscrRepository;
 import ru.prolib.aquila.transaq.engine.SymbolDataService;
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
-import ru.prolib.aquila.transaq.impl.TQSecID2;
+import ru.prolib.aquila.transaq.impl.TransaqException;
+import ru.prolib.aquila.transaq.remote.ISecIDT;
 
 public class SymbolDataServiceImpl implements SymbolDataService {
 	private static final Map<Integer, FeedID> token_to_feed;
+	private static final Logger logger;
 	
 	static {
+		logger = LoggerFactory.getLogger(SymbolDataServiceImpl.class);
 		token_to_feed = new LinkedHashMap<>();
 		token_to_feed.put(Field.NUM_L0, FeedID.SYMBOL_PRIMARY);
 		token_to_feed.put(Field.NUM_L1_BBO, FeedID.SYMBOL_QUOTATIONS);
@@ -82,7 +87,7 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 		return state;
 	}
 	
-	private void applyPendingChanges() {
+	private void applyPendingChanges() throws TransaqException {
 		// 1) Make 6 lists of TQSecID2:
 		//    - to subscribe for quotations
 		//    - to subscribe for alltrades
@@ -91,7 +96,7 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 		//	  - to unsubscribe of alltrades
 		//	  - to unsubscribe of quotes
 
-		Map<FeedID, Pair<Set<TQSecID2>, Set<TQSecID2>>> cache = new LinkedHashMap<>();
+		Map<FeedID, Pair<Set<ISecIDT>, Set<ISecIDT>>> cache = new LinkedHashMap<>();
 		cache.put(FeedID.SYMBOL_QUOTATIONS, Pair.of(new HashSet<>(), new HashSet<>()));
 		cache.put(FeedID.SYMBOL_ALLTRADES, Pair.of(new HashSet<>(), new HashSet<>()));
 		cache.put(FeedID.SYMBOL_QUOTES, Pair.of(new HashSet<>(), new HashSet<>()));
@@ -99,10 +104,10 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 			for ( FeedID feed_id : cache.keySet() ) {
 				switch ( state.getFeedState(feed_id) ) {
 				case PENDING_SUBSCR:
-					cache.get(feed_id).getLeft().add(state.getSecID2());
+					cache.get(feed_id).getLeft().add(state.getSecIDT());
 					break;
 				case PENDING_UNSUBSCR:
-					cache.get(feed_id).getRight().add(state.getSecID2());
+					cache.get(feed_id).getRight().add(state.getSecIDT());
 					break;
 				default:
 					break;	
@@ -118,8 +123,8 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 				cache.get(FeedID.SYMBOL_QUOTES).getLeft()
 			);
 		for ( FeedID feed_id : cache.keySet() ) {
-			for ( TQSecID2 sec_id : cache.get(feed_id).getLeft() ) {
-				stateRepository.getBySecID(sec_id).setFeedState(feed_id, FeedSubscrStatus.SUBSCR);
+			for ( ISecIDT sec_id : cache.get(feed_id).getLeft() ) {
+				stateRepository.getBySecIDT(sec_id).setFeedState(feed_id, FeedSubscrStatus.SUBSCR);
 			}
 		}
 		
@@ -131,9 +136,18 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 				cache.get(FeedID.SYMBOL_QUOTES).getRight()
 			);
 		for ( FeedID feed_id : cache.keySet() ) {
-			for ( TQSecID2 sec_id : cache.get(feed_id).getRight() ) {
-				stateRepository.getBySecID(sec_id).setFeedState(feed_id, FeedSubscrStatus.NOT_SUBSCR);
+			for ( ISecIDT sec_id : cache.get(feed_id).getRight() ) {
+				stateRepository.getBySecIDT(sec_id).setFeedState(feed_id, FeedSubscrStatus.NOT_SUBSCR);
 			}
+		}
+	}
+	
+	private void _applyPendingChanges() {
+		try {
+			applyPendingChanges();
+		} catch ( TransaqException e ) {
+			// TODO: Have to be done more.
+			logger.error("Error applying pending changes: ", e);
 		}
 	}
 
@@ -150,7 +164,7 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 		}
 		
 		if ( syncSubscrState(state, subscr) ) {
-			applyPendingChanges();
+			_applyPendingChanges();
 		}
 	}
 
@@ -167,7 +181,7 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 		}
 		
 		if ( syncSubscrState(state, subscr) ) {
-			applyPendingChanges();
+			_applyPendingChanges();
 		}
 	}
 

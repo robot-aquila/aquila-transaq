@@ -14,11 +14,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ru.prolib.aquila.transaq.impl.TQReactor;
-import ru.prolib.aquila.transaq.impl.TQSecID_F;
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
 import ru.prolib.aquila.transaq.engine.mp.SecuritiesMessageProcessor;
 import ru.prolib.aquila.transaq.impl.TQParser;
 import ru.prolib.aquila.transaq.impl.TQStateUpdate;
+import ru.prolib.aquila.transaq.remote.TQSecIDF;
 
 public class SecuritiesMessageProcessorTest {
 	
@@ -47,8 +47,8 @@ public class SecuritiesMessageProcessorTest {
 	@Test
 	public void testProcessMessage() throws Exception {
 		XMLStreamReader readerMock = control.createMock(XMLStreamReader.class);
-		List<TQStateUpdate<TQSecID_F>> updates = new ArrayList<>();
-		TQStateUpdate<TQSecID_F> duMock1, duMock2, duMock3;
+		List<TQStateUpdate<TQSecIDF>> updates = new ArrayList<>();
+		TQStateUpdate<TQSecIDF> duMock1, duMock2, duMock3;
 		updates.add(duMock1 = control.createMock(TQStateUpdate.class));
 		updates.add(duMock2 = control.createMock(TQStateUpdate.class));
 		updates.add(duMock3 = control.createMock(TQStateUpdate.class));

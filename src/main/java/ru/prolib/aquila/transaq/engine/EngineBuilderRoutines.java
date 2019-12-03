@@ -53,14 +53,14 @@ public class EngineBuilderRoutines {
 		services.setMessageRouter(standardRouter(services));
 		services.setDirectory(new TQDirectory(services.getEventQueue()));
 		services.setParser(TQParser.getInstance());
-		services.setAssembler(new TQFieldAssembler(services.getDirectory()));
+		services.setAssembler(new TQFieldAssembler());
 	}
 	
 	public void initSecondary(ServiceLocator services, EditableTerminal terminal) {
 		TQReactor reactor = new TQReactor(
 				services.getDirectory(),
 				new TQSecurityHandlerRegistry(),
-				new TQSecurityHandlerFactory(terminal, services.getAssembler())
+				new TQSecurityHandlerFactory(services)
 			);
 		services.setReactor(reactor);
 		services.setTerminal(terminal);

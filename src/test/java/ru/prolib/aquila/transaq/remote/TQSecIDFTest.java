@@ -1,5 +1,6 @@
-package ru.prolib.aquila.transaq.impl;
+package ru.prolib.aquila.transaq.remote;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.*;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -8,27 +9,36 @@ import org.junit.Test;
 
 import ru.prolib.aquila.core.utils.Variant;
 import ru.prolib.aquila.transaq.entity.SecType;
+import ru.prolib.aquila.transaq.remote.TQSecIDF;
 
-public class TQSecID_FTest {
-	private TQSecID_F service;
+public class TQSecIDFTest {
+	private TQSecIDF service;
 
 	@Before
 	public void setUp() throws Exception {
-		service = new TQSecID_F("foo", 19, "brd", "bar", SecType.FUT);
+		service = new TQSecIDF("foo", 19, "brd", "bar", SecType.FUT);
 	}
 	
 	@Test
-	public void testCtor3() {
+	public void testISA() {
+		assertThat(service, instanceOf(ISecIDT.class));
+		assertThat(service, instanceOf(ISecIDG.class));
+		assertThat(service, instanceOf(ISecIDF.class));
+	}
+	
+	@Test
+	public void testGetters() {
 		assertEquals("foo", service.getSecCode());
 		assertEquals(19, service.getMarketID());
 		assertEquals("brd", service.getDefaultBoard());
+		assertEquals("brd", service.getBoardCode());
 		assertEquals("bar", service.getShortName());
 		assertEquals(SecType.FUT, service.getType());
 	}
 	
 	@Test
 	public void testToString() {
-		String expected = "TQSecID_F[secCode=foo,marketID=19,defBoard=brd,shortName=bar,type=FUT]";
+		String expected = "TQSecIDF[boardCode=brd,shortName=bar,type=FUT,secCode=foo,marketID=19]";
 		
 		assertEquals(expected, service.toString());
 	}
@@ -62,9 +72,9 @@ public class TQSecID_FTest {
 		Variant<SecType> vTYP = new Variant<>(vSN, SecType.FUT, SecType.BOND);
 		Variant<?> iterator = vTYP;
 		int found_cnt = 0;
-		TQSecID_F x, found = null;
+		TQSecIDF x, found = null;
 		do {
-			x = new TQSecID_F(vSC.get(), vMID.get(), vBrd.get(), vSN.get(), vTYP.get());
+			x = new TQSecIDF(vSC.get(), vMID.get(), vBrd.get(), vSN.get(), vTYP.get());
 			if ( service.equals(x) ) {
 				found_cnt ++;
 				found = x;

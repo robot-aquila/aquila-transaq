@@ -5,15 +5,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
-import ru.prolib.aquila.transaq.impl.TQSecID2;
+import ru.prolib.aquila.transaq.remote.ISecIDT;
+import ru.prolib.aquila.transaq.remote.TQSecIDT;
 
 public class SymbolStateRepository {
 	private final Map<Symbol, SymbolStateHandler> stateBySymbol;
-	private final Map<TQSecID2, SymbolStateHandler> stateBySecID;
+	private final Map<TQSecIDT, SymbolStateHandler> stateBySecID;
 	
 	public SymbolStateRepository(
 			Map<Symbol, SymbolStateHandler> stateBySymbol,
-			Map<TQSecID2, SymbolStateHandler> stateBySecID)
+			Map<TQSecIDT, SymbolStateHandler> stateBySecID)
 	{
 		this.stateBySymbol = stateBySymbol;
 		this.stateBySecID = stateBySecID;
@@ -27,7 +28,7 @@ public class SymbolStateRepository {
 		return null;
 	}
 	
-	public SymbolStateHandler getBySecID(TQSecID2 sec_id) {
+	public SymbolStateHandler getBySecIDT(ISecIDT sec_id) {
 		return null;
 	}
 	

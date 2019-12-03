@@ -1,15 +1,15 @@
-package ru.prolib.aquila.transaq.impl;
+package ru.prolib.aquila.transaq.remote;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-public class TQSecID1 {
-	private final String secCode;
-	private final int marketID;
+public class TQSecIDG implements ISecIDG {
+	protected final String secCode;
+	protected final int marketID;
 	
-	public TQSecID1(String sec_code, int market_id) {
+	public TQSecIDG(String sec_code, int market_id) {
 		if ( sec_code == null || sec_code.length() == 0 ) {
 			throw new IllegalArgumentException("Invalid security code: " + sec_code);
 		}
@@ -17,14 +17,16 @@ public class TQSecID1 {
 		this.marketID = market_id;
 	}
 	
-	public TQSecID1(TQSecID_F sec_id3) {
-		this(sec_id3.getSecCode(), sec_id3.getMarketID());
+	public TQSecIDG(TQSecIDF sec_id) {
+		this(sec_id.getSecCode(), sec_id.getMarketID());
 	}
 	
+	@Override
 	public String getSecCode() {
 		return secCode;
 	}
 	
+	@Override
 	public int getMarketID() {
 		return marketID;
 	}
@@ -47,10 +49,10 @@ public class TQSecID1 {
 		if ( other == this ) {
 			return true;
 		}
-		if ( other == null || other.getClass() != TQSecID1.class ) {
+		if ( other == null || other.getClass() != TQSecIDG.class ) {
 			return false;
 		}
-		TQSecID1 o = (TQSecID1) other;
+		TQSecIDG o = (TQSecIDG) other;
 		return new EqualsBuilder()
 				.append(o.secCode, secCode)
 				.append(o.marketID, marketID)

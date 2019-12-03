@@ -1,4 +1,4 @@
-package ru.prolib.aquila.transaq.engine;
+package ru.prolib.aquila.transaq.remote;
 
 import ru.prolib.JTransaq.JTransaqHandler;
 import ru.prolib.aquila.transaq.impl.TransaqException;

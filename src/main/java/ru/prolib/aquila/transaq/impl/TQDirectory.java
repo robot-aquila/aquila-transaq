@@ -1,9 +1,13 @@
 package ru.prolib.aquila.transaq.impl;
 
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
 import ru.prolib.aquila.core.EventQueue;
+import ru.prolib.aquila.core.BusinessEntities.CDecimalBD;
+import ru.prolib.aquila.core.BusinessEntities.Symbol;
+import ru.prolib.aquila.core.BusinessEntities.SymbolType;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCRepository;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCRepositoryDecoratorRO;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCRepositoryImpl;
@@ -15,18 +19,37 @@ import ru.prolib.aquila.transaq.entity.CKind;
 import ru.prolib.aquila.transaq.entity.CKindFactory;
 import ru.prolib.aquila.transaq.entity.Market;
 import ru.prolib.aquila.transaq.entity.MarketFactory;
+import ru.prolib.aquila.transaq.entity.SecType;
 import ru.prolib.aquila.transaq.entity.SecurityBoardParams;
 import ru.prolib.aquila.transaq.entity.SecurityBoardParamsFactory;
 import ru.prolib.aquila.transaq.entity.SecurityParams;
 import ru.prolib.aquila.transaq.entity.SecurityParamsFactory;
+import ru.prolib.aquila.transaq.remote.TQSecIDT;
+import ru.prolib.aquila.transaq.remote.TQSecIDF;
+import ru.prolib.aquila.transaq.remote.TQSecIDG;
 
 public class TQDirectory {
+	private static final Map<SecType, SymbolType> TYPE_MAP;
+	
+	static {
+		TYPE_MAP = new HashMap<>();
+		TYPE_MAP.put(SecType.BOND, SymbolType.BOND);
+		TYPE_MAP.put(SecType.CURRENCY, SymbolType.CURRENCY);
+		TYPE_MAP.put(SecType.ETS_CURRENCY, SymbolType.CURRENCY);
+		TYPE_MAP.put(SecType.FOB, SymbolType.FUTURES);
+		TYPE_MAP.put(SecType.FUT, SymbolType.FUTURES);
+		TYPE_MAP.put(SecType.GKO, SymbolType.BOND);
+		TYPE_MAP.put(SecType.OPT, SymbolType.OPTION);
+		TYPE_MAP.put(SecType.SHARE, SymbolType.STOCK);
+	}
+
+
 	private final OSCRepository<Integer, CKind> ckinds;
 	private final OSCRepository<Integer, Market> markets;
 	private final OSCRepository<String, Board> boards;
 	private final OSCRepository<SymbolGID, SecurityParams> secParams;
 	private final OSCRepository<SymbolTID, SecurityBoardParams> secBoardParams;
-	private final Map<TQSecID1, SymbolGID> gidMap;
+	private final Map<TQSecIDG, SymbolGID> gidMap;
 	
 	TQDirectory(
 			OSCRepository<Integer, CKind> ckinds,
@@ -34,7 +57,7 @@ public class TQDirectory {
 			OSCRepository<String, Board> boards,
 			OSCRepository<SymbolGID, SecurityParams> secParams,
 			OSCRepository<SymbolTID, SecurityBoardParams> secBoardParams,
-			Map<TQSecID1, SymbolGID> gid_map)
+			Map<TQSecIDG, SymbolGID> gid_map)
 	{
 		this.ckinds = ckinds;
 		this.markets = markets;
@@ -86,7 +109,7 @@ public class TQDirectory {
 		boards.getOrCreate(board_update.getID()).consume(board_update.getUpdate());
 	}
 	
-	private SymbolGID toSymbolGID(TQSecID_F sec_id) {
+	private SymbolGID toSymbolGID(TQSecIDF sec_id) {
 		switch ( sec_id.getType() ) {
 		case FUT:
 		case OPT:
@@ -96,7 +119,7 @@ public class TQDirectory {
 		}
 	}
 
-	private SymbolGID getGIDFromMap(TQSecID1 sec_id, boolean lock, boolean strict) {
+	private SymbolGID getGIDFromMap(TQSecIDG sec_id, boolean lock, boolean strict) {
 		if ( lock ) {
 			secParams.lock();
 		}
@@ -113,11 +136,11 @@ public class TQDirectory {
 		}
 	}
 
-	private SymbolGID getGIDFromMap(TQSecID1 sec_id, boolean lock) {
+	private SymbolGID getGIDFromMap(TQSecIDG sec_id, boolean lock) {
 		return getGIDFromMap(sec_id, lock, true);
 	}
 
-	private TQSecID1 toSecID1(TQSecID2 sec_id) {
+	private TQSecIDG toSecID1(TQSecIDT sec_id) {
 		Board board = null;
 		try {
 			board = boards.getOrThrow(sec_id.getBoardCode());
@@ -128,27 +151,27 @@ public class TQDirectory {
 				throw e;
 			}
 		}
-		return new TQSecID1(sec_id.getSecCode(), board.getMarketID());
+		return new TQSecIDG(sec_id.getSecCode(), board.getMarketID());
 	}
 	
-	private SymbolTID toSymbolTID(TQSecID2 sec_id) {
-		TQSecID1 sec_id1 = toSecID1(sec_id);
+	private SymbolTID toSymbolTID(TQSecIDT sec_id) {
+		TQSecIDG sec_id1 = toSecID1(sec_id);
 		SymbolGID gid = getGIDFromMap(sec_id1, true);
 		return new SymbolTID(gid.getTicker(), gid.getMarketID(), sec_id.getBoardCode());
 	}
 	
-	public void updateSecurityParamsF(TQStateUpdate<TQSecID_F> sec_params_update) {
+	public void updateSecurityParamsF(TQStateUpdate<TQSecIDF> sec_params_update) {
 		SymbolGID gid = toSymbolGID(sec_params_update.getID());
 		secParams.lock();
 		try {
-			gidMap.put(new TQSecID1(sec_params_update.getID()), gid);
+			gidMap.put(new TQSecIDG(sec_params_update.getID()), gid);
 			secParams.getOrCreate(gid).consume(sec_params_update.getUpdate());
 		} finally {
 			secParams.unlock();
 		}
 	}
 	
-	public void updateSecurityParamsP(TQStateUpdate<TQSecID1> sec_params_update) {
+	public void updateSecurityParamsP(TQStateUpdate<TQSecIDG> sec_params_update) {
 		secParams.lock();
 		try {
 			SymbolGID gid = getGIDFromMap(sec_params_update.getID(), false);
@@ -158,7 +181,7 @@ public class TQDirectory {
 		}
 	}
 	
-	public void updateSecurityBoardParams(TQStateUpdate<TQSecID2> sbp_update) {
+	public void updateSecurityBoardParams(TQStateUpdate<TQSecIDT> sbp_update) {
 		secBoardParams.getOrCreate(toSymbolTID(sbp_update.getID())).consume(sbp_update.getUpdate());
 	}
 
@@ -166,7 +189,7 @@ public class TQDirectory {
 		return markets.getOrThrow(market_id).getName();
 	}
 	
-	public boolean isExistsSecurityParams(TQSecID1 sec_id) {
+	public boolean isExistsSecurityParams(TQSecIDG sec_id) {
 		secParams.lock();
 		try {
 			return gidMap.containsKey(sec_id);
@@ -175,7 +198,7 @@ public class TQDirectory {
 		}
 	}
 
-	public SecurityParams getSecurityParams(TQSecID1 sec_id) {
+	public SecurityParams getSecurityParams(TQSecIDG sec_id) {
 		secParams.lock();
 		try {
 			return secParams.getOrThrow(getGIDFromMap(sec_id, false));
@@ -184,7 +207,7 @@ public class TQDirectory {
 		}
 	}
 	
-	public boolean isExistsSecurityBoardParams(TQSecID2 sec_id) {
+	public boolean isExistsSecurityBoardParams(TQSecIDT sec_id) {
 		if ( ! boards.contains(sec_id.getBoardCode()) ) {
 			return false;
 		}
@@ -194,8 +217,17 @@ public class TQDirectory {
 		return secBoardParams.contains(toSymbolTID(sec_id));
 	}
 	
-	public SecurityBoardParams getSecurityBoardParams(TQSecID2 sec_id) {
+	public SecurityBoardParams getSecurityBoardParams(TQSecIDT sec_id) {
 		return secBoardParams.getOrThrow(toSymbolTID(sec_id));
+	}
+	
+	public Symbol toSymbol(TQSecIDF sec_id) {
+		SymbolGID gid = toSymbolGID(sec_id);
+		SymbolType type = TYPE_MAP.get(sec_id.getType());
+		if ( type == null ) {
+			type =  SymbolType.UNKNOWN;
+		}
+		return new Symbol(gid.getTicker(), sec_id.getDefaultBoard(), CDecimalBD.RUB, type);
 	}
 
 }

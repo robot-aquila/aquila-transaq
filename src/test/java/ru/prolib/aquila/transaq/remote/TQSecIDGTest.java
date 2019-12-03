@@ -1,19 +1,26 @@
-package ru.prolib.aquila.transaq.impl;
+package ru.prolib.aquila.transaq.remote;
 
 import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.instanceOf;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.junit.Before;
 import org.junit.Test;
 
 import ru.prolib.aquila.transaq.entity.SecType;
+import ru.prolib.aquila.transaq.remote.TQSecIDG;
 
-public class TQSecID1Test {
-	private TQSecID1 service;
+public class TQSecIDGTest {
+	private TQSecIDG service;
 
 	@Before
 	public void setUp() throws Exception {
-		service = new TQSecID1("foo", 220);
+		service = new TQSecIDG("foo", 220);
+	}
+	
+	@Test
+	public void testISA() {
+		assertThat(service, instanceOf(ISecIDG.class));
 	}
 	
 	@Test
@@ -23,15 +30,15 @@ public class TQSecID1Test {
 	}
 	
 	@Test
-	public void testCtor1_SecID3() {
-		service = new TQSecID1(new TQSecID_F("zulu24", 15, "UPS", "foobar", SecType.FUT));
+	public void testCtor1_SecIDF() {
+		service = new TQSecIDG(new TQSecIDF("zulu24", 15, "UPS", "foobar", SecType.FUT));
 		assertEquals("zulu24", service.getSecCode());
 		assertEquals(15, service.getMarketID());
 	}
 	
 	@Test
 	public void testToString() {
-		String expected = "TQSecID1[secCode=foo,marketID=220]";
+		String expected = "TQSecIDG[secCode=foo,marketID=220]";
 		
 		assertEquals(expected, service.toString());
 	}
@@ -55,10 +62,10 @@ public class TQSecID1Test {
 
 	@Test
 	public void testEquals() {
-		assertTrue(service.equals(new TQSecID1("foo", 220)));
-		assertFalse(service.equals(new TQSecID1("bar", 220)));
-		assertFalse(service.equals(new TQSecID1("foo", 110)));
-		assertFalse(service.equals(new TQSecID1("bar", 110)));
+		assertTrue(service.equals(new TQSecIDG("foo", 220)));
+		assertFalse(service.equals(new TQSecIDG("bar", 220)));
+		assertFalse(service.equals(new TQSecIDG("foo", 110)));
+		assertFalse(service.equals(new TQSecIDG("bar", 110)));
 	}
 
 }

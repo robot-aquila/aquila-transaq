@@ -15,8 +15,8 @@ import ru.prolib.aquila.transaq.engine.ServiceLocator;
 import ru.prolib.aquila.transaq.engine.mp.PitsProcessor;
 import ru.prolib.aquila.transaq.impl.TQParser;
 import ru.prolib.aquila.transaq.impl.TQReactor;
-import ru.prolib.aquila.transaq.impl.TQSecID2;
 import ru.prolib.aquila.transaq.impl.TQStateUpdate;
+import ru.prolib.aquila.transaq.remote.TQSecIDT;
 
 public class PitsProcessorTest {
 	private ServiceLocator services;
@@ -39,8 +39,8 @@ public class PitsProcessorTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testProcessMessage() throws Exception {
-		List<TQStateUpdate<TQSecID2>> updates = new ArrayList<>();
-		TQStateUpdate<TQSecID2> duMock1, duMock2, duMock3;
+		List<TQStateUpdate<TQSecIDT>> updates = new ArrayList<>();
+		TQStateUpdate<TQSecIDT> duMock1, duMock2, duMock3;
 		updates.add(duMock1 = control.createMock(TQStateUpdate.class));
 		updates.add(duMock2 = control.createMock(TQStateUpdate.class));
 		updates.add(duMock3 = control.createMock(TQStateUpdate.class));

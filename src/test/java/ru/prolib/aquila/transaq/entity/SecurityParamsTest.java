@@ -22,8 +22,8 @@ import ru.prolib.aquila.core.EventQueue;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCRepository;
 import ru.prolib.aquila.transaq.engine.sds.SymbolGID;
 import ru.prolib.aquila.transaq.impl.TQParser;
-import ru.prolib.aquila.transaq.impl.TQSecID_F;
 import ru.prolib.aquila.transaq.impl.TQStateUpdate;
+import ru.prolib.aquila.transaq.remote.TQSecIDF;
 
 public class SecurityParamsTest {
 	private static XMLInputFactory factory;
@@ -71,7 +71,7 @@ public class SecurityParamsTest {
 	@Test
 	public void testGetters() throws Exception {
 		XMLStreamReader sr = startReading("fixture/securities.xml", "securities");
-		for ( TQStateUpdate<TQSecID_F> su : parser.readSecurities(sr) ) {
+		for ( TQStateUpdate<TQSecIDF> su : parser.readSecurities(sr) ) {
 			service.consume(su.getUpdate());
 		}
 		sr.close();

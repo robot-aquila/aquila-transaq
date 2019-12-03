@@ -1,11 +1,10 @@
-package ru.prolib.aquila.transaq.impl;
+package ru.prolib.aquila.transaq.remote;
 
 import org.ini4j.Profile.Section;
 
 import ru.prolib.JTransaq.JTransaqHandler;
 import ru.prolib.JTransaq.JTransaqServer;
-import ru.prolib.aquila.transaq.engine.Connector;
-import ru.prolib.aquila.transaq.engine.ConnectorFactory;
+import ru.prolib.aquila.transaq.impl.TransaqException;
 
 public class StdConnectorFactory implements ConnectorFactory {
 	private final Section config;

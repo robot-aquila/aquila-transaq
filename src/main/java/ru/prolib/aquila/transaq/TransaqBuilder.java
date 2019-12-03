@@ -10,16 +10,16 @@ import ru.prolib.aquila.core.EventQueue;
 import ru.prolib.aquila.core.EventQueueImpl;
 import ru.prolib.aquila.core.data.DataProvider;
 import ru.prolib.aquila.transaq.engine.Cmd;
-import ru.prolib.aquila.transaq.engine.ConnectorFactory;
 import ru.prolib.aquila.transaq.engine.Engine;
 import ru.prolib.aquila.transaq.engine.EngineBuilderRoutines;
 import ru.prolib.aquila.transaq.engine.EngineCmdProcessor;
 import ru.prolib.aquila.transaq.engine.EngineImpl;
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
-import ru.prolib.aquila.transaq.impl.StdConnectorFactory;
 import ru.prolib.aquila.transaq.impl.TQDataProviderImpl;
 import ru.prolib.aquila.transaq.impl.TransaqException;
 import ru.prolib.aquila.transaq.impl.TransaqHandler;
+import ru.prolib.aquila.transaq.remote.ConnectorFactory;
+import ru.prolib.aquila.transaq.remote.StdConnectorFactory;
 
 public class TransaqBuilder {
 	private static final String DEFAULT_SERVICE_ID = "TRANSAQ";

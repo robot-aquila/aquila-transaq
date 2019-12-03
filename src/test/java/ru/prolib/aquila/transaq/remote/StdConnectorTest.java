@@ -1,11 +1,14 @@
-package ru.prolib.aquila.transaq.impl;
+package ru.prolib.aquila.transaq.remote;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
+import org.easymock.Capture;
 import org.easymock.IMocksControl;
 import org.ini4j.Profile.Section;
 import org.junit.Before;
@@ -13,6 +16,8 @@ import org.junit.Test;
 
 import ru.prolib.JTransaq.JTransaqHandler;
 import ru.prolib.JTransaq.JTransaqServer;
+import ru.prolib.aquila.transaq.remote.StdConnector;
+import ru.prolib.aquila.transaq.remote.TQSecIDT;
 
 public class StdConnectorTest {
 	private IMocksControl control;
@@ -95,10 +100,10 @@ public class StdConnectorTest {
 	
 	@Test
 	public void testSubscribe() throws Exception {
-		Set<TQSecID2> symbols = new LinkedHashSet<>();
-		symbols.add(new TQSecID2("foo", "EX1"));
-		symbols.add(new TQSecID2("bar", "EX2"));
-		symbols.add(new TQSecID2("buz", "EX3"));
+		Set<TQSecIDT> symbols = new LinkedHashSet<>();
+		symbols.add(new TQSecIDT("foo", "EX1"));
+		symbols.add(new TQSecIDT("bar", "EX2"));
+		symbols.add(new TQSecIDT("buz", "EX3"));
 		serverMock.SendCommand(
 				"<command id=\"subscribe\">\n" +
 		
@@ -159,10 +164,10 @@ public class StdConnectorTest {
 	
 	@Test
 	public void testUnsubscribe() throws Exception {
-		Set<TQSecID2> symbols = new LinkedHashSet<>();
-		symbols.add(new TQSecID2("foo", "EX1"));
-		symbols.add(new TQSecID2("bar", "EX2"));
-		symbols.add(new TQSecID2("buz", "EX3"));
+		Set<TQSecIDT> symbols = new LinkedHashSet<>();
+		symbols.add(new TQSecIDT("foo", "EX1"));
+		symbols.add(new TQSecIDT("bar", "EX2"));
+		symbols.add(new TQSecIDT("buz", "EX3"));
 		serverMock.SendCommand(
 				"<command id=\"unsubscribe\">\n" +
 		
@@ -222,13 +227,49 @@ public class StdConnectorTest {
 	}
 	
 	@Test
-	public void testSubscribe3() {
-		fail("Not yet implemented");
+	public void testSubscribe3() throws Exception {
+		Set<ISecIDT> alltrades = new LinkedHashSet<>();
+		alltrades.add(new TQSecIDT("RIZ9", "FUT"));
+		alltrades.add(new TQSecIDT("SBER", "EQTB"));
+		alltrades.add(new TQSecIDT("LKOH", "EQTB"));
+		Set<ISecIDT> quotations = new LinkedHashSet<>();
+		quotations.add(new TQSecIDT("AAPL", "NYSE"));
+		quotations.add(new TQSecIDT("GAZP", "EQTB"));
+		Set<ISecIDT> quotes = new LinkedHashSet<>();
+		quotes.add(new TQSecIDT("RIZ9", "FUT"));
+		quotes.add(new TQSecIDT("SiZ9", "FUT"));
+		Capture<String> my_cap = Capture.newInstance();
+		serverMock.SendCommand(capture(my_cap));
+		control.replay();
+		
+		service.subscribe(alltrades, quotations, quotes);
+		
+		control.verify();
+		String expected = FileUtils.readFileToString(new File("fixture/connector-subscribe3.xml"), "UTF8");
+		assertEquals(expected, my_cap.getValue());
 	}
 	
 	@Test
-	public void testUnsubscribe3() {
-		fail();
+	public void testUnsubscribe3() throws Exception {
+		Set<ISecIDT> alltrades = new LinkedHashSet<>();
+		alltrades.add(new TQSecIDT("RIZ9", "FUT"));
+		alltrades.add(new TQSecIDT("AAPL", "NYSE"));
+		alltrades.add(new TQSecIDT("SBER", "EQTB"));
+		Set<ISecIDT> quotations = new LinkedHashSet<>();
+		quotations.add(new TQSecIDT("LKOH", "EQTB"));
+		quotations.add(new TQSecIDT("RIZ9", "FUT"));
+		quotations.add(new TQSecIDT("GAZP", "EQTB"));
+		Set<ISecIDT> quotes = new LinkedHashSet<>();
+		quotes.add(new TQSecIDT("SiZ9", "FUT"));
+		Capture<String> my_cap = Capture.newInstance();
+		serverMock.SendCommand(capture(my_cap));
+		control.replay();
+		
+		service.unsubscribe(alltrades, quotations, quotes);
+		
+		control.verify();
+		String expected = FileUtils.readFileToString(new File("fixture/connector-unsubscribe3.xml"), "UTF8");
+		assertEquals(expected, my_cap.getValue());
 	}
 
 }

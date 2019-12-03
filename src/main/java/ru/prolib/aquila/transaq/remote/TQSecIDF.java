@@ -1,23 +1,17 @@
-package ru.prolib.aquila.transaq.impl;
+package ru.prolib.aquila.transaq.remote;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 
 import ru.prolib.aquila.transaq.entity.SecType;
 
-public class TQSecID_F {
-	private final String secCode;
-	private final int marketID;
-	private final String defBoard;
-	private final String shortName;
-	private final SecType type;
+public class TQSecIDF extends TQSecIDG implements ISecIDF {
+	protected final String boardCode;
+	protected final String shortName;
+	protected final SecType type;
 	
-	public TQSecID_F(String sec_code, int market_id, String default_board, String short_name, SecType type) {
-		if ( sec_code == null || sec_code.length() == 0 ) {
-			throw new IllegalArgumentException("Invalid security code: " + sec_code);
-		}
+	public TQSecIDF(String sec_code, int market_id, String default_board, String short_name, SecType type) {
+		super(sec_code, market_id);
 		if ( default_board == null || default_board.length() == 0 ) {
 			throw new IllegalArgumentException("Invalid board code: " + default_board);
 		}
@@ -27,36 +21,29 @@ public class TQSecID_F {
 		if ( type == null ) {
 			throw new IllegalArgumentException("Type must be defined");
 		}
-		this.secCode = sec_code;
-		this.marketID = market_id;
-		this.defBoard = default_board;
+		this.boardCode = default_board;
 		this.shortName = short_name;
 		this.type = type;
 	}
-
-	public String getSecCode() {
-		return secCode;
+	
+	@Override
+	public String getBoardCode() {
+		return boardCode;
 	}
 	
-	public int getMarketID() {
-		return marketID;
-	}
-	
+	@Override
 	public String getDefaultBoard() {
-		return defBoard;
+		return getBoardCode();
 	}
-	
+
+	@Override
 	public String getShortName() {
 		return shortName;
 	}
 	
+	@Override
 	public SecType getType() {
 		return type;
-	}
-	
-	@Override
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
 	}
 	
 	@Override
@@ -64,7 +51,7 @@ public class TQSecID_F {
 		return new HashCodeBuilder(234103, 1515)
 				.append(secCode)
 				.append(marketID)
-				.append(defBoard)
+				.append(boardCode)
 				.append(shortName)
 				.append(type)
 				.build();
@@ -75,14 +62,14 @@ public class TQSecID_F {
 		if ( other == this ) {
 			return true;
 		}
-		if ( other == null || other.getClass() != TQSecID_F.class ) {
+		if ( other == null || other.getClass() != TQSecIDF.class ) {
 			return false;
 		}
-		TQSecID_F o = (TQSecID_F) other;
+		TQSecIDF o = (TQSecIDF) other;
 		return new EqualsBuilder()
 				.append(o.secCode, secCode)
 				.append(o.marketID, marketID)
-				.append(o.defBoard, defBoard)
+				.append(o.boardCode, boardCode)
 				.append(o.shortName, shortName)
 				.append(o.type, type)
 				.build();

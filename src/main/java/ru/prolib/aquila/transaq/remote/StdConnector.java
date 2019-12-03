@@ -1,4 +1,4 @@
-package ru.prolib.aquila.transaq.impl;
+package ru.prolib.aquila.transaq.remote;
 
 import java.util.Set;
 
@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import ru.prolib.JTransaq.JTransaqHandler;
 import ru.prolib.JTransaq.JTransaqServer;
-import ru.prolib.aquila.transaq.engine.Connector;
+import ru.prolib.aquila.transaq.impl.TransaqException;
 
 public class StdConnector implements Connector {
 	public static final int SUBSCR_TYPE_QUOTATIONS = 0x01;
@@ -94,9 +94,9 @@ public class StdConnector implements Connector {
 		handler.delete();
 	}
 	
-	private void manageSubscriptions(Set<TQSecID2> symbols, int subscr_type, String command) throws TransaqException {
+	private void manageSubscriptions(Set<TQSecIDT> symbols, int subscr_type, String command) throws TransaqException {
 		String str_symbols = "";
-		for ( TQSecID2 symbol : symbols ) {
+		for ( TQSecIDT symbol : symbols ) {
 			str_symbols +=
 				"\t\t<security>\n" +
 				"\t\t\t<board>" + symbol.getBoardCode() + "</board>\n" +
@@ -132,13 +132,51 @@ public class StdConnector implements Connector {
 	 * @throws TransaqException - an error occurred
 	 */
 	@Deprecated
-	public void subscribe(Set<TQSecID2> symbols, int subscr_type) throws TransaqException {
+	public void subscribe(Set<TQSecIDT> symbols, int subscr_type) throws TransaqException {
 		manageSubscriptions(symbols, subscr_type, "subscribe");
 	}
 	
+	private String _to_security_list(Set<ISecIDT> ids) {
+		StringBuilder sb = new StringBuilder();
+		for ( ISecIDT id : ids ) {
+			sb.append("\t\t<security>\n")
+				.append("\t\t\t<board>").append(id.getBoardCode()).append("</board>\n")
+				.append("\t\t\t<seccode>").append(id.getSecCode()).append("</seccode>\n")
+				.append("\t\t</security>\n");
+		}
+		return sb.toString();
+	}
+	
+	private void _manage_subscriptions(
+			Set<ISecIDT> alltrades,
+			Set<ISecIDT> quotations,
+			Set<ISecIDT> quotes,
+			String command)
+					throws TransaqException
+	{
+		StringBuilder sb = new StringBuilder().append("<command id=\"").append(command).append("\">\n");
+		if ( alltrades.size() > 0 ) {
+			sb.append("\t<alltrades>\n").append(_to_security_list(alltrades)).append("\t</alltrades>\n");
+		}
+		if ( quotations.size() > 0 ) {
+			sb.append("\t<quotations>\n").append(_to_security_list(quotations)).append("\t</quotations>\n");
+		}
+		if ( quotes.size() > 0 ) {
+			sb.append("\t<quotes>\n").append(_to_security_list(quotes)).append("\t</quotes>\n");
+		}
+		sb.append("</command>");
+		try {
+			server.SendCommand(sb.toString());
+		} catch ( TransaqException e ) {
+			throw e;
+		} catch ( Exception e ) {
+			throw new TransaqException("Error sending command: ", e);
+		}
+	}
+	
 	@Override
-	public void subscribe(Set<TQSecID2> quotations, Set<TQSecID2> trades, Set<TQSecID2> quotes) {
-		throw new UnsupportedOperationException("Not yet implemented");
+	public void subscribe(Set<ISecIDT> trades, Set<ISecIDT> quotations, Set<ISecIDT> quotes) throws TransaqException {
+		_manage_subscriptions(trades, quotations, quotes, "subscribe");
 	}
 	
 	/**
@@ -149,13 +187,13 @@ public class StdConnector implements Connector {
 	 * @throws TransaqException - an error occurred
 	 */
 	@Deprecated
-	public void unsubscribe(Set<TQSecID2> symbols, int subscr_type) throws TransaqException {
+	public void unsubscribe(Set<TQSecIDT> symbols, int subscr_type) throws TransaqException {
 		manageSubscriptions(symbols, subscr_type, "unsubscribe");
 	}
 	
 	@Override
-	public void unsubscribe(Set<TQSecID2> quotations, Set<TQSecID2> trades, Set<TQSecID2> quotes) {
-		throw new UnsupportedOperationException("Not yet implemented");
+	public void unsubscribe(Set<ISecIDT> trades, Set<ISecIDT> quotations, Set<ISecIDT> quotes) throws TransaqException {
+		_manage_subscriptions(trades, quotations, quotes, "unsubscribe");
 	}
 	
 }

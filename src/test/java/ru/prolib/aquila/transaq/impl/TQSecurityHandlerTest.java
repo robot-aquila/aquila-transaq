@@ -14,6 +14,7 @@ import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateConsumer;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.core.BusinessEntities.UpdatableStateContainer;
 import ru.prolib.aquila.transaq.entity.SecType;
+import ru.prolib.aquila.transaq.remote.TQSecIDF;
 
 public class TQSecurityHandlerTest {
 	private IMocksControl control;
@@ -31,7 +32,7 @@ public class TQSecurityHandlerTest {
 		asmMock = control.createMock(TQFieldAssembler.class);
 		updateMock = control.createMock(DeltaUpdate.class);
 		service = new TQSecurityHandler(
-				new TQSecID_F("foo", 2, "FORTS", "bar", SecType.BOND),
+				new TQSecIDF("foo", 2, "FORTS", "bar", SecType.BOND),
 				new Symbol("F:RTS-6.19@FORTS:RUB"),
 				consMock,
 				stateMock, 

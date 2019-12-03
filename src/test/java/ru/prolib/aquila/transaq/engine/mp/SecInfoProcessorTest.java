@@ -9,11 +9,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ru.prolib.aquila.transaq.impl.TQReactor;
-import ru.prolib.aquila.transaq.impl.TQSecID1;
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
 import ru.prolib.aquila.transaq.engine.mp.SecInfoProcessor;
 import ru.prolib.aquila.transaq.impl.TQParser;
 import ru.prolib.aquila.transaq.impl.TQStateUpdate;
+import ru.prolib.aquila.transaq.remote.TQSecIDG;
 
 public class SecInfoProcessorTest {
 	private ServiceLocator services;
@@ -35,7 +35,7 @@ public class SecInfoProcessorTest {
 	public void testProcessMessage() throws Exception {
 		XMLStreamReader readerMock = control.createMock(XMLStreamReader.class);
 		@SuppressWarnings("unchecked")
-		TQStateUpdate<TQSecID1> suMock = control.createMock(TQStateUpdate.class);
+		TQStateUpdate<TQSecIDG> suMock = control.createMock(TQStateUpdate.class);
 		expect(parserMock.readSecInfo(readerMock)).andReturn(suMock);
 		reactorMock.updateSecurity1(suMock);
 		control.replay();

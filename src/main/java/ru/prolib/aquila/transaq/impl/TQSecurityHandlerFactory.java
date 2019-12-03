@@ -1,26 +1,25 @@
 package ru.prolib.aquila.transaq.impl;
 
-import ru.prolib.aquila.core.BusinessEntities.EditableTerminal;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.core.BusinessEntities.UpdatableStateContainerImpl;
+import ru.prolib.aquila.transaq.engine.ServiceLocator;
+import ru.prolib.aquila.transaq.remote.TQSecIDF;
 
 public class TQSecurityHandlerFactory {
-	private final EditableTerminal terminal;
-	private final TQFieldAssembler assembler;
+	private final ServiceLocator services;
 	
-	public TQSecurityHandlerFactory(EditableTerminal terminal, TQFieldAssembler assembler) {
-		this.terminal = terminal;
-		this.assembler = assembler;
+	public TQSecurityHandlerFactory(ServiceLocator services) {
+		this.services = services;
 	}
 
-	public TQSecurityHandler createHandler(TQSecID_F sec_id) {
-		Symbol symbol = assembler.toSymbol(sec_id);
+	public TQSecurityHandler createHandler(TQSecIDF sec_id) {
+		Symbol symbol = services.getDirectory().toSymbol(sec_id);
 		return new TQSecurityHandler(
 				sec_id,
 				symbol,
-				terminal.getEditableSecurity(symbol),
+				services.getTerminal().getEditableSecurity(symbol),
 				new UpdatableStateContainerImpl("TQ-SEC-" + symbol),
-				assembler
+				services.getAssembler()
 			);
 	}
 
