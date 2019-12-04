@@ -16,9 +16,9 @@ import org.junit.Test;
 import ru.prolib.aquila.transaq.impl.TQReactor;
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
 import ru.prolib.aquila.transaq.engine.mp.SecuritiesMessageProcessor;
-import ru.prolib.aquila.transaq.impl.TQParser;
 import ru.prolib.aquila.transaq.impl.TQStateUpdate;
-import ru.prolib.aquila.transaq.remote.TQSecIDF;
+import ru.prolib.aquila.transaq.remote.ISecIDF;
+import ru.prolib.aquila.transaq.remote.MessageParser;
 
 public class SecuritiesMessageProcessorTest {
 	
@@ -30,7 +30,7 @@ public class SecuritiesMessageProcessorTest {
 	
 	private ServiceLocator services;
 	private IMocksControl control;
-	private TQParser parserMock;
+	private MessageParser parserMock;
 	private TQReactor reactorMock;
 	private SecuritiesMessageProcessor service;
 
@@ -38,7 +38,7 @@ public class SecuritiesMessageProcessorTest {
 	public void setUp() throws Exception {
 		services = new ServiceLocator();
 		control = createStrictControl();
-		services.setParser(parserMock = control.createMock(TQParser.class));
+		services.setParser(parserMock = control.createMock(MessageParser.class));
 		services.setReactor(reactorMock = control.createMock(TQReactor.class));
 		service = new SecuritiesMessageProcessor(services);
 	}
@@ -47,8 +47,8 @@ public class SecuritiesMessageProcessorTest {
 	@Test
 	public void testProcessMessage() throws Exception {
 		XMLStreamReader readerMock = control.createMock(XMLStreamReader.class);
-		List<TQStateUpdate<TQSecIDF>> updates = new ArrayList<>();
-		TQStateUpdate<TQSecIDF> duMock1, duMock2, duMock3;
+		List<TQStateUpdate<ISecIDF>> updates = new ArrayList<>();
+		TQStateUpdate<ISecIDF> duMock1, duMock2, duMock3;
 		updates.add(duMock1 = control.createMock(TQStateUpdate.class));
 		updates.add(duMock2 = control.createMock(TQStateUpdate.class));
 		updates.add(duMock3 = control.createMock(TQStateUpdate.class));

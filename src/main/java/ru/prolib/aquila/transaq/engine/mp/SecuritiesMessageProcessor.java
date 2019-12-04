@@ -5,7 +5,7 @@ import javax.xml.stream.XMLStreamReader;
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
 import ru.prolib.aquila.transaq.impl.TQReactor;
 import ru.prolib.aquila.transaq.impl.TQStateUpdate;
-import ru.prolib.aquila.transaq.remote.TQSecIDF;
+import ru.prolib.aquila.transaq.remote.ISecIDF;
 
 public class SecuritiesMessageProcessor implements MessageProcessor {
 	private final ServiceLocator services;
@@ -17,7 +17,7 @@ public class SecuritiesMessageProcessor implements MessageProcessor {
 	@Override
 	public void processMessage(XMLStreamReader reader) throws Exception {
 		TQReactor reactor = services.getReactor();
-		for ( TQStateUpdate<TQSecIDF> update : services.getParser().readSecurities(reader) ) {
+		for ( TQStateUpdate<ISecIDF> update : services.getParser().readSecurities(reader) ) {
 			reactor.updateSecurityF(update);
 		}
 	}

@@ -11,7 +11,7 @@ import ru.prolib.aquila.core.EventQueue;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCControllerStub;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCRepository;
-import ru.prolib.aquila.transaq.impl.TQField.FCKind;
+import ru.prolib.aquila.transaq.remote.MessageFields.FCKind;
 
 public class CandleKindTest {
 	private IMocksControl control;

@@ -13,15 +13,15 @@ import org.junit.Test;
 
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
 import ru.prolib.aquila.transaq.engine.mp.PitsProcessor;
-import ru.prolib.aquila.transaq.impl.TQParser;
 import ru.prolib.aquila.transaq.impl.TQReactor;
 import ru.prolib.aquila.transaq.impl.TQStateUpdate;
-import ru.prolib.aquila.transaq.remote.TQSecIDT;
+import ru.prolib.aquila.transaq.remote.ISecIDT;
+import ru.prolib.aquila.transaq.remote.MessageParser;
 
 public class PitsProcessorTest {
 	private ServiceLocator services;
 	private IMocksControl control;
-	private TQParser parserMock;
+	private MessageParser parserMock;
 	private TQReactor reactorMock;
 	private XMLStreamReader readerMock;
 	private PitsProcessor service;
@@ -30,7 +30,7 @@ public class PitsProcessorTest {
 	public void setUp() throws Exception {
 		services = new ServiceLocator();
 		control = createStrictControl();
-		services.setParser(parserMock = control.createMock(TQParser.class));
+		services.setParser(parserMock = control.createMock(MessageParser.class));
 		services.setReactor(reactorMock = control.createMock(TQReactor.class));
 		readerMock = control.createMock(XMLStreamReader.class);
 		service = new PitsProcessor(services);
@@ -39,8 +39,8 @@ public class PitsProcessorTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testProcessMessage() throws Exception {
-		List<TQStateUpdate<TQSecIDT>> updates = new ArrayList<>();
-		TQStateUpdate<TQSecIDT> duMock1, duMock2, duMock3;
+		List<TQStateUpdate<ISecIDT>> updates = new ArrayList<>();
+		TQStateUpdate<ISecIDT> duMock1, duMock2, duMock3;
 		updates.add(duMock1 = control.createMock(TQStateUpdate.class));
 		updates.add(duMock2 = control.createMock(TQStateUpdate.class));
 		updates.add(duMock3 = control.createMock(TQStateUpdate.class));

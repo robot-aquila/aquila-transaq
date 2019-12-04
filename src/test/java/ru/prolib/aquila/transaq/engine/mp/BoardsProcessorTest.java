@@ -13,13 +13,13 @@ import org.junit.Test;
 
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
 import ru.prolib.aquila.transaq.engine.mp.BoardsProcessor;
-import ru.prolib.aquila.transaq.impl.TQParser;
 import ru.prolib.aquila.transaq.impl.TQReactor;
 import ru.prolib.aquila.transaq.impl.TQStateUpdate;
+import ru.prolib.aquila.transaq.remote.MessageParser;
 
 public class BoardsProcessorTest {
 	private IMocksControl control;
-	private TQParser parserMock;
+	private MessageParser parserMock;
 	private TQReactor reactorMock;
 	private ServiceLocator services;
 	private XMLStreamReader readerMock;
@@ -29,7 +29,7 @@ public class BoardsProcessorTest {
 	public void setUp() throws Exception {
 		services = new ServiceLocator();
 		control = createStrictControl();
-		services.setParser(parserMock = control.createMock(TQParser.class));
+		services.setParser(parserMock = control.createMock(MessageParser.class));
 		services.setReactor(reactorMock = control.createMock(TQReactor.class));
 		readerMock = control.createMock(XMLStreamReader.class);
 		service = new BoardsProcessor(services);

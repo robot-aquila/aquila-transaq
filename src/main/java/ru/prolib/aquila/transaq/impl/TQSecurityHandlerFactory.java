@@ -3,8 +3,9 @@ package ru.prolib.aquila.transaq.impl;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.core.BusinessEntities.UpdatableStateContainerImpl;
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
-import ru.prolib.aquila.transaq.remote.TQSecIDF;
+import ru.prolib.aquila.transaq.remote.ISecIDF;
 
+@Deprecated
 public class TQSecurityHandlerFactory {
 	private final ServiceLocator services;
 	
@@ -12,7 +13,7 @@ public class TQSecurityHandlerFactory {
 		this.services = services;
 	}
 
-	public TQSecurityHandler createHandler(TQSecIDF sec_id) {
+	public TQSecurityHandler createHandler(ISecIDF sec_id) {
 		Symbol symbol = services.getDirectory().toSymbol(sec_id);
 		return new TQSecurityHandler(
 				sec_id,

@@ -1,4 +1,4 @@
-package ru.prolib.aquila.transaq.impl;
+package ru.prolib.aquila.transaq.remote;
 
 import static ru.prolib.aquila.transaq.impl.TQOpmask.*;
 
@@ -19,26 +19,26 @@ import ru.prolib.aquila.core.BusinessEntities.CDecimal;
 import ru.prolib.aquila.core.BusinessEntities.CDecimalBD;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.transaq.entity.SecType;
-import ru.prolib.aquila.transaq.impl.TQField.FBoard;
-import ru.prolib.aquila.transaq.impl.TQField.FCKind;
-import ru.prolib.aquila.transaq.impl.TQField.FMarket;
-import ru.prolib.aquila.transaq.impl.TQField.FQuotation;
-import ru.prolib.aquila.transaq.impl.TQField.FSecurity;
-import ru.prolib.aquila.transaq.impl.TQField.FSecurityBoard;
-import ru.prolib.aquila.transaq.remote.TQSecIDT;
-import ru.prolib.aquila.transaq.remote.TQSecIDF;
-import ru.prolib.aquila.transaq.remote.TQSecIDG;
+import ru.prolib.aquila.transaq.impl.TQStateUpdate;
+import ru.prolib.aquila.transaq.remote.MessageFields.FBoard;
+import ru.prolib.aquila.transaq.remote.MessageFields.FCKind;
+import ru.prolib.aquila.transaq.remote.MessageFields.FMarket;
+import ru.prolib.aquila.transaq.remote.MessageFields.FQuotation;
+import ru.prolib.aquila.transaq.remote.MessageFields.FQuote;
+import ru.prolib.aquila.transaq.remote.MessageFields.FSecurity;
+import ru.prolib.aquila.transaq.remote.MessageFields.FSecurityBoard;
+import ru.prolib.aquila.transaq.remote.MessageFields.FTrade;
 
-public class TQParser {
+public class MessageParser {
 	private static final Logger logger;
-	private static final TQParser instance;
+	private static final MessageParser instance;
 	
 	static {
-		logger = LoggerFactory.getLogger(TQParser.class);
-		instance = new TQParser();
+		logger = LoggerFactory.getLogger(MessageParser.class);
+		instance = new MessageParser();
 	}
 	
-	public static TQParser getInstance() {
+	public static MessageParser getInstance() {
 		return instance;
 	}
 	
@@ -321,7 +321,7 @@ public class TQParser {
 		throw new XMLStreamException("Premature end of file");
 	}
 	
-	private TQStateUpdate<TQSecIDF> readSecurity(XMLStreamReader reader) throws XMLStreamException {
+	private TQStateUpdate<ISecIDF> readSecurity(XMLStreamReader reader) throws XMLStreamException {
 		Integer market_id = null;
 		String sec_code = null, short_name = null, default_board = null;
 		SecType sec_type = null;
@@ -411,11 +411,11 @@ public class TQParser {
 		throw new XMLStreamException("Premature end of file");
 	}
 	
-	public List<TQStateUpdate<TQSecIDF>> readSecurities(XMLStreamReader reader) throws XMLStreamException {
+	public List<TQStateUpdate<ISecIDF>> readSecurities(XMLStreamReader reader) throws XMLStreamException {
 		if ( ! "securities".equals(reader.getLocalName()) ) {
 			throw new IllegalStateException("Unexpected current element: " + reader.getLocalName());
 		}
-		List<TQStateUpdate<TQSecIDF>> result = new ArrayList<>();
+		List<TQStateUpdate<ISecIDF>> result = new ArrayList<>();
 		while ( reader.hasNext() ) {
 			switch ( reader.next() ) {
 			case XMLStreamReader.START_ELEMENT:
@@ -436,7 +436,7 @@ public class TQParser {
 		throw new XMLStreamException("Premature end of file");
 	}
 	
-	public TQStateUpdate<TQSecIDG> readSecInfo(XMLStreamReader reader) throws XMLStreamException {
+	public TQStateUpdate<ISecIDG> readSecInfo(XMLStreamReader reader) throws XMLStreamException {
 		if ( ! "sec_info".equals(reader.getLocalName()) ) {
 			throw new IllegalStateException("Unexpected current element: " + reader.getLocalName());
 		}
@@ -525,7 +525,7 @@ public class TQParser {
 		throw new XMLStreamException("Premature end of file");
 	}
 	
-	public TQStateUpdate<TQSecIDG> readSecInfoUpd(XMLStreamReader reader) throws XMLStreamException {
+	public TQStateUpdate<ISecIDG> readSecInfoUpd(XMLStreamReader reader) throws XMLStreamException {
 		if ( ! "sec_info_upd".equals(reader.getLocalName()) ) {
 			throw new IllegalStateException("Unexpected current element: " + reader.getLocalName());
 		}
@@ -584,7 +584,7 @@ public class TQParser {
 		throw new XMLStreamException("Premature end of file");
 	}
 	
-	private TQStateUpdate<TQSecIDT> readPit(XMLStreamReader reader) throws XMLStreamException {
+	private TQStateUpdate<ISecIDT> readPit(XMLStreamReader reader) throws XMLStreamException {
 		Integer market_id = null;
 		String sec_code = null, board_code = null;
 		DeltaUpdateBuilder builder = new DeltaUpdateBuilder()
@@ -625,11 +625,11 @@ public class TQParser {
 		throw new XMLStreamException("Premature end of file");
 	}
 
-	public List<TQStateUpdate<TQSecIDT>> readPits(XMLStreamReader reader) throws XMLStreamException {
+	public List<TQStateUpdate<ISecIDT>> readPits(XMLStreamReader reader) throws XMLStreamException {
 		if ( ! "pits".equals(reader.getLocalName()) ) {
 			throw new IllegalStateException("Unexpected current element: " + reader.getLocalName());
 		}
-		List<TQStateUpdate<TQSecIDT>> result = new ArrayList<>();
+		List<TQStateUpdate<ISecIDT>> result = new ArrayList<>();
 		while ( reader.hasNext() ) {
 			switch ( reader.next() ) {
 			case XMLStreamReader.START_ELEMENT:
@@ -650,7 +650,7 @@ public class TQParser {
 		throw new XMLStreamException("Premature end of file");
 	}
 	
-	private TQStateUpdate<TQSecIDT> readQuotation(XMLStreamReader reader) throws XMLStreamException {
+	private TQStateUpdate<ISecIDT> readQuotation(XMLStreamReader reader) throws XMLStreamException {
 		String sec_code = null, board_code = null;
 		DeltaUpdateBuilder builder = new DeltaUpdateBuilder()
 				.withToken(FQuotation.SECID, getAttributeInt(reader, "secid"));
@@ -796,11 +796,11 @@ public class TQParser {
 		throw new XMLStreamException("Premature end of file");
 	}
 	
-	public List<TQStateUpdate<TQSecIDT>> readQuotations(XMLStreamReader reader) throws XMLStreamException {
+	public List<TQStateUpdate<ISecIDT>> readQuotations(XMLStreamReader reader) throws XMLStreamException {
 		if ( ! "quotations".equals(reader.getLocalName()) ) {
 			throw new IllegalStateException("Unexpected current element: " + reader.getLocalName()); 
 		}
-		List<TQStateUpdate<TQSecIDT>> result = new ArrayList<>();
+		List<TQStateUpdate<ISecIDT>> result = new ArrayList<>();
 		while ( reader.hasNext() ) {
 			switch ( reader.next() ) {
 			case XMLStreamReader.START_ELEMENT:
@@ -813,6 +813,147 @@ public class TQParser {
 			case XMLStreamReader.END_ELEMENT:
 				switch ( reader.getLocalName() ) {
 				case "quotations":
+					return result;
+				}
+				break;
+			}
+		}
+		throw new XMLStreamException("Premature end of file");
+	}
+	
+	private TQStateUpdate<ISecIDT> readTrade(XMLStreamReader reader) throws XMLStreamException {
+		String sec_code = null, board_code = null;
+		DeltaUpdateBuilder builder = new DeltaUpdateBuilder()
+				.withToken(FTrade.SECID, getAttributeInt(reader, "secid"));
+		while ( reader.hasNext() ) {
+			switch ( reader.next() ) {
+			case XMLStreamReader.START_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "tradeno":
+					builder.withToken(FTrade.TRADENO, readCharacters(reader));
+					break;
+				case "board":
+					builder.withToken(FTrade.BOARD, board_code = readCharacters(reader));
+					break;
+				case "time":
+					builder.withToken(FTrade.TIME, readDate(reader));
+					break;
+				case "price":
+					builder.withToken(FTrade.PRICE, readDecimal(reader));
+					break;
+				case "quantity":
+					builder.withToken(FTrade.QUANTITY, readDecimal(reader));
+					break;
+				case "buysell":
+					builder.withToken(FTrade.BUYSELL, readCharacters(reader));
+					break;
+				case "openinterest":
+					builder.withToken(FTrade.OPENINTEREST, readDecimal(reader));
+					break;
+				case "seccode":
+					builder.withToken(FTrade.SECCODE, sec_code = readCharacters(reader));
+					break;
+				case "period":
+					builder.withToken(FTrade.PERIOD, readCharacters(reader));
+					break;
+				}
+				break;
+			case XMLStreamReader.END_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "trade":
+					checkNotNull(sec_code, "seccode");
+					checkNotNull(board_code, "board");
+					return new TQStateUpdate<>(new TQSecIDT(sec_code, board_code), builder.buildUpdate());
+				}
+				break;
+			}
+		}
+		throw new XMLStreamException("Premature end of file");
+	}
+	
+	public List<TQStateUpdate<ISecIDT>> readAlltrades(XMLStreamReader reader) throws XMLStreamException {
+		if ( ! "alltrades".equals(reader.getLocalName()) ) {
+			throw new IllegalStateException("Unexpected current element: " + reader.getLocalName());
+		}
+		List<TQStateUpdate<ISecIDT>> result = new ArrayList<>();
+		while ( reader.hasNext() ) {
+			switch ( reader.next() ) {
+			case XMLStreamReader.START_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "trade":
+					result.add(readTrade(reader));
+					break;
+				}
+				break;
+			case XMLStreamReader.END_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "alltrades":
+					return result;
+				}
+				break;
+			}
+		}
+		throw new XMLStreamException("Premature end of file");
+	}
+	
+	private TQStateUpdate<ISecIDT> readQuote(XMLStreamReader reader) throws XMLStreamException {
+		String sec_code = null, board_code = null;
+		DeltaUpdateBuilder builder = new DeltaUpdateBuilder()
+				.withToken(FQuote.SECID, getAttributeInt(reader, "secid"));
+		while ( reader.hasNext() ) {
+			switch ( reader.next() ) {
+			case XMLStreamReader.START_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "board":
+					builder.withToken(FQuote.BOARD, board_code = readCharacters(reader));
+					break;
+				case "seccode":
+					builder.withToken(FQuote.SECCODE, sec_code = readCharacters(reader));
+					break;
+				case "price":
+					builder.withToken(FQuote.PRICE, readDecimal(reader));
+					break;
+				case "yield":
+					builder.withToken(FQuote.YIELD, readDecimal(reader));
+					break;
+				case "buy":
+					builder.withToken(FQuote.BUY, readDecimal(reader));
+					break;
+				case "sell":
+					builder.withToken(FQuote.SELL, readDecimal(reader));
+					break;
+				}
+				break;
+			case XMLStreamReader.END_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "quote":
+					checkNotNull(sec_code, "seccode");
+					checkNotNull(board_code, "board");
+					return new TQStateUpdate<>(new TQSecIDT(sec_code, board_code), builder.buildUpdate());
+				}
+				break;
+			}
+		}
+		throw new XMLStreamException("Premature end of file");
+	}
+	
+	public List<TQStateUpdate<ISecIDT>> readQuotes(XMLStreamReader reader) throws XMLStreamException {
+		if ( ! "quotes".equals(reader.getLocalName()) ) {
+			throw new IllegalStateException("Unexpected current element: " + reader.getLocalName());
+		}
+		List<TQStateUpdate<ISecIDT>> result = new ArrayList<>();
+		while ( reader.hasNext() ) {
+			switch ( reader.next() ) {
+			case XMLStreamReader.START_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "quote":
+					result.add(readQuote(reader));
+					break;
+				}
+				break;
+			case XMLStreamReader.END_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "quotes":
 					return result;
 				}
 				break;

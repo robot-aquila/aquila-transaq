@@ -21,20 +21,20 @@ import org.junit.Test;
 import ru.prolib.aquila.core.EventQueue;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCRepository;
 import ru.prolib.aquila.transaq.engine.sds.SymbolGID;
-import ru.prolib.aquila.transaq.impl.TQParser;
 import ru.prolib.aquila.transaq.impl.TQStateUpdate;
-import ru.prolib.aquila.transaq.remote.TQSecIDF;
+import ru.prolib.aquila.transaq.remote.ISecIDF;
+import ru.prolib.aquila.transaq.remote.MessageParser;
 
 public class SecurityParamsTest {
 	private static XMLInputFactory factory;
-	private static TQParser parser;
+	private static MessageParser parser;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		BasicConfigurator.resetConfiguration();
 		BasicConfigurator.configure();
 		factory = XMLInputFactory.newInstance();
-		parser = new TQParser();
+		parser = new MessageParser();
 	}
 	
 	private IMocksControl control;
@@ -71,7 +71,7 @@ public class SecurityParamsTest {
 	@Test
 	public void testGetters() throws Exception {
 		XMLStreamReader sr = startReading("fixture/securities.xml", "securities");
-		for ( TQStateUpdate<TQSecIDF> su : parser.readSecurities(sr) ) {
+		for ( TQStateUpdate<ISecIDF> su : parser.readSecurities(sr) ) {
 			service.consume(su.getUpdate());
 		}
 		sr.close();

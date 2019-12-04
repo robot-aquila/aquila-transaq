@@ -2,7 +2,7 @@ package ru.prolib.aquila.transaq.entity;
 
 import ru.prolib.aquila.core.BusinessEntities.ObservableStateContainerImpl;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCParams;
-import ru.prolib.aquila.transaq.impl.TQField.FCKind;
+import ru.prolib.aquila.transaq.remote.MessageFields.FCKind;
 
 public class CKind extends ObservableStateContainerImpl {
 	

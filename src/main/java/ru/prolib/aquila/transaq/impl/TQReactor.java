@@ -1,8 +1,8 @@
 package ru.prolib.aquila.transaq.impl;
 
-import ru.prolib.aquila.transaq.remote.TQSecIDT;
-import ru.prolib.aquila.transaq.remote.TQSecIDF;
-import ru.prolib.aquila.transaq.remote.TQSecIDG;
+import ru.prolib.aquila.transaq.remote.ISecIDF;
+import ru.prolib.aquila.transaq.remote.ISecIDG;
+import ru.prolib.aquila.transaq.remote.ISecIDT;
 
 public class TQReactor {
 	private final TQDirectory dir;
@@ -30,13 +30,13 @@ public class TQReactor {
 		dir.updateCKind(update);
 	}
 
-	public void updateSecurity1(TQStateUpdate<TQSecIDG> update) {
+	public void updateSecurity1(TQStateUpdate<ISecIDG> update) {
 		dir.updateSecurityParamsP(update);
 		shr.getHandler(update.getID()).update(update.getUpdate());
 	}
 
-	public void updateSecurityF(TQStateUpdate<TQSecIDF> update) {
-		TQSecIDF sec_id = update.getID();
+	public void updateSecurityF(TQStateUpdate<ISecIDF> update) {
+		ISecIDF sec_id = update.getID();
 		dir.updateSecurityParamsF(update);
 		TQSecurityHandler x = shr.getHandlerOrNull(sec_id);
 		if ( x == null ) {
@@ -48,7 +48,7 @@ public class TQReactor {
 		}
 	}
 	
-	public void updateSecurityBoard(TQStateUpdate<TQSecIDT> update) {
+	public void updateSecurityBoard(TQStateUpdate<ISecIDT> update) {
 		dir.updateSecurityBoardParams(update);
 	}
 

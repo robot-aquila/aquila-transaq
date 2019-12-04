@@ -5,13 +5,13 @@ import ru.prolib.aquila.core.BusinessEntities.EditableTerminal;
 import ru.prolib.aquila.transaq.engine.mp.MessageRouter;
 import ru.prolib.aquila.transaq.impl.TQDirectory;
 import ru.prolib.aquila.transaq.impl.TQFieldAssembler;
-import ru.prolib.aquila.transaq.impl.TQParser;
 import ru.prolib.aquila.transaq.impl.TQReactor;
 import ru.prolib.aquila.transaq.remote.Connector;
+import ru.prolib.aquila.transaq.remote.MessageParser;
 
 public class ServiceLocator {
 	private EventQueue queue;
-	private TQParser parser;
+	private MessageParser parser;
 	private TQReactor reactor;
 	private TQDirectory directory;
 	private MessageRouter msgRouter;
@@ -20,14 +20,14 @@ public class ServiceLocator {
 	private SymbolDataService symbolDataService;
 	private EditableTerminal terminal;
 	
-	public synchronized TQParser getParser() {
+	public synchronized MessageParser getParser() {
 		if ( parser == null ) {
 			throw new IllegalStateException("Parser was not defined");
 		}
 		return parser;
 	}
 	
-	public synchronized void setParser(TQParser parser) {
+	public synchronized void setParser(MessageParser parser) {
 		this.parser = parser;
 	}
 	

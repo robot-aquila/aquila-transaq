@@ -12,13 +12,15 @@ import org.junit.Test;
 
 import ru.prolib.aquila.transaq.entity.SecType;
 import ru.prolib.aquila.transaq.remote.TQSecIDG;
+import ru.prolib.aquila.transaq.remote.ISecIDF;
+import ru.prolib.aquila.transaq.remote.ISecIDG;
 import ru.prolib.aquila.transaq.remote.TQSecIDF;
 
 public class TQSecurityHandlerRegistryImplTest {
 	private IMocksControl control;
 	private TQSecurityHandler shMock1, shMock2, shMock3;
-	private Map<TQSecIDG, TQSecurityHandler> map_sec_id1;
-	private Map<TQSecIDF, TQSecurityHandler> map_sec_id3;
+	private Map<ISecIDG, TQSecurityHandler> map_sec_id1;
+	private Map<ISecIDF, TQSecurityHandler> map_sec_id3;
 	private TQSecurityHandlerRegistry service;
 
 	@Before

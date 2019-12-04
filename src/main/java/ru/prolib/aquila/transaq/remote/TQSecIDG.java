@@ -17,7 +17,7 @@ public class TQSecIDG implements ISecIDG {
 		this.marketID = market_id;
 	}
 	
-	public TQSecIDG(TQSecIDF sec_id) {
+	public TQSecIDG(ISecIDF sec_id) {
 		this(sec_id.getSecCode(), sec_id.getMarketID());
 	}
 	

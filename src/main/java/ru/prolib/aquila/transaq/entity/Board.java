@@ -2,7 +2,7 @@ package ru.prolib.aquila.transaq.entity;
 
 import ru.prolib.aquila.core.BusinessEntities.ObservableStateContainerImpl;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCParams;
-import ru.prolib.aquila.transaq.impl.TQField.FBoard;
+import ru.prolib.aquila.transaq.remote.MessageFields.FBoard;
 
 public class Board extends ObservableStateContainerImpl {
 	

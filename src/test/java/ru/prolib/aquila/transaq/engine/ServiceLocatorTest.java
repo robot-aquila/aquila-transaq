@@ -14,15 +14,15 @@ import ru.prolib.aquila.core.BusinessEntities.EditableTerminal;
 import ru.prolib.aquila.transaq.engine.mp.MessageRouter;
 import ru.prolib.aquila.transaq.impl.TQDirectory;
 import ru.prolib.aquila.transaq.impl.TQFieldAssembler;
-import ru.prolib.aquila.transaq.impl.TQParser;
 import ru.prolib.aquila.transaq.impl.TQReactor;
 import ru.prolib.aquila.transaq.remote.Connector;
+import ru.prolib.aquila.transaq.remote.MessageParser;
 
 public class ServiceLocatorTest {
 	@Rule
 	public ExpectedException eex = ExpectedException.none();
 	private IMocksControl control;
-	private TQParser parserMock;
+	private MessageParser parserMock;
 	private TQReactor reactorMock;
 	private TQDirectory dirMock;
 	private MessageRouter mrouterMock;
@@ -36,7 +36,7 @@ public class ServiceLocatorTest {
 	@Before
 	public void setUp() throws Exception {
 		control = createStrictControl();
-		parserMock = control.createMock(TQParser.class);
+		parserMock = control.createMock(MessageParser.class);
 		reactorMock = control.createMock(TQReactor.class);
 		dirMock = control.createMock(TQDirectory.class);
 		mrouterMock = control.createMock(MessageRouter.class);

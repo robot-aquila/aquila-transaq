@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import ru.prolib.aquila.core.BusinessEntities.CDecimal;
 import ru.prolib.aquila.core.BusinessEntities.ObservableStateContainerImpl;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCParams;
-import ru.prolib.aquila.transaq.impl.TQField.FSecurity;
+import ru.prolib.aquila.transaq.remote.MessageFields.FSecurity;
 
 public class SecurityParams extends ObservableStateContainerImpl {
 

@@ -9,6 +9,9 @@ import org.junit.Test;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdate;
 import ru.prolib.aquila.transaq.entity.SecType;
 import ru.prolib.aquila.transaq.remote.TQSecIDT;
+import ru.prolib.aquila.transaq.remote.ISecIDF;
+import ru.prolib.aquila.transaq.remote.ISecIDG;
+import ru.prolib.aquila.transaq.remote.ISecIDT;
 import ru.prolib.aquila.transaq.remote.TQSecIDF;
 import ru.prolib.aquila.transaq.remote.TQSecIDG;
 
@@ -70,7 +73,7 @@ public class TQReactorTest {
 	public void testUpdateSecurity1_U1() {
 		TQSecIDG sec_id = new TQSecIDG("foo", 26);
 		DeltaUpdate duMock = control.createMock(DeltaUpdate.class);
-		TQStateUpdate<TQSecIDG> update = new TQStateUpdate<>(sec_id, duMock);
+		TQStateUpdate<ISecIDG> update = new TQStateUpdate<>(sec_id, duMock);
 		dirMock.updateSecurityParamsP(update);
 		expect(shrMock.getHandler(sec_id)).andReturn(shMock1);
 		shMock1.update(duMock);
@@ -85,7 +88,7 @@ public class TQReactorTest {
 	public void testUpdateSecurityF_U3_NewHandler() {
 		TQSecIDF sec_id3 = new TQSecIDF("foo", 7, "OPT", "bar", SecType.BOND);
 		DeltaUpdate duMock = control.createMock(DeltaUpdate.class);
-		TQStateUpdate<TQSecIDF> update = new TQStateUpdate<>(sec_id3, duMock);
+		TQStateUpdate<ISecIDF> update = new TQStateUpdate<>(sec_id3, duMock);
 		dirMock.updateSecurityParamsF(update);
 		expect(shrMock.getHandlerOrNull(sec_id3)).andReturn(null);
 		expect(shfMock.createHandler(sec_id3)).andReturn(shMock1);
@@ -102,7 +105,7 @@ public class TQReactorTest {
 	public void testUpdateSecurityF_U3_ExistingHandler() {
 		TQSecIDF sec_id3 = new TQSecIDF("buz", 8, "BOSS", "bar", SecType.GKO);
 		DeltaUpdate duMock = control.createMock(DeltaUpdate.class);
-		TQStateUpdate<TQSecIDF> update = new TQStateUpdate<>(sec_id3, duMock);
+		TQStateUpdate<ISecIDF> update = new TQStateUpdate<>(sec_id3, duMock);
 		dirMock.updateSecurityParamsF(update);
 		expect(shrMock.getHandlerOrNull(sec_id3)).andReturn(shMock1);
 		shMock1.update(duMock);
@@ -117,7 +120,7 @@ public class TQReactorTest {
 	public void testUpdateSecurityBoard() {
 		TQSecIDT sec_id = new TQSecIDT("foo", "bar");
 		DeltaUpdate duMock = control.createMock(DeltaUpdate.class);
-		TQStateUpdate<TQSecIDT> update = new TQStateUpdate<>(sec_id, duMock);
+		TQStateUpdate<ISecIDT> update = new TQStateUpdate<>(sec_id, duMock);
 		dirMock.updateSecurityBoardParams(update);
 		control.replay();
 		

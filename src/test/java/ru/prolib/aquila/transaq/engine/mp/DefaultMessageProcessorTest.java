@@ -20,7 +20,7 @@ import org.junit.Test;
 
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
 import ru.prolib.aquila.transaq.engine.mp.DefaultMessageProcessor;
-import ru.prolib.aquila.transaq.impl.TQParser;
+import ru.prolib.aquila.transaq.remote.MessageParser;
 
 public class DefaultMessageProcessorTest {
 	private static XMLInputFactory factory;
@@ -39,7 +39,7 @@ public class DefaultMessageProcessorTest {
 	@Before
 	public void setUp() throws Exception {
 		services = new ServiceLocator();
-		services.setParser(TQParser.getInstance());
+		services.setParser(MessageParser.getInstance());
 		dataStub = new LinkedHashMap<>();
 		service = new DefaultMessageProcessor(dataStub, services);
 	}

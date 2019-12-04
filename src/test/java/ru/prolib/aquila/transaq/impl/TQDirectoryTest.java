@@ -35,10 +35,11 @@ import ru.prolib.aquila.transaq.entity.SecurityBoardParams;
 import ru.prolib.aquila.transaq.entity.SecurityBoardParamsFactory;
 import ru.prolib.aquila.transaq.entity.SecurityParams;
 import ru.prolib.aquila.transaq.entity.SecurityParamsFactory;
-import ru.prolib.aquila.transaq.impl.TQField.FBoard;
-import ru.prolib.aquila.transaq.impl.TQField.FSecurity;
-import ru.prolib.aquila.transaq.impl.TQField.FSecurityBoard;
 import ru.prolib.aquila.transaq.remote.TQSecIDT;
+import ru.prolib.aquila.transaq.remote.ISecIDG;
+import ru.prolib.aquila.transaq.remote.MessageFields.FBoard;
+import ru.prolib.aquila.transaq.remote.MessageFields.FSecurity;
+import ru.prolib.aquila.transaq.remote.MessageFields.FSecurityBoard;
 import ru.prolib.aquila.transaq.remote.TQSecIDF;
 import ru.prolib.aquila.transaq.remote.TQSecIDG;
 
@@ -60,7 +61,7 @@ public class TQDirectoryTest {
 	private OSCRepository<SymbolGID, SecurityParams> secParamsMock, secParams;
 	private OSCRepository<SymbolTID, SecurityBoardParams> secBoardParamsMock, secBoardParams;
 	private DeltaUpdate duMock;
-	private Map<TQSecIDG, SymbolGID> gidMap;
+	private Map<ISecIDG, SymbolGID> gidMap;
 	private TQDirectory service;
 
 	@SuppressWarnings("unchecked")

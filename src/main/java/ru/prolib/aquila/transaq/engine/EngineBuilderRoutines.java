@@ -21,10 +21,10 @@ import ru.prolib.aquila.transaq.engine.sds.SymbolStateFactory;
 import ru.prolib.aquila.transaq.engine.sds.SymbolStateRepository;
 import ru.prolib.aquila.transaq.impl.TQDirectory;
 import ru.prolib.aquila.transaq.impl.TQFieldAssembler;
-import ru.prolib.aquila.transaq.impl.TQParser;
 import ru.prolib.aquila.transaq.impl.TQReactor;
 import ru.prolib.aquila.transaq.impl.TQSecurityHandlerFactory;
 import ru.prolib.aquila.transaq.impl.TQSecurityHandlerRegistry;
+import ru.prolib.aquila.transaq.remote.MessageParser;
 
 public class EngineBuilderRoutines {
 
@@ -52,7 +52,7 @@ public class EngineBuilderRoutines {
 	public void initPrimary(ServiceLocator services) {
 		services.setMessageRouter(standardRouter(services));
 		services.setDirectory(new TQDirectory(services.getEventQueue()));
-		services.setParser(TQParser.getInstance());
+		services.setParser(MessageParser.getInstance());
 		services.setAssembler(new TQFieldAssembler());
 	}
 	

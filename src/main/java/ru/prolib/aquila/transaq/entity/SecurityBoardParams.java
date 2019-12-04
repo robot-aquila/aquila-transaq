@@ -3,8 +3,8 @@ package ru.prolib.aquila.transaq.entity;
 import ru.prolib.aquila.core.BusinessEntities.CDecimal;
 import ru.prolib.aquila.core.BusinessEntities.ObservableStateContainerImpl;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCParams;
-import ru.prolib.aquila.transaq.impl.TQField.FSecurityBoard;
 import ru.prolib.aquila.transaq.remote.TQSecIDT;
+import ru.prolib.aquila.transaq.remote.MessageFields.FSecurityBoard;
 import ru.prolib.aquila.transaq.remote.TQSecIDG;
 
 public class SecurityBoardParams extends ObservableStateContainerImpl {

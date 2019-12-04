@@ -18,8 +18,8 @@ import org.junit.Test;
 
 import ru.prolib.aquila.transaq.engine.mp.MessageProcessor;
 import ru.prolib.aquila.transaq.engine.mp.ProcessorRegistry;
+import ru.prolib.aquila.transaq.remote.MessageParser;
 import ru.prolib.aquila.transaq.engine.mp.MessageRouterImpl;
-import ru.prolib.aquila.transaq.impl.TQParser;
 
 public class MessageRouterImplTest {
 	
@@ -56,7 +56,7 @@ public class MessageRouterImplTest {
 			@Override
 			public void processMessage(XMLStreamReader reader) throws XMLStreamException {
 				assertEquals("foobar", reader.getLocalName());
-				assertEquals("zulu-charlie", new TQParser().readCharacters(reader));
+				assertEquals("zulu-charlie", new MessageParser().readCharacters(reader));
 				finished.countDown();
 			}
 			

@@ -15,7 +15,7 @@ import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.core.BusinessEntities.SecurityField;
 import ru.prolib.aquila.core.BusinessEntities.UpdatableStateContainer;
 import ru.prolib.aquila.core.BusinessEntities.UpdatableStateContainerImpl;
-import ru.prolib.aquila.transaq.impl.TQField.FSecurity;
+import ru.prolib.aquila.transaq.remote.MessageFields.FSecurity;
 
 public class TQFieldAssemblerTest {
 	private TQFieldAssembler service;

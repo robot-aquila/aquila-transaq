@@ -1,0 +1,24 @@
+<alltrades>
+	<trade secid="41712">
+		<tradeno>2418002896</tradeno>
+		<board>FUT</board>
+		<time>04.12.2019 11:12:37.085</time>
+		<price>141300</price>
+		<quantity>1</quantity>
+		<buysell>B</buysell>
+		<openinterest>319668</openinterest>
+		<seccode>RIZ9</seccode>
+		<period/>
+	</trade>
+	<trade secid="41712">
+		<tradeno>2418002897</tradeno>
+		<board>FUT</board>
+		<time>04.12.2019 11:12:38.175</time>
+		<price>141200</price>
+		<quantity>3</quantity>
+		<buysell>S</buysell>
+		<openinterest>319674</openinterest>
+		<seccode>RIZ9</seccode>
+		<period>N</period>
+	</trade>
+</alltrades>

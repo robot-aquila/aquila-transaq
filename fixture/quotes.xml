@@ -1,0 +1,37 @@
+<quotes>
+	<quote secid="41712">
+		<board>FUT</board>
+		<seccode>RIZ9</seccode>
+		<price>141280</price>
+		<yield>0</yield>
+		<buy>24</buy>
+	</quote>
+	<quote secid="41712">
+		<board>FUT</board>
+		<seccode>RIZ9</seccode>
+		<price>141290</price>
+		<yield>0</yield>
+		<buy>10</buy>
+	</quote>
+	<quote secid="41712">
+		<board>FUT</board>
+		<seccode>RIZ9</seccode>
+		<price>141280</price>
+		<yield>0</yield>
+		<buy>25</buy>
+	</quote>
+	<quote secid="41712">
+		<board>FUT</board>
+		<seccode>RIZ9</seccode>
+		<price>141300</price>
+		<yield>0</yield>
+		<sell>10</sell>
+	</quote>
+	<quote secid="41712">
+		<board>FUT</board>
+		<seccode>RIZ9</seccode>
+		<price>141310</price>
+		<yield>0</yield>
+		<sell>28</sell>
+	</quote>
+</quotes>
