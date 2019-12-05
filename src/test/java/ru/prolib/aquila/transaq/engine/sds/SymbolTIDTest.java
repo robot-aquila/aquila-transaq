@@ -69,5 +69,14 @@ public class SymbolTIDTest {
 		assertEquals(4, found.getMarketID());
 		assertEquals("FUT", found.getBoard());
 	}
+	
+	@Test
+	public void testToGID() {
+		SymbolGID expected = new SymbolGID("RTS-12.19", 4);
+		
+		SymbolGID actual = service.toGID();
+		
+		assertEquals(expected, actual);
+	}
 
 }

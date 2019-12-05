@@ -51,5 +51,9 @@ public class SymbolTID extends SymbolGID {
 				.append(o.board,  board)
 				.build();
 	}
+	
+	public SymbolGID toGID() {
+		return new SymbolGID(ticker, marketID);
+	}
 
 }

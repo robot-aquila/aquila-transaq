@@ -141,7 +141,7 @@ public class TQDirectory {
 		return getGIDFromMap(sec_id, lock, true);
 	}
 
-	private ISecIDG toSecID1(ISecIDT sec_id) {
+	private ISecIDG toSecIDG(ISecIDT sec_id) {
 		Board board = null;
 		try {
 			board = boards.getOrThrow(sec_id.getBoardCode());
@@ -156,7 +156,7 @@ public class TQDirectory {
 	}
 	
 	private SymbolTID toSymbolTID(ISecIDT sec_id) {
-		ISecIDG sec_id1 = toSecID1(sec_id);
+		ISecIDG sec_id1 = toSecIDG(sec_id);
 		SymbolGID gid = getGIDFromMap(sec_id1, true);
 		return new SymbolTID(gid.getTicker(), gid.getMarketID(), sec_id.getBoardCode());
 	}
@@ -198,6 +198,14 @@ public class TQDirectory {
 			secParams.unlock();
 		}
 	}
+	
+	public boolean isExistsSecurityParams(SymbolGID gid) {
+		return secParams.contains(gid);
+	}
+	
+	public boolean isExistsSecurityParams(SymbolTID tid) {
+		return isExistsSecurityParams(tid.toGID());
+	}
 
 	public SecurityParams getSecurityParams(ISecIDG sec_id) {
 		secParams.lock();
@@ -208,27 +216,60 @@ public class TQDirectory {
 		}
 	}
 	
+	public SecurityParams getSecurityParams(SymbolGID gid) {
+		return secParams.getOrThrow(gid);
+	}
+	
+	public SecurityParams getSecurityParams(SymbolTID tid) {
+		return getSecurityParams(tid.toGID());
+	}
+	
 	public boolean isExistsSecurityBoardParams(ISecIDT sec_id) {
 		if ( ! boards.contains(sec_id.getBoardCode()) ) {
 			return false;
 		}
-		if ( ! isExistsSecurityParams(toSecID1(sec_id)) ) {
+		if ( ! isExistsSecurityParams(toSecIDG(sec_id)) ) {
 			return false;
 		}
 		return secBoardParams.contains(toSymbolTID(sec_id));
+	}
+	
+	public boolean isExistsSecurityBoardParams(SymbolTID tid) {
+		return secBoardParams.contains(tid);
 	}
 	
 	public SecurityBoardParams getSecurityBoardParams(ISecIDT sec_id) {
 		return secBoardParams.getOrThrow(toSymbolTID(sec_id));
 	}
 	
-	public Symbol toSymbol(ISecIDF sec_id) {
-		SymbolGID gid = toSymbolGID(sec_id);
-		SymbolType type = TYPE_MAP.get(sec_id.getType());
+	public SecurityBoardParams getSecurityBoardParams(SymbolTID tid) {
+		return secBoardParams.getOrThrow(tid);
+	}
+	
+	private SymbolType toSymbolType(SecType sec_type) {
+		SymbolType type = TYPE_MAP.get(sec_type);
 		if ( type == null ) {
 			type =  SymbolType.UNKNOWN;
 		}
-		return new Symbol(gid.getTicker(), sec_id.getDefaultBoard(), CDecimalBD.RUB, type);
+		return type;
+	}
+	
+	public Symbol toSymbol(ISecIDF sec_id) {
+		return new Symbol(
+				toSymbolGID(sec_id).getTicker(),
+				sec_id.getDefaultBoard(),
+				CDecimalBD.RUB,
+				toSymbolType(sec_id.getType())
+			);
+	}
+	
+	public Symbol toSymbol(SymbolTID tid) {
+		return new Symbol(
+				tid.getTicker(),
+				tid.getBoard(),
+				CDecimalBD.RUB,
+				toSymbolType(getSecurityParams(tid.toGID()).getSecType())
+			);
 	}
 
 }
