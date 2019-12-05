@@ -29,16 +29,19 @@ import ru.prolib.aquila.transaq.entity.CKind;
 import ru.prolib.aquila.transaq.entity.Market;
 import ru.prolib.aquila.transaq.entity.SecurityBoardParams;
 import ru.prolib.aquila.transaq.entity.SecurityParams;
+import ru.prolib.aquila.transaq.entity.SecurityQuotations;
 import ru.prolib.aquila.transaq.impl.TQDirectory;
 import ru.prolib.aquila.transaq.remote.MessageFields.FBoard;
 import ru.prolib.aquila.transaq.remote.MessageFields.FCKind;
 import ru.prolib.aquila.transaq.remote.MessageFields.FMarket;
+import ru.prolib.aquila.transaq.remote.MessageFields.FQuotation;
 import ru.prolib.aquila.transaq.remote.MessageFields.FSecurity;
 import ru.prolib.aquila.transaq.remote.MessageFields.FSecurityBoard;
 import ru.prolib.aquila.ui.ITableModel;
 import ru.prolib.aquila.ui.TableModelController;
 import ru.prolib.aquila.ui.form.OSCRepositoryTableModel;
 import ru.prolib.aquila.ui.msg.CommonMsg;
+import ru.prolib.aquila.ui.msg.SecurityMsg;
 
 public class TQServiceMenu implements ActionListener {
 	public static final String ITEM_SHOW_MARKETS = "SHOW_MARKETS";
@@ -46,11 +49,12 @@ public class TQServiceMenu implements ActionListener {
 	public static final String ITEM_SHOW_CKINDS = "SHOW_CKINDS";
 	public static final String ITEM_SHOW_SEC_PARAMS = "SHOW_SEC_PARAMS";
 	public static final String ITEM_SHOW_SEC_BRD_PARAMS = "SHOW_SEC_BRD_PARAMS";
+	public static final String ITEM_SHOW_SEC_QUOTATIONS = "SHOW_SEC_QUOTATIONS";
 	
 	private final IMessages messages;
 	private final JFrame frame;
 	private final TQDirectory directory;
-	private JDialog marketsDialog, boardsDialog, ckindsDialog, secParamsDialog, secBrdParamsDialog;
+	private JDialog marketsDialog, boardsDialog, ckindsDialog, secParamsDialog, secBrdParamsDialog, secQuotationsDialog;
 	
 	public TQServiceMenu(IMessages messages, JFrame frame, TQDirectory directory) {
 		this.messages = messages;
@@ -192,6 +196,97 @@ public class TQServiceMenu implements ActionListener {
 		return new OSCRepositoryTableModel<>(messages, repository, column_id_list, column_id_to_header);
 	}
 	
+	public OSCRepositoryTableModel<SecurityQuotations>
+		createSecurityQuotationsTableModel(OSCRepository<SymbolTID, SecurityQuotations> repository)
+	{
+		List<Integer> column_id_list = new ArrayList<>();
+		column_id_list.add(FQuotation.SECID);
+		column_id_list.add(FQuotation.SECCODE);
+		column_id_list.add(FQuotation.BOARD);
+		column_id_list.add(FQuotation.POINT_COST);
+		column_id_list.add(FQuotation.ACCRUED_INT_VALUE);
+		column_id_list.add(FQuotation.OPEN);
+		column_id_list.add(FQuotation.WA_PRICE);
+		column_id_list.add(FQuotation.BID_DEPTH);
+		column_id_list.add(FQuotation.BID_DEPTH_T);
+		column_id_list.add(FQuotation.NUM_BIDS);
+		column_id_list.add(FQuotation.OFFER_DEPTH);
+		column_id_list.add(FQuotation.OFFER_DEPTH_T);
+		column_id_list.add(FQuotation.BID);
+		column_id_list.add(FQuotation.OFFER);
+		column_id_list.add(FQuotation.NUM_OFFERS);
+		column_id_list.add(FQuotation.NUM_TRADES);
+		column_id_list.add(FQuotation.VOL_TODAY);
+		column_id_list.add(FQuotation.OPEN_POSITIONS);
+		column_id_list.add(FQuotation.DELTA_POSITIONS);
+		column_id_list.add(FQuotation.LAST);
+		column_id_list.add(FQuotation.QUANTITY);
+		column_id_list.add(FQuotation.TIME);
+		column_id_list.add(FQuotation.CHANGE);
+		column_id_list.add(FQuotation.PRICE_MINUS_PREV_WA_PRICE);
+		column_id_list.add(FQuotation.VAL_TODAY);
+		column_id_list.add(FQuotation.YIELD);
+		column_id_list.add(FQuotation.YIELD_AT_WA_PRICE);
+		column_id_list.add(FQuotation.MARKET_PRICE_TODAY);
+		column_id_list.add(FQuotation.HIGH_BID);
+		column_id_list.add(FQuotation.LOW_OFFER);
+		column_id_list.add(FQuotation.HIGH);
+		column_id_list.add(FQuotation.LOW);
+		column_id_list.add(FQuotation.CLOSE_PRICE);
+		column_id_list.add(FQuotation.CLOSE_YIELD);
+		column_id_list.add(FQuotation.STATUS);
+		column_id_list.add(FQuotation.TRADING_STATUS);
+		column_id_list.add(FQuotation.BUY_DEPOSIT);
+		column_id_list.add(FQuotation.SELL_DEPOSIT);
+		column_id_list.add(FQuotation.VOLATILITY);
+		column_id_list.add(FQuotation.THEORETICAL_PRICE);
+		column_id_list.add(FQuotation.BGO_BUY);
+		column_id_list.add(FQuotation.L_CURRENT_PRICE);
+		Map<Integer, MsgID> column_id_to_header = new HashMap<>();
+		column_id_to_header.put(FQuotation.SECID, TQMessages.SEC_ID);
+		column_id_to_header.put(FQuotation.SECCODE, TQMessages.SEC_CODE);
+		column_id_to_header.put(FQuotation.BOARD, TQMessages.BOARD);
+		column_id_to_header.put(FQuotation.POINT_COST, TQMessages.POINT_COST);
+		column_id_to_header.put(FQuotation.ACCRUED_INT_VALUE, TQMessages.ACCRUED_INT);
+		column_id_to_header.put(FQuotation.OPEN, SecurityMsg.OPEN_PRICE);
+		column_id_to_header.put(FQuotation.WA_PRICE, TQMessages.WA_PRICE);
+		column_id_to_header.put(FQuotation.BID_DEPTH_T, TQMessages.BID_DEPTH_T);
+		column_id_to_header.put(FQuotation.NUM_BIDS, TQMessages.NUM_BIDS);
+		column_id_to_header.put(FQuotation.OFFER_DEPTH, SecurityMsg.ASK_SIZE);
+		column_id_to_header.put(FQuotation.OFFER_DEPTH_T, TQMessages.OFFER_DEPTH_T);
+		column_id_to_header.put(FQuotation.BID, SecurityMsg.BID_PRICE);
+		column_id_to_header.put(FQuotation.OFFER, SecurityMsg.ASK_PRICE);
+		column_id_to_header.put(FQuotation.NUM_OFFERS, TQMessages.NUM_OFFERS);
+		column_id_to_header.put(FQuotation.NUM_TRADES, TQMessages.NUM_TRADES);
+		column_id_to_header.put(FQuotation.VOL_TODAY, TQMessages.VOL_TODAY);
+		column_id_to_header.put(FQuotation.OPEN_POSITIONS, TQMessages.OPEN_POSITIONS);
+		column_id_to_header.put(FQuotation.DELTA_POSITIONS, TQMessages.DELTA_POSITIONS);
+		column_id_to_header.put(FQuotation.LAST, SecurityMsg.LAST_PRICE);
+		column_id_to_header.put(FQuotation.QUANTITY, SecurityMsg.LAST_SIZE);
+		column_id_to_header.put(FQuotation.TIME, CommonMsg.TIME);
+		column_id_to_header.put(FQuotation.CHANGE, TQMessages.CHANGE);
+		column_id_to_header.put(FQuotation.PRICE_MINUS_PREV_WA_PRICE, TQMessages.PRICE_MINUS_PREV_WA_PRICE);
+		column_id_to_header.put(FQuotation.VAL_TODAY, TQMessages.VAL_TODAY);
+		column_id_to_header.put(FQuotation.YIELD, TQMessages.YIELD);
+		column_id_to_header.put(FQuotation.YIELD_AT_WA_PRICE, TQMessages.YIELD_AT_WA_PRICE);
+		column_id_to_header.put(FQuotation.MARKET_PRICE_TODAY, TQMessages.MARKET_PRICE_TODAY);
+		column_id_to_header.put(FQuotation.HIGH_BID, TQMessages.HIGH_BID);
+		column_id_to_header.put(FQuotation.LOW_OFFER, TQMessages.LOW_OFFER);
+		column_id_to_header.put(FQuotation.HIGH, SecurityMsg.HIGH_PRICE);
+		column_id_to_header.put(FQuotation.LOW, SecurityMsg.LOW_PRICE);
+		column_id_to_header.put(FQuotation.CLOSE_PRICE, TQMessages.CLOSE_PRICE);
+		column_id_to_header.put(FQuotation.CLOSE_YIELD, TQMessages.CLOSE_YIELD);
+		column_id_to_header.put(FQuotation.STATUS, CommonMsg.STATUS);
+		column_id_to_header.put(FQuotation.TRADING_STATUS, TQMessages.TRADING_STATUS);
+		column_id_to_header.put(FQuotation.BUY_DEPOSIT, TQMessages.BUY_DEPOSIT);
+		column_id_to_header.put(FQuotation.SELL_DEPOSIT, TQMessages.SELL_DEPOSIT);
+		column_id_to_header.put(FQuotation.VOLATILITY, TQMessages.VOLATILITY);
+		column_id_to_header.put(FQuotation.THEORETICAL_PRICE, TQMessages.THEORETICAL_PRICE);
+		column_id_to_header.put(FQuotation.BGO_BUY, TQMessages.BGO_BUY);
+		column_id_to_header.put(FQuotation.L_CURRENT_PRICE, CommonMsg.CURR_PR);
+		return new OSCRepositoryTableModel<>(messages, repository, column_id_list, column_id_to_header);
+	}
+	
 	private JTable createTable(ITableModel table_model) {
 		JTable table = new JTable(table_model);
 		table.setShowGrid(true);
@@ -217,6 +312,10 @@ public class TQServiceMenu implements ActionListener {
 	
 	public JTable createSecBrdParamsTable(OSCRepository<SymbolTID, SecurityBoardParams> repository) {
 		return createTable(createSecurityBoardParamsTableModel(repository));
+	}
+	
+	public JTable createSecQuotationsTable(OSCRepository<SymbolTID, SecurityQuotations> repository) {
+		return createTable(createSecurityQuotationsTableModel(repository));
 	}
 	
 	private JDialog createTableDialog(JTable table, MsgID title_msg_id, Dimension initial_size) {
@@ -264,6 +363,14 @@ public class TQServiceMenu implements ActionListener {
 			);
 	}
 	
+	public JDialog createSecQuotationsDialog(OSCRepository<SymbolTID, SecurityQuotations> repository) {
+		return createTableDialog(
+				createSecQuotationsTable(repository),
+				TQMessages.DIALOG_TITLE_SEC_QUOTATIONS,
+				new Dimension(1000, 400)
+			);
+	}
+	
 	public JMenu create() {
 		JMenuItem item;
 		JMenu menu = new JMenu(messages.get(TQMessages.SERVICE_MENU));
@@ -286,6 +393,10 @@ public class TQServiceMenu implements ActionListener {
 		
 		menu.add(item = new JMenuItem(messages.get(TQMessages.SHOW_SEC_BRD_PARAMS)));
 		item.setActionCommand(ITEM_SHOW_SEC_BRD_PARAMS);
+		item.addActionListener(this);
+		
+		menu.add(item = new JMenuItem(messages.get(TQMessages.SHOW_SEC_QUOTATIONS)));
+		item.setActionCommand(ITEM_SHOW_SEC_QUOTATIONS);
 		item.addActionListener(this);
 		
 		return menu;
@@ -324,6 +435,11 @@ public class TQServiceMenu implements ActionListener {
 			}
 			secBrdParamsDialog.setVisible(true);
 			break;
+		case ITEM_SHOW_SEC_QUOTATIONS:
+			if ( secQuotationsDialog == null ) {
+				secQuotationsDialog = createSecQuotationsDialog(directory.getSecurityQuotationsRepository());
+			}
+			secQuotationsDialog.setVisible(true);
 		}
 	}
 	

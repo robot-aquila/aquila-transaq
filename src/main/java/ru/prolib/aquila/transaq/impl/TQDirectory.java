@@ -24,6 +24,8 @@ import ru.prolib.aquila.transaq.entity.SecurityBoardParams;
 import ru.prolib.aquila.transaq.entity.SecurityBoardParamsFactory;
 import ru.prolib.aquila.transaq.entity.SecurityParams;
 import ru.prolib.aquila.transaq.entity.SecurityParamsFactory;
+import ru.prolib.aquila.transaq.entity.SecurityQuotations;
+import ru.prolib.aquila.transaq.entity.SecurityQuotationsFactory;
 import ru.prolib.aquila.transaq.remote.ISecIDF;
 import ru.prolib.aquila.transaq.remote.ISecIDG;
 import ru.prolib.aquila.transaq.remote.ISecIDT;
@@ -50,6 +52,7 @@ public class TQDirectory {
 	private final OSCRepository<String, Board> boards;
 	private final OSCRepository<SymbolGID, SecurityParams> secParams;
 	private final OSCRepository<SymbolTID, SecurityBoardParams> secBoardParams;
+	private final OSCRepository<SymbolTID, SecurityQuotations> secQuots;
 	private final Map<ISecIDG, SymbolGID> gidMap;
 	
 	TQDirectory(
@@ -58,6 +61,7 @@ public class TQDirectory {
 			OSCRepository<String, Board> boards,
 			OSCRepository<SymbolGID, SecurityParams> secParams,
 			OSCRepository<SymbolTID, SecurityBoardParams> secBoardParams,
+			OSCRepository<SymbolTID, SecurityQuotations> secQuotations,
 			Map<ISecIDG, SymbolGID> gid_map)
 	{
 		this.ckinds = ckinds;
@@ -65,6 +69,7 @@ public class TQDirectory {
 		this.boards = boards;
 		this.secParams = secParams;
 		this.secBoardParams = secBoardParams;
+		this.secQuots = secQuotations;
 		this.gidMap = gid_map;
 	}
 	
@@ -74,6 +79,7 @@ public class TQDirectory {
 			 new OSCRepositoryImpl<>(new BoardFactory(queue), "BOARDS"),
 			 new OSCRepositoryImpl<>(new SecurityParamsFactory(queue), "SEC_PARAMS"),
 			 new OSCRepositoryImpl<>(new SecurityBoardParamsFactory(queue), "SEC_BRD_PARAMS"),
+			 new OSCRepositoryImpl<>(new SecurityQuotationsFactory(queue), "SEC_QUOTATIONS"),
 			 new Hashtable<>()
 		);
 	}
@@ -96,6 +102,10 @@ public class TQDirectory {
 	
 	public OSCRepository<SymbolTID, SecurityBoardParams> getSecurityBoardParamsRepository() {
 		return new OSCRepositoryDecoratorRO<>(secBoardParams);
+	}
+	
+	public OSCRepository<SymbolTID, SecurityQuotations> getSecurityQuotationsRepository() {
+		return new OSCRepositoryDecoratorRO<>(secQuots);
 	}
 	
 	public void updateCKind(TQStateUpdate<Integer> ckind_update) {
@@ -185,6 +195,10 @@ public class TQDirectory {
 	public void updateSecurityBoardParams(TQStateUpdate<ISecIDT> sbp_update) {
 		secBoardParams.getOrCreate(toSymbolTID(sbp_update.getID())).consume(sbp_update.getUpdate());
 	}
+	
+	public void updateSecurityQuotations(TQStateUpdate<ISecIDT> update) {
+		secQuots.getOrCreate(toSymbolTID(update.getID())).consume(update.getUpdate());
+	}
 
 	public String getMarketName(int market_id) {
 		return markets.getOrThrow(market_id).getName();
@@ -244,6 +258,14 @@ public class TQDirectory {
 	
 	public SecurityBoardParams getSecurityBoardParams(SymbolTID tid) {
 		return secBoardParams.getOrThrow(tid);
+	}
+	
+	public boolean isExistsSecurityQuotations(SymbolTID tid) {
+		return secQuots.contains(tid);
+	}
+	
+	public SecurityQuotations getSecurityQuotations(SymbolTID tid) {
+		return secQuots.getOrThrow(tid);
 	}
 	
 	private SymbolType toSymbolType(SecType sec_type) {

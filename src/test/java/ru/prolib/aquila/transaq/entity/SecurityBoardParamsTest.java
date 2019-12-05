@@ -79,12 +79,12 @@ public class SecurityBoardParamsTest {
 		assertEquals("PRTK", service.getSecCode());
 		assertEquals("TQBR", service.getBoardCode());
 		assertEquals(1, service.getMarketID());
-		assertEquals(2, service.getDecimals());
+		assertEquals(Integer.valueOf(2), service.getDecimals());
 		assertEquals(of("0.1"), service.getMinStep());
 		assertEquals(of("10"), service.getLotSize());
 		assertEquals(of("12.34"), service.getPointCost());
-		assertEquals(new TQSecIDG("PRTK", 1), service.toSecID1());
-		assertEquals(new TQSecIDT("PRTK", "TQBR"), service.toSecID2());
+		assertEquals(new TQSecIDG("PRTK", 1), service.toSecIDG());
+		assertEquals(new TQSecIDT("PRTK", "TQBR"), service.toSecIDT());
 	}
 
 }

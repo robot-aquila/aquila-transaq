@@ -25,7 +25,7 @@ public class SecurityBoardParams extends ObservableStateContainerImpl {
 		return this.getInteger(FSecurityBoard.MARKET);
 	}
 	
-	public int getDecimals() {
+	public Integer getDecimals() {
 		return this.getInteger(FSecurityBoard.DECIMALS);
 	}
 	
@@ -41,11 +41,11 @@ public class SecurityBoardParams extends ObservableStateContainerImpl {
 		return this.getCDecimal(FSecurityBoard.POINT_COST);
 	}
 	
-	public TQSecIDG toSecID1() {
+	public TQSecIDG toSecIDG() {
 		return new TQSecIDG(getSecCode(), getMarketID());
 	}
 	
-	public TQSecIDT toSecID2() {
+	public TQSecIDT toSecIDT() {
 		return new TQSecIDT(getSecCode(), getBoardCode());
 	}
 

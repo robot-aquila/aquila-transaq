@@ -88,14 +88,14 @@ public class SecurityParamsTest {
 		assertEquals("F", service.getSecClass());
 		assertEquals("FUT", service.getDefaultBoard());
 		assertEquals("RTS-6.19", service.getShortName());
-		assertEquals(0, service.getDecimals());
+		assertEquals(Integer.valueOf(0), service.getDecimals());
 		assertEquals(of(10L), service.getMinStep());
 		assertEquals(of(1L), service.getLotSize());
 		assertEquals(of("7625.71"), service.getPointCost());
-		assertEquals(0x02 | 0x10, service.getOpMask());
+		assertEquals(Integer.valueOf(0x02 | 0x10), service.getOpMask());
 		assertEquals(SecType.FUT, service.getSecType());
 		assertEquals("Russian Standard Time", service.getSecTZ());
-		assertEquals(1, service.getQuotesType());
+		assertEquals(Integer.valueOf(1), service.getQuotesType());
 		assertEquals("FOOBAR", service.getSecName());
 		assertEquals("pcs.", service.getPName());
 		assertEquals(LocalDateTime.of(2019, 6, 1, 6, 26, 15), service.getMatDate());
@@ -109,11 +109,11 @@ public class SecurityParamsTest {
 		assertEquals(of("0.02"), service.getAccruedInt());
 		assertEquals(of("192.77"), service.getCouponValue());
 		assertEquals(LocalDateTime.of(2019, 12, 31, 0, 0, 0), service.getCouponDate());
-		assertEquals(12, service.getCouponPeriod());
+		assertEquals(Integer.valueOf(12), service.getCouponPeriod());
 		assertEquals(of("1000.00"), service.getFaceValue());
 		assertEquals("P", service.getPutCall());
 		assertEquals("M", service.getOptType());
-		assertEquals(1, service.getLotVolume());
+		assertEquals(Integer.valueOf(1), service.getLotVolume());
 		assertEquals(of("4605.53"), service.getBGO_BUY());
 	}
 

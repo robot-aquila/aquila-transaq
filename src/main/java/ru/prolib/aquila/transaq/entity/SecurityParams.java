@@ -21,7 +21,7 @@ public class SecurityParams extends ObservableStateContainerImpl {
 		return this.getInteger(FSecurity.MARKETID);
 	}
 	
-	public boolean isActive() {
+	public Boolean isActive() {
 		return this.getBoolean(FSecurity.ACTIVE);
 	}
 	
@@ -37,7 +37,7 @@ public class SecurityParams extends ObservableStateContainerImpl {
 		return this.getString(FSecurity.SHORT_NAME);
 	}
 	
-	public int getDecimals() {
+	public Integer getDecimals() {
 		return this.getInteger(FSecurity.DECIMALS);
 	}
 	
@@ -53,7 +53,7 @@ public class SecurityParams extends ObservableStateContainerImpl {
 		return this.getCDecimal(FSecurity.POINT_COST);
 	}
 	
-	public int getOpMask() {
+	public Integer getOpMask() {
 		return this.getInteger(FSecurity.OPMASK);
 	}
 	
@@ -65,7 +65,7 @@ public class SecurityParams extends ObservableStateContainerImpl {
 		return this.getString(FSecurity.SECTZ);
 	}
 	
-	public int getQuotesType() {
+	public Integer getQuotesType() {
 		return this.getInteger(FSecurity.QUOTESTYPE);
 	}
 	
@@ -121,7 +121,7 @@ public class SecurityParams extends ObservableStateContainerImpl {
 		return (LocalDateTime) this.getObject(FSecurity.COUPON_DATE);
 	}
 	
-	public int getCouponPeriod() {
+	public Integer getCouponPeriod() {
 		return this.getInteger(FSecurity.COUPON_PERIOD);
 	}
 	
@@ -137,7 +137,7 @@ public class SecurityParams extends ObservableStateContainerImpl {
 		return this.getString(FSecurity.OPT_TYPE);
 	}
 	
-	public int getLotVolume() {
+	public Integer getLotVolume() {
 		return this.getInteger(FSecurity.LOT_VOLUME);
 	}
 	
