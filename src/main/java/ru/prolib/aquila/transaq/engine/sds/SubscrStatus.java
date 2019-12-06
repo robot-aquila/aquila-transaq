@@ -1,6 +1,6 @@
 package ru.prolib.aquila.transaq.engine.sds;
 
-public enum FeedSubscrStatus {
+public enum SubscrStatus {
 	
 	/**
 	 * Not subscribed to data feed.
@@ -20,6 +20,11 @@ public enum FeedSubscrStatus {
 	/**
 	 * Unsubscription request received.
 	 */
-	PENDING_UNSUBSCR
+	PENDING_UNSUBSCR,
+	
+	/**
+	 * Unable to subscribe because feed is not available.
+	 */
+	NOT_AVAILABLE
 	
 }

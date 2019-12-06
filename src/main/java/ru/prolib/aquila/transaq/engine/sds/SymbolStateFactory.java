@@ -16,7 +16,7 @@ public class SymbolStateFactory {
 		this.services = services;
 	}
 	
-	public SymbolStateHandler produce(Symbol symbol) {
+	public StateOfDataFeeds produce(Symbol symbol) {
 		/*
 		TQSecIDT sec_id2 = services.getAssembler().toSecID2(symbol);
 		SymbolStateHandler symbol_state = new SymbolStateHandler(symbol, sec_id2);

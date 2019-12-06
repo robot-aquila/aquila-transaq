@@ -46,7 +46,6 @@ public class TQDirectory {
 		TYPE_MAP.put(SecType.SHARE, SymbolType.STOCK);
 	}
 
-
 	private final OSCRepository<Integer, CKind> ckinds;
 	private final OSCRepository<Integer, Market> markets;
 	private final OSCRepository<String, Board> boards;

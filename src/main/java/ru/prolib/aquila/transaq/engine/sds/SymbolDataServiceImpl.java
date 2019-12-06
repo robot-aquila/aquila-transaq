@@ -60,7 +60,7 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 	 * @return true if at least one feed has pending subscription or pending
 	 * unsubscription state.
 	 */
-	private boolean syncSubscrState(SymbolStateHandler state, SymbolSubscrCounter subscr) {
+	private boolean syncSubscrState(StateOfDataFeeds state, SymbolSubscrCounter subscr) {
 		int x = 0;
 		Iterator<Map.Entry<Integer, FeedID>> it = token_to_feed.entrySet().iterator();
 		while ( it.hasNext() ) {
@@ -78,8 +78,8 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 		return x > 0;
 	}
 	
-	private SymbolStateHandler getStateBySymbol(Symbol symbol) {
-		SymbolStateHandler state = stateRepository.getBySymbol(symbol);
+	private StateOfDataFeeds getStateBySymbol(Symbol symbol) {
+		StateOfDataFeeds state = stateRepository.getBySymbol(symbol);
 		if ( state == null ) {
 			state = stateFactory.produce(symbol);
 			stateRepository.register(state);
@@ -100,9 +100,9 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 		cache.put(FeedID.SYMBOL_QUOTATIONS, Pair.of(new HashSet<>(), new HashSet<>()));
 		cache.put(FeedID.SYMBOL_ALLTRADES, Pair.of(new HashSet<>(), new HashSet<>()));
 		cache.put(FeedID.SYMBOL_QUOTES, Pair.of(new HashSet<>(), new HashSet<>()));
-		for ( SymbolStateHandler state : stateRepository.getAll() ) {
+		for ( StateOfDataFeeds state : stateRepository.getAll() ) {
 			for ( FeedID feed_id : cache.keySet() ) {
-				switch ( state.getFeedState(feed_id) ) {
+				switch ( state.getFeedStatus(feed_id) ) {
 				case PENDING_SUBSCR:
 					cache.get(feed_id).getLeft().add(state.getSecIDT());
 					break;
@@ -110,7 +110,7 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 					cache.get(feed_id).getRight().add(state.getSecIDT());
 					break;
 				default:
-					break;	
+					break;
 				}
 			}
 		}
@@ -124,7 +124,7 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 			);
 		for ( FeedID feed_id : cache.keySet() ) {
 			for ( ISecIDT sec_id : cache.get(feed_id).getLeft() ) {
-				stateRepository.getBySecIDT(sec_id).setFeedState(feed_id, FeedSubscrStatus.SUBSCR);
+				stateRepository.getBySecIDT(sec_id).setFeedStatus(feed_id, SubscrStatus.SUBSCR);
 			}
 		}
 		
@@ -137,7 +137,7 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 			);
 		for ( FeedID feed_id : cache.keySet() ) {
 			for ( ISecIDT sec_id : cache.get(feed_id).getRight() ) {
-				stateRepository.getBySecIDT(sec_id).setFeedState(feed_id, FeedSubscrStatus.NOT_SUBSCR);
+				stateRepository.getBySecIDT(sec_id).setFeedStatus(feed_id, SubscrStatus.NOT_SUBSCR);
 			}
 		}
 	}
@@ -146,7 +146,7 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 		try {
 			applyPendingChanges();
 		} catch ( TransaqException e ) {
-			// TODO: Have to be done more.
+			// TODO: Have to do more.
 			logger.error("Error applying pending changes: ", e);
 		}
 	}
@@ -158,8 +158,8 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 			return;
 		}
 
-		SymbolStateHandler state = getStateBySymbol(symbol);
-		if ( state.isMarkedAsNotFound() ) {
+		StateOfDataFeeds state = getStateBySymbol(symbol);
+		if ( state.isNotFound() ) {
 			return;
 		}
 		
@@ -175,8 +175,8 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 			return;
 		}
 		
-		SymbolStateHandler state = getStateBySymbol(symbol);
-		if ( state.isMarkedAsNotFound() ) {
+		StateOfDataFeeds state = getStateBySymbol(symbol);
+		if ( state.isNotFound() ) {
 			return;
 		}
 		

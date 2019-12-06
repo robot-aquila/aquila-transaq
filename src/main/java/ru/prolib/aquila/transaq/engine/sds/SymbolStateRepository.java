@@ -9,12 +9,12 @@ import ru.prolib.aquila.transaq.remote.ISecIDT;
 import ru.prolib.aquila.transaq.remote.TQSecIDT;
 
 public class SymbolStateRepository {
-	private final Map<Symbol, SymbolStateHandler> stateBySymbol;
-	private final Map<TQSecIDT, SymbolStateHandler> stateBySecID;
+	private final Map<Symbol, StateOfDataFeeds> stateBySymbol;
+	private final Map<TQSecIDT, StateOfDataFeeds> stateBySecID;
 	
 	public SymbolStateRepository(
-			Map<Symbol, SymbolStateHandler> stateBySymbol,
-			Map<TQSecIDT, SymbolStateHandler> stateBySecID)
+			Map<Symbol, StateOfDataFeeds> stateBySymbol,
+			Map<TQSecIDT, StateOfDataFeeds> stateBySecID)
 	{
 		this.stateBySymbol = stateBySymbol;
 		this.stateBySecID = stateBySecID;
@@ -24,19 +24,19 @@ public class SymbolStateRepository {
 		this(new HashMap<>(), new HashMap<>());
 	}
 	
-	public SymbolStateHandler getBySymbol(Symbol symbol) {
+	public StateOfDataFeeds getBySymbol(Symbol symbol) {
 		return null;
 	}
 	
-	public SymbolStateHandler getBySecIDT(ISecIDT sec_id) {
+	public StateOfDataFeeds getBySecIDT(ISecIDT sec_id) {
 		return null;
 	}
 	
-	public void register(SymbolStateHandler symbol_state) {
+	public void register(StateOfDataFeeds symbol_state) {
 		
 	}
 	
-	public Collection<SymbolStateHandler> getAll() {
+	public Collection<StateOfDataFeeds> getAll() {
 		return null;
 	}
 
