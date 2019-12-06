@@ -106,7 +106,7 @@ public class EngineCmdProcessorTest {
 	
 	@Test
 	public void testSubscrSymbol() throws Exception {
-		sdsMock.subscribe(symbol, MDLevel.L1_BBO);
+		sdsMock.onSubscribe(symbol, MDLevel.L1_BBO);
 		control.replay();
 		
 		queue.put(cmd = new CmdSubscrSymbol(symbol, MDLevel.L1_BBO));
@@ -117,7 +117,7 @@ public class EngineCmdProcessorTest {
 
 	@Test
 	public void testUnsubscrSymbol() throws Exception {
-		sdsMock.unsubscribe(symbol, MDLevel.L1);
+		sdsMock.onUnsubscribe(symbol, MDLevel.L1);
 		control.replay();
 		
 		queue.put(cmd = new CmdUnsubscrSymbol(symbol, MDLevel.L1));

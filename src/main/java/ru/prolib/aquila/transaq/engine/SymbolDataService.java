@@ -4,6 +4,7 @@ import ru.prolib.aquila.core.BusinessEntities.MDLevel;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 
 public interface SymbolDataService {
-	void subscribe(Symbol symbol, MDLevel level);
-	void unsubscribe(Symbol symbol, MDLevel level);
+	void onSubscribe(Symbol symbol, MDLevel level);
+	void onUnsubscribe(Symbol symbol, MDLevel level);
+	void onConnectionStatusChange(boolean connected);
 }

@@ -58,13 +58,13 @@ public class EngineCmdProcessor implements Runnable {
 				case SUBSCR_SYMBOL:
 				{
 					CmdSubscrSymbol _cmd = (CmdSubscrSymbol) cmd;
-					services.getSymbolDataService().subscribe(_cmd.getSymbol(), _cmd.getLevel());
+					services.getSymbolDataService().onSubscribe(_cmd.getSymbol(), _cmd.getLevel());
 					break;
 				}
 				case UNSUBSCR_SYMBOL:
 				{
 					CmdUnsubscrSymbol _cmd = (CmdUnsubscrSymbol) cmd;
-					services.getSymbolDataService().unsubscribe(_cmd.getSymbol(), _cmd.getLevel());
+					services.getSymbolDataService().onUnsubscribe(_cmd.getSymbol(), _cmd.getLevel());
 					break;
 				}
 				default:

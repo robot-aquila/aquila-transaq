@@ -1,6 +1,7 @@
 package ru.prolib.aquila.transaq.engine.sds;
 
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -17,6 +18,7 @@ import ru.prolib.aquila.core.BusinessEntities.SymbolSubscrCounter.Field;
 import ru.prolib.aquila.core.BusinessEntities.SymbolSubscrRepository;
 import ru.prolib.aquila.transaq.engine.SymbolDataService;
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
+import ru.prolib.aquila.transaq.impl.TQDirectory;
 import ru.prolib.aquila.transaq.impl.TransaqException;
 import ru.prolib.aquila.transaq.remote.ISecIDT;
 
@@ -34,21 +36,30 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 	}
 	
 	private final ServiceLocator services;
-	private final SymbolStateFactory stateFactory;
-	private final SymbolStateRepository stateRepository;
+	private final StateOfDataFeedsFactory feedStateFactory;
+	private final Map<ISecIDT, StateOfDataFeeds> feedStateMap;
 	private final SymbolSubscrRepository subscrCounters;
+	
 	private boolean connected = false;
 	
 	public SymbolDataServiceImpl(
 			ServiceLocator services,
-			SymbolStateFactory factory,
-			SymbolStateRepository repository,
+			StateOfDataFeedsFactory sodf_factory,
+			SymbolSubscrRepository subscrCounters,
+			Map<ISecIDT, StateOfDataFeeds> feed_state_map)
+	{
+		this.services = services;
+		this.feedStateFactory = sodf_factory;
+		this.subscrCounters = subscrCounters;
+		this.feedStateMap = feed_state_map;
+	}
+	
+	public SymbolDataServiceImpl(
+			ServiceLocator services,
+			StateOfDataFeedsFactory sodf_factory,
 			SymbolSubscrRepository subscrCounters)
 	{
-		this.stateFactory = factory;
-		this.services = services;
-		this.stateRepository = repository;
-		this.subscrCounters = subscrCounters;
+		this(services, sodf_factory, subscrCounters, new Hashtable<>());
 	}
 	
 	/**
@@ -78,13 +89,43 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 		return x > 0;
 	}
 	
-	private StateOfDataFeeds getStateBySymbol(Symbol symbol) {
-		StateOfDataFeeds state = stateRepository.getBySymbol(symbol);
+	private boolean syncSubscrStates() {
+		boolean x = false;
+		TQDirectory dir = services.getDirectory();
+		for ( SymbolSubscrCounter subscr : subscrCounters.getEntities() ) {
+			Symbol symbol = subscr.getSymbol();
+			ISecIDT idt = dir.toSecIDT(symbol, true);
+			if ( idt != null ) {
+				if ( syncSubscrState(getStateOfDataFeeds(idt), subscr) ) {
+					x = true;
+				}
+			}
+		}
+		return x;
+	}
+	
+	private StateOfDataFeeds getStateOfDataFeeds(ISecIDT idt) {
+		StateOfDataFeeds state = feedStateMap.get(idt);
 		if ( state == null ) {
-			state = stateFactory.produce(symbol);
-			stateRepository.register(state);
+			state = feedStateFactory.produce(idt);
+			feedStateMap.put(idt, state);
 		}
 		return state;
+	}
+	
+	/**
+	 * Get state of data feeds for the symbol.
+	 * <p>
+	 * @param symbol - local symbol
+	 * @return state of data feeds or null if appropriate TRANSAQ/MOEX identifier currently mapped with another symbol.
+	 * This is all about problem with MOEX repeating security codes like for futures. For example, RTS-12.9 and
+	 * RTS-12.19 are of same security codes RIZ9. If current symbol under RIZ9@FUT is RTS-12.19 then calling this method
+	 * with symbol of RTS-12.9@FUT will give null. Because that symbol is not actual and current feeds under RIZ9
+	 * belong to RTS-12.19.
+	 */
+	private StateOfDataFeeds getStateOfDataFeeds(Symbol symbol) {
+		ISecIDT idt = services.getDirectory().toSecIDT(symbol, true);
+		return idt == null ? null : getStateOfDataFeeds(idt);
 	}
 	
 	private void applyPendingChanges() throws TransaqException {
@@ -100,7 +141,7 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 		cache.put(FeedID.SYMBOL_QUOTATIONS, Pair.of(new HashSet<>(), new HashSet<>()));
 		cache.put(FeedID.SYMBOL_ALLTRADES, Pair.of(new HashSet<>(), new HashSet<>()));
 		cache.put(FeedID.SYMBOL_QUOTES, Pair.of(new HashSet<>(), new HashSet<>()));
-		for ( StateOfDataFeeds state : stateRepository.getAll() ) {
+		for ( StateOfDataFeeds state : feedStateMap.values() ) {
 			for ( FeedID feed_id : cache.keySet() ) {
 				switch ( state.getFeedStatus(feed_id) ) {
 				case PENDING_SUBSCR:
@@ -124,7 +165,7 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 			);
 		for ( FeedID feed_id : cache.keySet() ) {
 			for ( ISecIDT sec_id : cache.get(feed_id).getLeft() ) {
-				stateRepository.getBySecIDT(sec_id).setFeedStatus(feed_id, SubscrStatus.SUBSCR);
+				feedStateMap.get(sec_id).setFeedStatus(feed_id, SubscrStatus.SUBSCR);
 			}
 		}
 		
@@ -137,7 +178,7 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 			);
 		for ( FeedID feed_id : cache.keySet() ) {
 			for ( ISecIDT sec_id : cache.get(feed_id).getRight() ) {
-				stateRepository.getBySecIDT(sec_id).setFeedStatus(feed_id, SubscrStatus.NOT_SUBSCR);
+				feedStateMap.get(sec_id).setFeedStatus(feed_id, SubscrStatus.NOT_SUBSCR);
 			}
 		}
 	}
@@ -152,14 +193,14 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 	}
 
 	@Override
-	public void subscribe(Symbol symbol, MDLevel level) {
+	public void onSubscribe(Symbol symbol, MDLevel level) {
 		SymbolSubscrCounter subscr = subscrCounters.subscribe(symbol, level);
 		if ( ! connected ) {
 			return;
 		}
 
-		StateOfDataFeeds state = getStateBySymbol(symbol);
-		if ( state.isNotFound() ) {
+		StateOfDataFeeds state = getStateOfDataFeeds(symbol);
+		if ( state == null || state.isNotFound() ) {
 			return;
 		}
 		
@@ -169,19 +210,40 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 	}
 
 	@Override
-	public void unsubscribe(Symbol symbol, MDLevel level) {
+	public void onUnsubscribe(Symbol symbol, MDLevel level) {
 		SymbolSubscrCounter subscr = subscrCounters.unsubscribe(symbol, level);
 		if ( ! connected ) {
 			return;
 		}
 		
-		StateOfDataFeeds state = getStateBySymbol(symbol);
-		if ( state.isNotFound() ) {
+		StateOfDataFeeds state = getStateOfDataFeeds(symbol);
+		if ( state == null || state.isNotFound() ) {
 			return;
 		}
 		
 		if ( syncSubscrState(state, subscr) ) {
 			_applyPendingChanges();
+		}
+	}
+
+	@Override
+	public void onConnectionStatusChange(boolean connected) {
+		if ( this.connected = connected ) {
+			// Connection established: it need to synchronize
+			// subscription counters with state of data feeds
+			// for each existing counter. Then apply pending
+			// changes.
+			if ( syncSubscrStates() ) {
+				_applyPendingChanges();
+			}
+			
+		} else {
+			// Connection lost: for each TRANSAQ/MOEX security ID
+			// mark the state of data feeds as disconnected
+			for ( StateOfDataFeeds state : feedStateMap.values() ) {
+				state.markAllNotSubscribed();
+			}
+
 		}
 	}
 

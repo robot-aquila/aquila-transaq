@@ -30,6 +30,7 @@ import ru.prolib.aquila.transaq.remote.ISecIDF;
 import ru.prolib.aquila.transaq.remote.ISecIDG;
 import ru.prolib.aquila.transaq.remote.ISecIDT;
 import ru.prolib.aquila.transaq.remote.TQSecIDG;
+import ru.prolib.aquila.transaq.remote.TQSecIDT;
 
 public class TQDirectory {
 	private static final Map<SecType, SymbolType> TYPE_MAP;
@@ -52,7 +53,25 @@ public class TQDirectory {
 	private final OSCRepository<SymbolGID, SecurityParams> secParams;
 	private final OSCRepository<SymbolTID, SecurityBoardParams> secBoardParams;
 	private final OSCRepository<SymbolTID, SecurityQuotations> secQuots;
-	private final Map<ISecIDG, SymbolGID> gidMap;
+	
+	/**
+	 * Map TRANSAQ/MOEX general security identifier to local symbol general identifier.
+	 * Due to possible duplicate of TRANSAQ/MOEX security code across different securities
+	 * there is only one mapping in the map - the last, the actual, recently update.
+	 */
+	private final Map<ISecIDG, SymbolGID> tq2gidMap;
+	
+	/**
+	 * Map local symbol general identifier to TRANSAQ/MOEX security identifier.
+	 * Very important map because it's only possibility to get full TRANSAQ/MOEX identifier
+	 * of security associated with any known local symbol general identifier. For example
+	 * if there are two identifiers known locally RTS-12.19 and RTS-12.09 both point to
+	 * RIZ9@FUT. The reverse map contains mapping RIZ9@FUT to RTS-12.19 cuz it was updated
+	 * recently. So it is unable to restore link back from RTS-12.09 to RIZ9@FUT without
+	 * this map. Using those two maps we can answer which one local symbol is actual and
+	 * what TRANSAQ/MOEX identifier was associated with outdated symbols.
+	 */
+	private final Map<SymbolGID, ISecIDF> gid2tqMap;
 	
 	TQDirectory(
 			OSCRepository<Integer, CKind> ckinds,
@@ -61,7 +80,8 @@ public class TQDirectory {
 			OSCRepository<SymbolGID, SecurityParams> secParams,
 			OSCRepository<SymbolTID, SecurityBoardParams> secBoardParams,
 			OSCRepository<SymbolTID, SecurityQuotations> secQuotations,
-			Map<ISecIDG, SymbolGID> gid_map)
+			Map<ISecIDG, SymbolGID> tq2gid_map,
+			Map<SymbolGID, ISecIDF> gid2tq_map)
 	{
 		this.ckinds = ckinds;
 		this.markets = markets;
@@ -69,7 +89,8 @@ public class TQDirectory {
 		this.secParams = secParams;
 		this.secBoardParams = secBoardParams;
 		this.secQuots = secQuotations;
-		this.gidMap = gid_map;
+		this.tq2gidMap = tq2gid_map;
+		this.gid2tqMap = gid2tq_map;
 	}
 	
 	public TQDirectory(EventQueue queue) {
@@ -79,6 +100,7 @@ public class TQDirectory {
 			 new OSCRepositoryImpl<>(new SecurityParamsFactory(queue), "SEC_PARAMS"),
 			 new OSCRepositoryImpl<>(new SecurityBoardParamsFactory(queue), "SEC_BRD_PARAMS"),
 			 new OSCRepositoryImpl<>(new SecurityQuotationsFactory(queue), "SEC_QUOTATIONS"),
+			 new Hashtable<>(),
 			 new Hashtable<>()
 		);
 	}
@@ -129,12 +151,12 @@ public class TQDirectory {
 		}
 	}
 
-	private SymbolGID getGIDFromMap(ISecIDG sec_id, boolean lock, boolean strict) {
+	private SymbolGID getSymbolGIDFromMap(ISecIDG sec_id, boolean lock, boolean strict) {
 		if ( lock ) {
 			secParams.lock();
 		}
 		try {
-			SymbolGID gid = gidMap.get(sec_id);
+			SymbolGID gid = tq2gidMap.get(sec_id);
 			if ( gid == null && strict ) {
 				throw new IllegalStateException("Symbol GID not found: " + sec_id);
 			}
@@ -146,9 +168,30 @@ public class TQDirectory {
 		}
 	}
 
-	private SymbolGID getGIDFromMap(ISecIDG sec_id, boolean lock) {
-		return getGIDFromMap(sec_id, lock, true);
+	private SymbolGID getSymbolGIDFromMap(ISecIDG sec_id, boolean lock) {
+		return getSymbolGIDFromMap(sec_id, lock, true);
 	}
+	
+	private ISecIDF getSecIDFFromMap(SymbolGID gid, boolean lock, boolean strict) {
+		if  (lock ) {
+			secParams.lock();
+		}
+		try {
+			ISecIDF sec_id = gid2tqMap.get(gid);
+			if ( sec_id == null && strict ) {
+				throw new IllegalStateException("Security IDG not found: " + gid);
+			}
+			return sec_id;
+		} finally {
+			if  ( lock ) {
+				secParams.unlock();
+			}
+		}
+	}
+	
+	//private ISecIDF getSecIDFFromMap(SymbolGID gid, boolean lock) {
+	//	return getSecIDFFromMap(gid, lock, true);
+	//}
 
 	private ISecIDG toSecIDG(ISecIDT sec_id) {
 		Board board = null;
@@ -166,7 +209,7 @@ public class TQDirectory {
 	
 	private SymbolTID toSymbolTID(ISecIDT sec_id) {
 		ISecIDG sec_id1 = toSecIDG(sec_id);
-		SymbolGID gid = getGIDFromMap(sec_id1, true);
+		SymbolGID gid = getSymbolGIDFromMap(sec_id1, true);
 		return new SymbolTID(gid.getTicker(), gid.getMarketID(), sec_id.getBoardCode());
 	}
 	
@@ -174,7 +217,8 @@ public class TQDirectory {
 		SymbolGID gid = toSymbolGID(sec_params_update.getID());
 		secParams.lock();
 		try {
-			gidMap.put(new TQSecIDG(sec_params_update.getID()), gid);
+			tq2gidMap.put(new TQSecIDG(sec_params_update.getID()), gid);
+			gid2tqMap.put(gid, sec_params_update.getID());
 			secParams.getOrCreate(gid).consume(sec_params_update.getUpdate());
 		} finally {
 			secParams.unlock();
@@ -184,7 +228,7 @@ public class TQDirectory {
 	public void updateSecurityParamsP(TQStateUpdate<ISecIDG> sec_params_update) {
 		secParams.lock();
 		try {
-			SymbolGID gid = getGIDFromMap(sec_params_update.getID(), false);
+			SymbolGID gid = getSymbolGIDFromMap(sec_params_update.getID(), false);
 			secParams.getOrCreate(gid).consume(sec_params_update.getUpdate());
 		} finally {
 			secParams.unlock();
@@ -206,7 +250,7 @@ public class TQDirectory {
 	public boolean isExistsSecurityParams(ISecIDG sec_id) {
 		secParams.lock();
 		try {
-			return gidMap.containsKey(sec_id);
+			return tq2gidMap.containsKey(sec_id);
 		} finally {
 			secParams.unlock();
 		}
@@ -223,7 +267,7 @@ public class TQDirectory {
 	public SecurityParams getSecurityParams(ISecIDG sec_id) {
 		secParams.lock();
 		try {
-			return secParams.getOrThrow(getGIDFromMap(sec_id, false));
+			return secParams.getOrThrow(getSymbolGIDFromMap(sec_id, false));
 		} finally {
 			secParams.unlock();
 		}
@@ -291,6 +335,41 @@ public class TQDirectory {
 				CDecimalBD.RUB,
 				toSymbolType(getSecurityParams(tid.toGID()).getSecType())
 			);
+	}
+	
+	public SymbolTID toSymbolTID(Symbol symbol) {
+		Board board = boards.getOrThrow(symbol.getExchangeID());
+		return new SymbolTID(
+				symbol.getCode(),
+				board.getMarketID(),
+				symbol.getExchangeID()
+			);
+	}
+	
+	/**
+	 * Convert local symbol to TRANSAQ/MOEX tradeable security identifier.
+	 * <p>
+	 * @param symbol - local symbol
+	 * @param only_if_actual - enable or disable reverse check
+	 * @return if <b>only_if_actual</b> is true then it will check reverse conversion
+	 * and return TRANSAQ/MOEX identifier only if reverse conversion will give the same
+	 * symbol as argument. If <b>only_if_actual</b> is false then it will use cached
+	 * data to restore TRANSAQ/MOEX identifier. Any case the result may be null if
+	 * there is no data or reverse check gave another symbol.
+	 */
+	public ISecIDT toSecIDT(Symbol symbol, boolean only_if_actual) {
+		SymbolTID tid = toSymbolTID(symbol);
+		SymbolGID gid = tid.toGID();
+		ISecIDF sec_idf = getSecIDFFromMap(gid, true, false);
+		if ( sec_idf == null ) {
+			return null;
+		}
+		ISecIDG sec_idg = new TQSecIDG(sec_idf);
+		ISecIDT sec_idt = new TQSecIDT(sec_idg.getSecCode(), tid.getBoard());
+		if ( only_if_actual && gid.equals(getSymbolGIDFromMap(sec_idg, true, false)) == false ) {
+			return null;
+		}
+		return sec_idt;
 	}
 
 }

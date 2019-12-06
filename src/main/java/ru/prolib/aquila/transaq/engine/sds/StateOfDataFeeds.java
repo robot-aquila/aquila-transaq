@@ -23,8 +23,7 @@ public class StateOfDataFeeds {
 	}
 	
 	public StateOfDataFeeds(ISecIDT idt) {
-		this.idt = idt;
-		this.feedStates = new Hashtable<>();
+		this(idt, new Hashtable<>());
 		this.feedStates.put(FeedID.SYMBOL_PRIMARY, new FeedSubscrState(SubscrStatus.NOT_SUBSCR));
 		this.feedStates.put(FeedID.SYMBOL_QUOTATIONS, new FeedSubscrState(SubscrStatus.NOT_SUBSCR));
 		this.feedStates.put(FeedID.SYMBOL_ALLTRADES, new FeedSubscrState(SubscrStatus.NOT_SUBSCR));
@@ -87,6 +86,23 @@ public class StateOfDataFeeds {
 			return false;
 		default:
 			throw new IllegalStateException("Unexpected status: " + state.getStatus());
+		}
+	}
+	
+	public void markAllNotSubscribed() {
+		for ( FeedSubscrState state : feedStates.values() ) {
+			switch ( state.getStatus() ) {
+			case NOT_SUBSCR:
+			case NOT_AVAILABLE:
+				break;
+			case PENDING_SUBSCR:
+			case SUBSCR:
+			case PENDING_UNSUBSCR:
+				state.switchTo(SubscrStatus.NOT_SUBSCR);
+				break;
+			default:
+				throw new IllegalStateException("Unexpected status: " + state.getStatus());
+			}
 		}
 	}
 	
