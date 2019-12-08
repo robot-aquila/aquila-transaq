@@ -1,0 +1,5 @@
+<root>
+	<server_status connected="true" />
+	<server_status id="256" connected="false" recover="true" />
+	<server_status id="256" connected="error">Connection lost</server_status>
+</root>

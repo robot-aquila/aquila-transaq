@@ -13,8 +13,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.stream.XMLInputFactory;
@@ -31,12 +33,41 @@ import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.transaq.entity.SecType;
 import ru.prolib.aquila.transaq.impl.TQStateUpdate;
 import ru.prolib.aquila.transaq.remote.TQSecIDT;
+import ru.prolib.aquila.transaq.remote.entity.ServerStatus;
 import ru.prolib.aquila.transaq.remote.MessageParser;
 import ru.prolib.aquila.transaq.remote.TQSecIDF;
 import ru.prolib.aquila.transaq.remote.TQSecIDG;
 
 public class MessageParserTest {
+	private static final Map<Integer, String> EVENT_TYPE_MAP = new Hashtable<>();
+	
+	static {
+		EVENT_TYPE_MAP.put(XMLStreamReader.ATTRIBUTE, "ATRIBUTE");
+		EVENT_TYPE_MAP.put(XMLStreamReader.CDATA, "CDATA");
+		EVENT_TYPE_MAP.put(XMLStreamReader.CHARACTERS, "CHARACTERS");
+		EVENT_TYPE_MAP.put(XMLStreamReader.COMMENT, "COMMENT");
+		EVENT_TYPE_MAP.put(XMLStreamReader.DTD, "DTD");
+		EVENT_TYPE_MAP.put(XMLStreamReader.END_DOCUMENT, "END_DOCUMENT");
+		EVENT_TYPE_MAP.put(XMLStreamReader.END_ELEMENT, "END_ELEMENT");
+		EVENT_TYPE_MAP.put(XMLStreamReader.ENTITY_DECLARATION, "ENTITY_DECLARATION");
+		EVENT_TYPE_MAP.put(XMLStreamReader.ENTITY_REFERENCE, "ENTITY_REFERENCE");
+		EVENT_TYPE_MAP.put(XMLStreamReader.NAMESPACE, "NAMESPACE");
+		EVENT_TYPE_MAP.put(XMLStreamReader.NOTATION_DECLARATION, "NOTATION_DECLARATION");
+		EVENT_TYPE_MAP.put(XMLStreamReader.PROCESSING_INSTRUCTION, "PROCESSING_INSTRUCTION");
+		EVENT_TYPE_MAP.put(XMLStreamReader.SPACE, "SPACE");
+		EVENT_TYPE_MAP.put(XMLStreamReader.START_DOCUMENT, "START_DOCUMENT");
+		EVENT_TYPE_MAP.put(XMLStreamReader.START_ELEMENT, "START_ELEMENT");
+	}
+	
 	private static XMLInputFactory factory;
+	
+	private String getEventTypeString(int event_type) {
+		String x = EVENT_TYPE_MAP.get(event_type);
+		if ( x != null ) {
+			return x;
+		}
+		throw new IllegalArgumentException("Unknown event type: " + event_type);
+	}
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -50,6 +81,36 @@ public class MessageParserTest {
 	@Before
 	public void setUp() throws Exception {
 		service = new MessageParser();
+	}
+	
+	private XMLStreamReader moveNextElem(XMLStreamReader sr, String expected_elem_name) throws Exception {
+		while ( sr.hasNext() ) {
+			switch ( sr.next() ) {
+			case XMLStreamReader.START_DOCUMENT:
+			case XMLStreamReader.START_ELEMENT:
+				if ( expected_elem_name.equals(sr.getLocalName()) ) {
+					return sr;
+				}
+				throw new IllegalStateException("Unexpected element: " + sr.getLocalName());
+			}
+		}
+		throw new IllegalStateException("Element not found: " + expected_elem_name);
+	}
+	
+	private XMLStreamReader startReader(String filename, String start_element) throws Exception {
+		return moveNextElem(factory.createXMLStreamReader(new FileInputStream(new File(filename))), start_element);
+	}
+	
+	private XMLStreamReader checkIsElementEnd(XMLStreamReader sr, String expected_element) throws Exception {
+		if ( sr.getEventType() != XMLStreamReader.END_ELEMENT
+		  && sr.getEventType() != XMLStreamReader.END_DOCUMENT )
+		{
+			throw new IllegalStateException("Unexpected event type: " + getEventTypeString(sr.getEventType()));
+		}
+		if ( ! expected_element.equals(sr.getLocalName()) ) {
+			throw new IllegalStateException("Unexpected element: " + sr.getLocalName());
+		}
+		return sr;
 	}
 	
 	@Test
@@ -945,19 +1006,9 @@ public class MessageParserTest {
 	
 	@Test
 	public void testReadAlltrades() throws Exception {
-		InputStream is = new FileInputStream(new File("fixture/alltrades.xml"));
-		XMLStreamReader sr = factory.createXMLStreamReader(is);
-		List<TQStateUpdate<ISecIDT>> actual = null;
-		while ( sr.hasNext() ) {
-			switch ( sr.next() ) {
-			case XMLStreamReader.START_DOCUMENT:
-			case XMLStreamReader.START_ELEMENT:
-				if ( "alltrades".equals(sr.getLocalName()) ) {
-					actual = service.readAlltrades(sr);
-				}
-				break;
-			}
-		}
+		XMLStreamReader sr = startReader("fixture/alltrades.xml", "alltrades");
+		List<TQStateUpdate<ISecIDT>> actual = service.readAlltrades(sr);
+		sr.close();
 		List<TQStateUpdate<ISecIDT>> expected = new ArrayList<>();
 		expected.add(new TQStateUpdate<>(new TQSecIDT("RIZ9", "FUT"), new DeltaUpdateBuilder()
 				.withToken(FTrade.SECID, 41712)
@@ -988,19 +1039,10 @@ public class MessageParserTest {
 	
 	@Test
 	public void testReadQuotes() throws Exception {
-		InputStream is = new FileInputStream(new File("fixture/quotes.xml"));
-		XMLStreamReader sr = factory.createXMLStreamReader(is);
-		List<TQStateUpdate<ISecIDT>> actual = null;
-		while ( sr.hasNext() ) {
-			switch ( sr.next() ) {
-			case XMLStreamReader.START_DOCUMENT:
-			case XMLStreamReader.START_ELEMENT:
-				if ( "quotes".equals(sr.getLocalName()) ) {
-					actual = service.readQuotes(sr);
-				}
-				break;
-			}
-		}
+		XMLStreamReader sr = startReader("fixture/quotes.xml", "quotes");
+		List<TQStateUpdate<ISecIDT>> actual = service.readQuotes(sr);
+		sr.close();
+		
 		List<TQStateUpdate<ISecIDT>> expected = new ArrayList<>();
 		expected.add(new TQStateUpdate<>(new TQSecIDT("RIZ9", "FUT"), new DeltaUpdateBuilder()
 				.withToken(FQuote.SECID, 41712)
@@ -1043,6 +1085,24 @@ public class MessageParserTest {
 				.withToken(FQuote.SELL, of(28L))
 				.buildUpdate()));
 		assertEquals(expected, actual);
+	}
+	
+	@Test
+	public void testReadServerStatus() throws Exception {
+		String element = "server_status";
+		XMLStreamReader sr = startReader("fixture/server_status1.xml", "root");
+		
+		moveNextElem(sr, element);
+		assertEquals(new ServerStatus(true, false, null), service.readServerStatus(sr));
+		checkIsElementEnd(sr, element);
+
+		moveNextElem(sr, element);
+		assertEquals(new ServerStatus(false, true, null), service.readServerStatus(sr));
+		checkIsElementEnd(sr, element);
+		
+		moveNextElem(sr, element);
+		assertEquals(new ServerStatus(false, false, "Connection lost"), service.readServerStatus(sr));
+		checkIsElementEnd(sr, element);
 	}
 
 }

@@ -28,6 +28,7 @@ import ru.prolib.aquila.transaq.remote.MessageFields.FQuote;
 import ru.prolib.aquila.transaq.remote.MessageFields.FSecurity;
 import ru.prolib.aquila.transaq.remote.MessageFields.FSecurityBoard;
 import ru.prolib.aquila.transaq.remote.MessageFields.FTrade;
+import ru.prolib.aquila.transaq.remote.entity.ServerStatus;
 
 public class MessageParser {
 	private static final Logger logger;
@@ -85,6 +86,9 @@ public class MessageParser {
 	
 	public void skipElement(XMLStreamReader reader) throws XMLStreamException {
 		String tag_name = reader.getLocalName();
+		if ( reader.getEventType() == XMLStreamReader.END_ELEMENT ) {
+			return;
+		}
 		int level_index = 0;
 		while ( reader.hasNext() ) {
 			switch ( reader.next() ) {
@@ -960,6 +964,46 @@ public class MessageParser {
 			}
 		}
 		throw new XMLStreamException("Premature end of file");
+	}
+	
+	public ServerStatus readServerStatus(XMLStreamReader reader) throws XMLStreamException {
+		if ( ! "server_status".equals(reader.getLocalName()) ) {
+			throw new IllegalStateException("Unexpected current element: " + reader.getLocalName());
+		}
+		String str_connected = getAttribute(reader, "connected");
+		String str_recover = getAttribute(reader, "recover");
+		boolean connected = false, recover = false;
+		String error_msg = null;
+		if ( str_connected != null ) {
+			switch ( str_connected ) {
+			case "true":
+				connected = true;
+				break;
+			case "false":
+				connected = false;
+				break;
+			case "error":
+				connected = false;
+				error_msg = readCharacters(reader);
+				break;
+			default:
+				throw new XMLStreamException("Unexpected connection status: " + str_connected);
+			}
+		}
+		if ( str_recover != null ) {
+			switch ( str_recover ) {
+			case "true":
+				recover = true;
+				break;
+			case "false":
+				recover = false;
+				break;
+			default:
+				throw new XMLStreamException("Unexpected recover status: " + str_recover);
+			}
+		}
+		skipElement(reader);
+		return new ServerStatus(connected, recover, error_msg);
 	}
 	
 }
