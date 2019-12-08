@@ -15,7 +15,8 @@ import ru.prolib.aquila.transaq.engine.mp.ProcessorRegistryBuilder;
 import ru.prolib.aquila.transaq.engine.mp.RawMessageDumper;
 import ru.prolib.aquila.transaq.engine.mp.SecInfoProcessor;
 import ru.prolib.aquila.transaq.engine.mp.SecInfoUpdProcessor;
-import ru.prolib.aquila.transaq.engine.mp.SecuritiesMessageProcessor;
+import ru.prolib.aquila.transaq.engine.mp.SecuritiesProcessor;
+import ru.prolib.aquila.transaq.engine.mp.ServerStatusProcessor;
 import ru.prolib.aquila.transaq.engine.sds.SymbolDataServiceImpl;
 import ru.prolib.aquila.transaq.engine.sds.StateOfDataFeedsFactory;
 import ru.prolib.aquila.transaq.impl.TQDirectory;
@@ -30,7 +31,8 @@ public class EngineBuilderRoutines {
 	MessageRouter standardRouter(ServiceLocator services) {
 		return new MessageRouterImpl(new ProcessorRegistryBuilder()
 				.withDefaultProcessor(new DefaultMessageProcessor(services))
-				.withProcessor("securities", new SecuritiesMessageProcessor(services))
+				.withProcessor("server_status", new ServerStatusProcessor(services))
+				.withProcessor("securities", new SecuritiesProcessor(services))
 				.withProcessor("sec_info", new SecInfoProcessor(services))
 				.withProcessor("sec_info_upd", new SecInfoUpdProcessor(services))
 				.withProcessor("markets", new MarketsProcessor(services))
@@ -43,7 +45,6 @@ public class EngineBuilderRoutines {
 				.withProcessor("positions", new RawMessageDumper())
 				.withProcessor("union", new RawMessageDumper())
 				.withProcessor("overnight", new RawMessageDumper())
-				.withProcessor("server_status", new RawMessageDumper())
 				
 				.build());
 	}

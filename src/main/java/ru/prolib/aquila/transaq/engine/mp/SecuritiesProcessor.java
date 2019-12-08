@@ -7,10 +7,10 @@ import ru.prolib.aquila.transaq.impl.TQReactor;
 import ru.prolib.aquila.transaq.impl.TQStateUpdate;
 import ru.prolib.aquila.transaq.remote.ISecIDF;
 
-public class SecuritiesMessageProcessor implements MessageProcessor {
+public class SecuritiesProcessor implements MessageProcessor {
 	private final ServiceLocator services;
 	
-	public SecuritiesMessageProcessor(ServiceLocator services) {
+	public SecuritiesProcessor(ServiceLocator services) {
 		this.services = services;
 	}
 

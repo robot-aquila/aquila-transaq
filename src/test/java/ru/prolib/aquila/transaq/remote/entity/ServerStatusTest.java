@@ -19,6 +19,13 @@ public class ServerStatusTest {
 		service_prop = new ServerStatus(true, true, "Props test");
 	}
 	
+	public void testCtor1() {
+		ServerStatus service = new ServerStatus(true);
+		assertTrue(service.isConnected());
+		assertFalse(service.isRecover());
+		assertNull(service.getErrorMsg());
+	}
+	
 	@Test
 	public void testGetters() {
 		assertTrue(service_conn.isConnected());

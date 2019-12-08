@@ -9,6 +9,7 @@ import org.junit.Test;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdate;
 import ru.prolib.aquila.transaq.entity.SecType;
 import ru.prolib.aquila.transaq.remote.TQSecIDT;
+import ru.prolib.aquila.transaq.remote.entity.ServerStatus;
 import ru.prolib.aquila.transaq.remote.ISecIDF;
 import ru.prolib.aquila.transaq.remote.ISecIDG;
 import ru.prolib.aquila.transaq.remote.ISecIDT;
@@ -125,6 +126,15 @@ public class TQReactorTest {
 		control.replay();
 		
 		service.updateSecurityBoard(update);
+		
+		control.verify();
+	}
+	
+	@Test
+	public void testUpdateServerStatus() {
+		control.replay();
+		
+		service.updateServerStatus(new ServerStatus(true));
 		
 		control.verify();
 	}

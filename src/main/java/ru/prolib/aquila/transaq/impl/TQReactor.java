@@ -3,6 +3,7 @@ package ru.prolib.aquila.transaq.impl;
 import ru.prolib.aquila.transaq.remote.ISecIDF;
 import ru.prolib.aquila.transaq.remote.ISecIDG;
 import ru.prolib.aquila.transaq.remote.ISecIDT;
+import ru.prolib.aquila.transaq.remote.entity.ServerStatus;
 
 public class TQReactor {
 	private final TQDirectory dir;
@@ -50,6 +51,10 @@ public class TQReactor {
 	
 	public void updateSecurityBoard(TQStateUpdate<ISecIDT> update) {
 		dir.updateSecurityBoardParams(update);
+	}
+	
+	public void updateServerStatus(ServerStatus update) {
+		
 	}
 
 }

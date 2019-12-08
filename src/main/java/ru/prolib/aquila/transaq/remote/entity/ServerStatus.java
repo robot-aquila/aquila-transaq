@@ -15,6 +15,10 @@ public class ServerStatus {
 		this.errorMsg = error_msg;
 	}
 	
+	public ServerStatus(boolean connected) {
+		this(connected, false, null);
+	}
+	
 	public boolean isConnected() {
 		return connected;
 	}
