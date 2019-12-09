@@ -4,6 +4,7 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -250,6 +251,15 @@ public class StdConnectorTest {
 	}
 	
 	@Test
+	public void testSubscribe3_DoesNotSendIfEmptySets() throws Exception {
+		control.replay();
+		
+		service.subscribe(new HashSet<>(), new HashSet<>(), new HashSet<>());
+		
+		control.verify();
+	}
+	
+	@Test
 	public void testUnsubscribe3() throws Exception {
 		Set<ISecIDT> alltrades = new LinkedHashSet<>();
 		alltrades.add(new TQSecIDT("RIZ9", "FUT"));
@@ -270,6 +280,15 @@ public class StdConnectorTest {
 		control.verify();
 		String expected = FileUtils.readFileToString(new File("fixture/connector-unsubscribe3.xml"), "UTF8");
 		assertEquals(expected, my_cap.getValue());
+	}
+	
+	@Test
+	public void testUnsubscribe3_DoesNotSendIfEmptySets() throws Exception {
+		control.replay();
+		
+		service.unsubscribe(new HashSet<>(), new HashSet<>(), new HashSet<>());
+		
+		control.verify();
 	}
 
 }

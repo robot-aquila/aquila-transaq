@@ -7,11 +7,13 @@ import ru.prolib.aquila.transaq.engine.mp.CandleKindsProcessor;
 import ru.prolib.aquila.transaq.engine.mp.ClientProcessor;
 import ru.prolib.aquila.transaq.engine.mp.DefaultMessageProcessor;
 import ru.prolib.aquila.transaq.engine.mp.MarketsProcessor;
+import ru.prolib.aquila.transaq.engine.mp.MessageProcessor;
 import ru.prolib.aquila.transaq.engine.mp.MessageRouter;
 
 import ru.prolib.aquila.transaq.engine.mp.MessageRouterImpl;
 import ru.prolib.aquila.transaq.engine.mp.PitsProcessor;
 import ru.prolib.aquila.transaq.engine.mp.ProcessorRegistryBuilder;
+import ru.prolib.aquila.transaq.engine.mp.QuotationsProcessor;
 import ru.prolib.aquila.transaq.engine.mp.RawMessageDumper;
 import ru.prolib.aquila.transaq.engine.mp.SecInfoProcessor;
 import ru.prolib.aquila.transaq.engine.mp.SecInfoUpdProcessor;
@@ -29,8 +31,10 @@ import ru.prolib.aquila.transaq.remote.MessageParser;
 public class EngineBuilderRoutines {
 
 	MessageRouter standardRouter(ServiceLocator services) {
+		MessageProcessor default_processor = new DefaultMessageProcessor(services);
 		return new MessageRouterImpl(new ProcessorRegistryBuilder()
-				.withDefaultProcessor(new DefaultMessageProcessor(services))
+				.withDefaultProcessor(default_processor)
+				.withProcessor(DefaultMessageProcessor.DUMP_PROC_ID, default_processor)
 				.withProcessor("server_status", new ServerStatusProcessor(services))
 				.withProcessor("securities", new SecuritiesProcessor(services))
 				.withProcessor("sec_info", new SecInfoProcessor(services))
@@ -39,12 +43,15 @@ public class EngineBuilderRoutines {
 				.withProcessor("boards", new BoardsProcessor(services))
 				.withProcessor("candlekinds", new CandleKindsProcessor(services))
 				.withProcessor("pits", new PitsProcessor(services))
+				.withProcessor("quotations", new QuotationsProcessor(services))
 				// TODO: do it
 				.withProcessor("client", new ClientProcessor())
 				.withProcessor("messages", new RawMessageDumper())
 				.withProcessor("positions", new RawMessageDumper())
 				.withProcessor("union", new RawMessageDumper())
 				.withProcessor("overnight", new RawMessageDumper())
+				.withProcessor("alltrades", new RawMessageDumper())
+				.withProcessor("quotes", new RawMessageDumper())
 				
 				.build());
 	}
@@ -58,7 +65,7 @@ public class EngineBuilderRoutines {
 	
 	public void initSecondary(ServiceLocator services, EditableTerminal terminal) {
 		TQReactor reactor = new TQReactor(
-				services.getDirectory(),
+				services,
 				new TQSecurityHandlerRegistry(),
 				new TQSecurityHandlerFactory(services)
 			);

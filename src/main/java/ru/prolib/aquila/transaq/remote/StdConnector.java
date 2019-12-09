@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import ru.prolib.JTransaq.JTransaqHandler;
 import ru.prolib.JTransaq.JTransaqServer;
+import ru.prolib.aquila.transaq.engine.mp.DefaultMessageProcessor;
 import ru.prolib.aquila.transaq.impl.TransaqException;
 
 public class StdConnector implements Connector {
@@ -39,6 +40,13 @@ public class StdConnector implements Connector {
 		return x;
 	}
 	
+	private void SendCommand(String data) throws Exception {
+		if ( logger.isDebugEnabled() ) {
+			logger.debug("OUT> {}", data);
+		}
+		server.SendCommand(data);
+	}
+	
 	@Override
 	public void init() throws TransaqException {
 		try {
@@ -53,7 +61,7 @@ public class StdConnector implements Connector {
 	@Override
 	public void connect() throws TransaqException {
 		try {
-			server.SendCommand("<command id=\"connect\">"
+			SendCommand("<command id=\"connect\">"
 					+ "<login>" + cfg_var("login") + "</login>"
 					+ "<password>" + cfg_var("password") + "</password>"
 					+ "<host>" + cfg_var("host") + "</host>"
@@ -77,7 +85,7 @@ public class StdConnector implements Connector {
 	@Override
 	public void disconnect() {
 		try {
-			server.SendCommand("<command id=\"disconnect\"/>");
+			SendCommand("<command id=\"disconnect\"/>");
 		} catch ( Exception e ) {
 			logger.error("Disconnect error: ", e);
 		}
@@ -90,7 +98,7 @@ public class StdConnector implements Connector {
 		} catch ( Exception e ) {
 			logger.error("Error shutting down: ", e);
 		}
-		handler.Handle("<dump_stats/>");
+		handler.Handle(DefaultMessageProcessor.DUMP_PROC_TAG);
 		handler.delete();
 	}
 	
@@ -115,7 +123,7 @@ public class StdConnector implements Connector {
 		}
 		x += "</command>";
 		try {
-			server.SendCommand(x);
+			SendCommand(x);
 		} catch ( TransaqException e ) {
 			throw e;
 		} catch ( Exception e ) {
@@ -154,6 +162,9 @@ public class StdConnector implements Connector {
 			String command)
 					throws TransaqException
 	{
+		if ( alltrades.size() + quotations.size() + quotes.size() <= 0 ) {
+			return;
+		}
 		StringBuilder sb = new StringBuilder().append("<command id=\"").append(command).append("\">\n");
 		if ( alltrades.size() > 0 ) {
 			sb.append("\t<alltrades>\n").append(_to_security_list(alltrades)).append("\t</alltrades>\n");
@@ -166,7 +177,7 @@ public class StdConnector implements Connector {
 		}
 		sb.append("</command>");
 		try {
-			server.SendCommand(sb.toString());
+			SendCommand(sb.toString());
 		} catch ( TransaqException e ) {
 			throw e;
 		} catch ( Exception e ) {

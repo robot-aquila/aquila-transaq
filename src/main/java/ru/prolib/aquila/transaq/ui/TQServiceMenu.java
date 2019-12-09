@@ -250,6 +250,7 @@ public class TQServiceMenu implements ActionListener {
 		column_id_to_header.put(FQuotation.ACCRUED_INT_VALUE, TQMessages.ACCRUED_INT);
 		column_id_to_header.put(FQuotation.OPEN, SecurityMsg.OPEN_PRICE);
 		column_id_to_header.put(FQuotation.WA_PRICE, TQMessages.WA_PRICE);
+		column_id_to_header.put(FQuotation.BID_DEPTH, SecurityMsg.BID_SIZE);
 		column_id_to_header.put(FQuotation.BID_DEPTH_T, TQMessages.BID_DEPTH_T);
 		column_id_to_header.put(FQuotation.NUM_BIDS, TQMessages.NUM_BIDS);
 		column_id_to_header.put(FQuotation.OFFER_DEPTH, SecurityMsg.ASK_SIZE);

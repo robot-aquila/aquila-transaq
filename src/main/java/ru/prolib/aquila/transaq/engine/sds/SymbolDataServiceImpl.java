@@ -159,8 +159,8 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 		// 2) Call subscribe for all required feeds
 		// 3) Change feed status of all subscribed feeds
 		services.getConnector().subscribe(
-				cache.get(FeedID.SYMBOL_QUOTATIONS).getLeft(),
 				cache.get(FeedID.SYMBOL_ALLTRADES).getLeft(),
+				cache.get(FeedID.SYMBOL_QUOTATIONS).getLeft(),
 				cache.get(FeedID.SYMBOL_QUOTES).getLeft()
 			);
 		for ( FeedID feed_id : cache.keySet() ) {
@@ -172,8 +172,8 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 		// 4) Call unsubscribe of all feeds which aren't required anymore
 		// 5) Change feed status of all unsubscribed feeds
 		services.getConnector().unsubscribe(
-				cache.get(FeedID.SYMBOL_QUOTATIONS).getRight(),
 				cache.get(FeedID.SYMBOL_ALLTRADES).getRight(),
+				cache.get(FeedID.SYMBOL_QUOTATIONS).getRight(),
 				cache.get(FeedID.SYMBOL_QUOTES).getRight()
 			);
 		for ( FeedID feed_id : cache.keySet() ) {

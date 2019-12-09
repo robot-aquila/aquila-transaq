@@ -13,6 +13,7 @@ import ru.prolib.aquila.transaq.engine.ServiceLocator;
 
 public class DefaultMessageProcessor implements MessageProcessor {
 	public static final String DUMP_PROC_ID = "dump_stats";
+	public static final String DUMP_PROC_TAG = "<dump_stats/>";
 	private static final Logger logger;
 	
 	static {

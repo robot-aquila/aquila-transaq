@@ -177,5 +177,24 @@ public class MessageProcessorsTest {
 		
 		control.verify();
 	}
+	
+	@Test
+	public void testQuotationsProcessor() throws Exception {
+		List<TQStateUpdate<ISecIDT>> su_list = new ArrayList<>();
+		TQStateUpdate<ISecIDT> su_mock1, su_mock2, su_mock3;
+		su_list.add(su_mock1 = control.createMock(TQStateUpdate.class));
+		su_list.add(su_mock2 = control.createMock(TQStateUpdate.class));
+		su_list.add(su_mock3 = control.createMock(TQStateUpdate.class));
+		expect(parserMock.readQuotations(readerMock)).andReturn(su_list);
+		reactorMock.updateSecurityQuotations(su_mock1);
+		reactorMock.updateSecurityQuotations(su_mock2);
+		reactorMock.updateSecurityQuotations(su_mock3);
+		control.replay();
+		QuotationsProcessor service = new QuotationsProcessor(services);
+		
+		service.processMessage(readerMock);
+		
+		control.verify();
+	}
 
 }
