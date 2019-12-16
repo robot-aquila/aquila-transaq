@@ -5,14 +5,13 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import ru.prolib.aquila.core.EventQueue;
-import ru.prolib.aquila.core.BusinessEntities.CDecimalBD;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.core.BusinessEntities.SymbolType;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCRepository;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCRepositoryDecoratorRO;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCRepositoryImpl;
-import ru.prolib.aquila.transaq.engine.sds.SymbolGID;
-import ru.prolib.aquila.transaq.engine.sds.SymbolTID;
+import ru.prolib.aquila.transaq.engine.sds.GSymbol;
+import ru.prolib.aquila.transaq.engine.sds.TSymbol;
 import ru.prolib.aquila.transaq.entity.Board;
 import ru.prolib.aquila.transaq.entity.BoardFactory;
 import ru.prolib.aquila.transaq.entity.CKind;
@@ -50,16 +49,16 @@ public class TQDirectory {
 	private final OSCRepository<Integer, CKind> ckinds;
 	private final OSCRepository<Integer, Market> markets;
 	private final OSCRepository<String, Board> boards;
-	private final OSCRepository<SymbolGID, SecurityParams> secParams;
-	private final OSCRepository<SymbolTID, SecurityBoardParams> secBoardParams;
-	private final OSCRepository<SymbolTID, SecurityQuotations> secQuots;
+	private final OSCRepository<GSymbol, SecurityParams> secParams;
+	private final OSCRepository<TSymbol, SecurityBoardParams> secBoardParams;
+	private final OSCRepository<TSymbol, SecurityQuotations> secQuots;
 	
 	/**
 	 * Map TRANSAQ/MOEX general security identifier to local symbol general identifier.
 	 * Due to possible duplicate of TRANSAQ/MOEX security code across different securities
 	 * there is only one mapping in the map - the last, the actual, recently update.
 	 */
-	private final Map<ISecIDG, SymbolGID> tq2gidMap;
+	private final Map<ISecIDG, GSymbol> tq2gidMap;
 	
 	/**
 	 * Map local symbol general identifier to TRANSAQ/MOEX security identifier.
@@ -71,17 +70,17 @@ public class TQDirectory {
 	 * this map. Using those two maps we can answer which one local symbol is actual and
 	 * what TRANSAQ/MOEX identifier was associated with outdated symbols.
 	 */
-	private final Map<SymbolGID, ISecIDF> gid2tqMap;
+	private final Map<GSymbol, ISecIDF> gid2tqMap;
 	
 	TQDirectory(
 			OSCRepository<Integer, CKind> ckinds,
 			OSCRepository<Integer, Market> markets,
 			OSCRepository<String, Board> boards,
-			OSCRepository<SymbolGID, SecurityParams> secParams,
-			OSCRepository<SymbolTID, SecurityBoardParams> secBoardParams,
-			OSCRepository<SymbolTID, SecurityQuotations> secQuotations,
-			Map<ISecIDG, SymbolGID> tq2gid_map,
-			Map<SymbolGID, ISecIDF> gid2tq_map)
+			OSCRepository<GSymbol, SecurityParams> secParams,
+			OSCRepository<TSymbol, SecurityBoardParams> secBoardParams,
+			OSCRepository<TSymbol, SecurityQuotations> secQuotations,
+			Map<ISecIDG, GSymbol> tq2gid_map,
+			Map<GSymbol, ISecIDF> gid2tq_map)
 	{
 		this.ckinds = ckinds;
 		this.markets = markets;
@@ -105,58 +104,50 @@ public class TQDirectory {
 		);
 	}
 	
-	public OSCRepository<Integer, CKind> getCKindRepository() {
-		return new OSCRepositoryDecoratorRO<>(ckinds);
-	}
-	
-	public OSCRepository<Integer, Market> getMarketRepository() {
-		return new OSCRepositoryDecoratorRO<>(markets);
-	}
-	
-	public OSCRepository<String, Board> getBoardRepository() {
-		return new OSCRepositoryDecoratorRO<>(boards);
-	}
-	
-	public OSCRepository<SymbolGID, SecurityParams> getSecurityParamsRepository() {
-		return new OSCRepositoryDecoratorRO<>(secParams);
-	}
-	
-	public OSCRepository<SymbolTID, SecurityBoardParams> getSecurityBoardParamsRepository() {
-		return new OSCRepositoryDecoratorRO<>(secBoardParams);
-	}
-	
-	public OSCRepository<SymbolTID, SecurityQuotations> getSecurityQuotationsRepository() {
-		return new OSCRepositoryDecoratorRO<>(secQuots);
-	}
-	
-	public void updateCKind(TQStateUpdate<Integer> ckind_update) {
-		ckinds.getOrCreate(ckind_update.getID()).consume(ckind_update.getUpdate());
-	}
-	
-	public void updateMarket(TQStateUpdate<Integer> market_update) {
-		markets.getOrCreate(market_update.getID()).consume(market_update.getUpdate());
+	private SymbolType toSymbolType(SecType sec_type) {
+		SymbolType type = TYPE_MAP.get(sec_type);
+		if ( type == null ) {
+			type =  SymbolType.UNKNOWN;
+		}
+		return type;
 	}
 
-	public void updateBoard(TQStateUpdate<String> board_update) {
-		boards.getOrCreate(board_update.getID()).consume(board_update.getUpdate());
+	private String getMarketCode(ISecIDF sec_id) {
+		return markets.getOrThrow(sec_id.getMarketID()).getName();
 	}
 	
-	private SymbolGID toSymbolGID(ISecIDF sec_id) {
+	private String getCurrencyCode(ISecIDF sec_id) {
+		return "RUB";
+	}
+	
+	private String getSecCode(ISecIDF sec_id) {
 		switch ( sec_id.getType() ) {
 		case FUT:
 		case OPT:
-			return new SymbolGID(sec_id.getShortName(), sec_id.getMarketID());
+			return sec_id.getShortName();
 		default:
-			return new SymbolGID(sec_id.getSecCode(), sec_id.getMarketID());
+			return sec_id.getSecCode();
 		}
 	}
+	
+	private SymbolType getSymbolType(ISecIDF sec_id) {
+		return toSymbolType(sec_id.getType());
+	}
+	
+	private GSymbol toSymbolGID(ISecIDF sec_id) {
+		return new GSymbol(
+				getSecCode(sec_id),
+				getMarketCode(sec_id),
+				getCurrencyCode(sec_id), getSymbolType(sec_id)
+			);
+	}
 
-	private SymbolGID getSymbolGIDFromMap(ISecIDG sec_id, boolean lock, boolean strict) {
+	private GSymbol getSymbolGIDFromMap(ISecIDG sec_id, boolean lock, boolean strict) {
 		if ( lock ) {
 			secParams.lock();
 		}
 		try {
-			SymbolGID gid = tq2gidMap.get(sec_id);
+			GSymbol gid = tq2gidMap.get(sec_id);
 			if ( gid == null && strict ) {
 				throw new IllegalStateException("Symbol GID not found: " + sec_id);
 			}
@@ -168,11 +159,11 @@ public class TQDirectory {
 		}
 	}
 
-	private SymbolGID getSymbolGIDFromMap(ISecIDG sec_id, boolean lock) {
+	private GSymbol getSymbolGIDFromMap(ISecIDG sec_id, boolean lock) {
 		return getSymbolGIDFromMap(sec_id, lock, true);
 	}
 	
-	private ISecIDF getSecIDFFromMap(SymbolGID gid, boolean lock, boolean strict) {
+	private ISecIDF getSecIDFFromMap(GSymbol gid, boolean lock, boolean strict) {
 		if  (lock ) {
 			secParams.lock();
 		}
@@ -207,14 +198,59 @@ public class TQDirectory {
 		return new TQSecIDG(sec_id.getSecCode(), board.getMarketID());
 	}
 	
-	private SymbolTID toSymbolTID(ISecIDT sec_id) {
+	private TSymbol toSymbolTID(ISecIDT sec_id) {
 		ISecIDG sec_id1 = toSecIDG(sec_id);
-		SymbolGID gid = getSymbolGIDFromMap(sec_id1, true);
-		return new SymbolTID(gid.getTicker(), gid.getMarketID(), sec_id.getBoardCode());
+		GSymbol gid = getSymbolGIDFromMap(sec_id1, true);
+		return new TSymbol(gid.getCode(), sec_id.getBoardCode(), gid.getCurrencyCode(), gid.getType());
 	}
 	
+	private GSymbol toSymbolGID(TSymbol tid) {
+		return new GSymbol(
+				tid.getCode(),
+				getMarketName(boards.getOrThrow(tid.getBoardCode()).getMarketID()),
+				tid.getCurrencyCode(),
+				tid.getType()
+			);
+	}
+	
+	public OSCRepository<Integer, CKind> getCKindRepository() {
+		return new OSCRepositoryDecoratorRO<>(ckinds);
+	}
+	
+	public OSCRepository<Integer, Market> getMarketRepository() {
+		return new OSCRepositoryDecoratorRO<>(markets);
+	}
+	
+	public OSCRepository<String, Board> getBoardRepository() {
+		return new OSCRepositoryDecoratorRO<>(boards);
+	}
+	
+	public OSCRepository<GSymbol, SecurityParams> getSecurityParamsRepository() {
+		return new OSCRepositoryDecoratorRO<>(secParams);
+	}
+	
+	public OSCRepository<TSymbol, SecurityBoardParams> getSecurityBoardParamsRepository() {
+		return new OSCRepositoryDecoratorRO<>(secBoardParams);
+	}
+	
+	public OSCRepository<TSymbol, SecurityQuotations> getSecurityQuotationsRepository() {
+		return new OSCRepositoryDecoratorRO<>(secQuots);
+	}
+	
+	public void updateCKind(TQStateUpdate<Integer> ckind_update) {
+		ckinds.getOrCreate(ckind_update.getID()).consume(ckind_update.getUpdate());
+	}
+	
+	public void updateMarket(TQStateUpdate<Integer> market_update) {
+		markets.getOrCreate(market_update.getID()).consume(market_update.getUpdate());
+	}
+
+	public void updateBoard(TQStateUpdate<String> board_update) {
+		boards.getOrCreate(board_update.getID()).consume(board_update.getUpdate());
+	}
+
 	public void updateSecurityParamsF(TQStateUpdate<ISecIDF> sec_params_update) {
-		SymbolGID gid = toSymbolGID(sec_params_update.getID());
+		GSymbol gid = toSymbolGID(sec_params_update.getID());
 		secParams.lock();
 		try {
 			tq2gidMap.put(new TQSecIDG(sec_params_update.getID()), gid);
@@ -228,7 +264,7 @@ public class TQDirectory {
 	public void updateSecurityParamsP(TQStateUpdate<ISecIDG> sec_params_update) {
 		secParams.lock();
 		try {
-			SymbolGID gid = getSymbolGIDFromMap(sec_params_update.getID(), false);
+			GSymbol gid = getSymbolGIDFromMap(sec_params_update.getID(), false);
 			secParams.getOrCreate(gid).consume(sec_params_update.getUpdate());
 		} finally {
 			secParams.unlock();
@@ -242,10 +278,6 @@ public class TQDirectory {
 	public void updateSecurityQuotations(TQStateUpdate<ISecIDT> update) {
 		secQuots.getOrCreate(toSymbolTID(update.getID())).consume(update.getUpdate());
 	}
-
-	public String getMarketName(int market_id) {
-		return markets.getOrThrow(market_id).getName();
-	}
 	
 	public boolean isExistsSecurityParams(ISecIDG sec_id) {
 		secParams.lock();
@@ -256,12 +288,12 @@ public class TQDirectory {
 		}
 	}
 	
-	public boolean isExistsSecurityParams(SymbolGID gid) {
+	public boolean isExistsSecurityParams(GSymbol gid) {
 		return secParams.contains(gid);
 	}
 	
-	public boolean isExistsSecurityParams(SymbolTID tid) {
-		return isExistsSecurityParams(tid.toGID());
+	public boolean isExistsSecurityParams(TSymbol tid) {
+		return isExistsSecurityParams(toSymbolGID(tid));
 	}
 
 	public SecurityParams getSecurityParams(ISecIDG sec_id) {
@@ -273,12 +305,12 @@ public class TQDirectory {
 		}
 	}
 	
-	public SecurityParams getSecurityParams(SymbolGID gid) {
+	public SecurityParams getSecurityParams(GSymbol gid) {
 		return secParams.getOrThrow(gid);
 	}
 	
-	public SecurityParams getSecurityParams(SymbolTID tid) {
-		return getSecurityParams(tid.toGID());
+	public SecurityParams getSecurityParams(TSymbol tid) {
+		return getSecurityParams(toSymbolGID(tid));
 	}
 	
 	public boolean isExistsSecurityBoardParams(ISecIDT sec_id) {
@@ -291,7 +323,7 @@ public class TQDirectory {
 		return secBoardParams.contains(toSymbolTID(sec_id));
 	}
 	
-	public boolean isExistsSecurityBoardParams(SymbolTID tid) {
+	public boolean isExistsSecurityBoardParams(TSymbol tid) {
 		return secBoardParams.contains(tid);
 	}
 	
@@ -299,50 +331,47 @@ public class TQDirectory {
 		return secBoardParams.getOrThrow(toSymbolTID(sec_id));
 	}
 	
-	public SecurityBoardParams getSecurityBoardParams(SymbolTID tid) {
+	public SecurityBoardParams getSecurityBoardParams(TSymbol tid) {
 		return secBoardParams.getOrThrow(tid);
 	}
 	
-	public boolean isExistsSecurityQuotations(SymbolTID tid) {
+	public boolean isExistsSecurityQuotations(TSymbol tid) {
 		return secQuots.contains(tid);
 	}
 	
-	public SecurityQuotations getSecurityQuotations(SymbolTID tid) {
+	public SecurityQuotations getSecurityQuotations(TSymbol tid) {
 		return secQuots.getOrThrow(tid);
 	}
-	
-	private SymbolType toSymbolType(SecType sec_type) {
-		SymbolType type = TYPE_MAP.get(sec_type);
-		if ( type == null ) {
-			type =  SymbolType.UNKNOWN;
-		}
-		return type;
+
+	public String getMarketName(int market_id) {
+		return markets.getOrThrow(market_id).getName();
 	}
-	
+
+	public Symbol toSymbol(TSymbol tid) {
+		return new Symbol(
+				tid.getCode(),
+				tid.getExchangeID(),
+				tid.getCurrencyCode(),
+				tid.getType()
+			);
+	}
+
 	public Symbol toSymbol(ISecIDF sec_id) {
+		GSymbol gid = toSymbolGID(sec_id);
 		return new Symbol(
-				toSymbolGID(sec_id).getTicker(),
+				gid.getCode(),
 				sec_id.getDefaultBoard(),
-				CDecimalBD.RUB,
-				toSymbolType(sec_id.getType())
+				gid.getCurrencyCode(),
+				gid.getType()
 			);
 	}
-	
-	public Symbol toSymbol(SymbolTID tid) {
-		return new Symbol(
-				tid.getTicker(),
-				tid.getBoard(),
-				CDecimalBD.RUB,
-				toSymbolType(getSecurityParams(tid.toGID()).getSecType())
-			);
-	}
-	
-	public SymbolTID toSymbolTID(Symbol symbol) {
-		Board board = boards.getOrThrow(symbol.getExchangeID());
-		return new SymbolTID(
+		
+	public TSymbol toSymbolTID(Symbol symbol) {
+		return new TSymbol(
 				symbol.getCode(),
-				board.getMarketID(),
-				symbol.getExchangeID()
+				symbol.getExchangeID(),
+				symbol.getCurrencyCode(),
+				symbol.getType()
 			);
 	}
 	
@@ -358,14 +387,19 @@ public class TQDirectory {
 	 * there is no data or reverse check gave another symbol.
 	 */
 	public ISecIDT toSecIDT(Symbol symbol, boolean only_if_actual) {
-		SymbolTID tid = toSymbolTID(symbol);
-		SymbolGID gid = tid.toGID();
+		TSymbol tid = toSymbolTID(symbol);
+		GSymbol gid = new GSymbol(
+				tid.getCode(),
+				getMarketName(boards.getOrThrow(tid.getExchangeID()).getMarketID()),
+				tid.getCurrencyCode(),
+				tid.getType()
+			);
 		ISecIDF sec_idf = getSecIDFFromMap(gid, true, false);
 		if ( sec_idf == null ) {
 			return null;
 		}
 		ISecIDG sec_idg = new TQSecIDG(sec_idf);
-		ISecIDT sec_idt = new TQSecIDT(sec_idg.getSecCode(), tid.getBoard());
+		ISecIDT sec_idt = new TQSecIDT(sec_idg.getSecCode(), tid.getExchangeID());
 		if ( only_if_actual && gid.equals(getSymbolGIDFromMap(sec_idg, true, false)) == false ) {
 			return null;
 		}

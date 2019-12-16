@@ -19,8 +19,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ru.prolib.aquila.core.EventQueue;
+import ru.prolib.aquila.core.BusinessEntities.SymbolType;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCRepository;
-import ru.prolib.aquila.transaq.engine.sds.SymbolGID;
+import ru.prolib.aquila.transaq.engine.sds.GSymbol;
 import ru.prolib.aquila.transaq.impl.TQStateUpdate;
 import ru.prolib.aquila.transaq.remote.ISecIDF;
 import ru.prolib.aquila.transaq.remote.MessageParser;
@@ -38,7 +39,7 @@ public class SecurityParamsTest {
 	}
 	
 	private IMocksControl control;
-	private OSCRepository<SymbolGID, SecurityParams> repoMock;
+	private OSCRepository<GSymbol, SecurityParams> repoMock;
 	private EventQueue queueMock;
 
 	private SecurityParams service;
@@ -49,7 +50,7 @@ public class SecurityParamsTest {
 		control = createStrictControl();
 		repoMock = control.createMock(OSCRepository.class);
 		queueMock = control.createMock(EventQueue.class);
-		service = new SecurityParamsFactory(queueMock).produce(repoMock, new SymbolGID("KKK", 7));
+		service = new SecurityParamsFactory(queueMock).produce(repoMock, new GSymbol("KKK", "ZZZ", "USD", SymbolType.UNKNOWN));
 	}
 	
 	private XMLStreamReader startReading(String filename, String expected_elem) throws Exception {

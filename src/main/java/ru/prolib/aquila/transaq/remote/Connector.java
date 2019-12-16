@@ -9,6 +9,7 @@ public interface Connector {
 	void connect() throws TransaqException;
 	void disconnect();
 	void close();
-	void subscribe(Set<ISecIDT> trades, Set<ISecIDT> quotations, Set<ISecIDT> quotes) throws TransaqException ;
-	void unsubscribe(Set<ISecIDT> trades, Set<ISecIDT> quotations, Set<ISecIDT> quotes) throws TransaqException ;
+	void subscribe(Set<ISecIDT> trades, Set<ISecIDT> quotations, Set<ISecIDT> quotes) throws TransaqException;
+	void unsubscribe(Set<ISecIDT> trades, Set<ISecIDT> quotations, Set<ISecIDT> quotes) throws TransaqException;
+	void getSecurities() throws TransaqException;
 }

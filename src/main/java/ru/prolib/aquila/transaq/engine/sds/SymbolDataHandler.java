@@ -5,10 +5,12 @@ import ru.prolib.aquila.core.BusinessEntities.EditableSecurity;
 import ru.prolib.aquila.core.BusinessEntities.SecurityField;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
+import ru.prolib.aquila.transaq.entity.SecurityBoardParams;
 import ru.prolib.aquila.transaq.entity.SecurityParams;
 import ru.prolib.aquila.transaq.impl.TQFieldAssembler;
 
 public class SymbolDataHandler {
+	/*
 	private final SymbolTID tid;
 	private final Symbol symbol;
 	private final ServiceLocator services;
@@ -36,29 +38,35 @@ public class SymbolDataHandler {
 		}
 		return securityParams;
 	}
+	*/
 	
 	public void updateSecurityParams() {
-		SecurityParams sp = getSecurityParams();
-		if ( sp == null ) {
-			return;
-		}
+		//SecurityParams sp = getSecurityParams();
+		//if ( sp == null ) {
+		//	return;
+		//}
 		
-		TQFieldAssembler asm = services.getAssembler();
-		DeltaUpdateBuilder builder = new DeltaUpdateBuilder();
+		//TQFieldAssembler asm = services.getAssembler();
+		//DeltaUpdateBuilder builder = new DeltaUpdateBuilder();
 		
 
-		
+		//SecurityBoardParams sbp = null;
+		//sbp.getm
 		
 		/*
-			SecurityField.DISPLAY_NAME			= sp#ShortName@board#Name;
-			SecurityField.EXPIRATION_TIME		= N/A (получение данных не подтверждено) sp@MatDate
-			SecurityField.LOT_SIZE 				= sbp#LotSize
-			SecurityField.TICK_SIZE				= sbp#MinStep
-			SecurityField.TICK_VALUE			= 10 ^ sbp#Decimals * sbp#PointCost * sbp#MinStep / 100
-			SecurityField.INITIAL_MARGIN;		= MAX(sp#BuyDeposit, sp#SellDeposit) (FORTS only)
+			SecurityField.DISPLAY_NAME			= sp#ShortName@board#Code;
+			SecurityField.INITIAL_MARGIN		= MAX(sp#BuyDeposit, sp#SellDeposit) (FORTS only)
 			SecurityField.UPPER_PRICE_LIMIT		= sp#MinPrice (FORTS only)
 			SecurityField.LOWER_PRICE_LIMIT		= sp#MaxPrice (FORTS only)
 			SecurityField.SETTLEMENT_PRICE		= N/A (получение данных не подтверждено) sp#ClearingPrice (FORTS only)
+			SecurityField.EXPIRATION_TIME		= N/A (получение данных не подтверждено) sp@MatDate
+			
+			Проблема: settlement price определить не удается. Не передается clearing_price даже для фортса.
+						
+			SecurityField.LOT_SIZE 				= sbp#LotSize
+			SecurityField.TICK_SIZE				= sbp#MinStep
+			SecurityField.TICK_VALUE			= 10 ^ sbp#Decimals * sbp#PointCost * sbp#MinStep / 100
+
 			SecurityField.OPEN_PRICE			= quot#Open
 			SecurityField.HIGH_PRICE			= quot#High
 			SecurityField.LOW_PRICE				= quot#Low
@@ -69,7 +77,6 @@ public class SymbolDataHandler {
 			Last								= Поток alltrades 
 			MarketDepth							= Поток quotes
 			
-			Проблема: settlement price определить не удается. Не передается clearing_price даже для фортса.
 		*/
 
 	}

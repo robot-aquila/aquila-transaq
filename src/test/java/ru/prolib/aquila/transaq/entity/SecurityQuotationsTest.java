@@ -21,8 +21,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ru.prolib.aquila.core.EventQueue;
+import ru.prolib.aquila.core.BusinessEntities.SymbolType;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCRepository;
-import ru.prolib.aquila.transaq.engine.sds.SymbolTID;
+import ru.prolib.aquila.transaq.engine.sds.TSymbol;
 import ru.prolib.aquila.transaq.impl.TQStateUpdate;
 import ru.prolib.aquila.transaq.remote.ISecIDT;
 import ru.prolib.aquila.transaq.remote.MessageParser;
@@ -40,7 +41,7 @@ public class SecurityQuotationsTest {
 	}
 	
 	private IMocksControl control;
-	private OSCRepository<SymbolTID, SecurityQuotations> repoMock;
+	private OSCRepository<TSymbol, SecurityQuotations> repoMock;
 	private EventQueue queueMock;
 
 	private SecurityQuotations service;
@@ -51,7 +52,7 @@ public class SecurityQuotationsTest {
 		control = createStrictControl();
 		repoMock = control.createMock(OSCRepository.class);
 		queueMock = control.createMock(EventQueue.class);
-		service = new SecurityQuotationsFactory(queueMock).produce(repoMock, new SymbolTID("KKK", 7, "ZZZ"));
+		service = new SecurityQuotationsFactory(queueMock).produce(repoMock, new TSymbol("KKK", "ZZZ", "EUR", SymbolType.UNKNOWN));
 	}
 	
 	private XMLStreamReader startReading(String filename, String expected_elem) throws Exception {

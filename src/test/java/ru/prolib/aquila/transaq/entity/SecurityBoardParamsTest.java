@@ -18,8 +18,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ru.prolib.aquila.core.EventQueue;
+import ru.prolib.aquila.core.BusinessEntities.SymbolType;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCRepository;
-import ru.prolib.aquila.transaq.engine.sds.SymbolTID;
+import ru.prolib.aquila.transaq.engine.sds.TSymbol;
 import ru.prolib.aquila.transaq.impl.TQStateUpdate;
 import ru.prolib.aquila.transaq.remote.TQSecIDT;
 import ru.prolib.aquila.transaq.remote.ISecIDT;
@@ -39,7 +40,7 @@ public class SecurityBoardParamsTest {
 	}
 
 	private IMocksControl control;
-	private OSCRepository<SymbolTID, SecurityBoardParams> repoMock;
+	private OSCRepository<TSymbol, SecurityBoardParams> repoMock;
 	private EventQueue queueMock;
 	private SecurityBoardParams service;
 
@@ -49,7 +50,7 @@ public class SecurityBoardParamsTest {
 		control = createStrictControl();
 		repoMock = control.createMock(OSCRepository.class);
 		queueMock = control.createMock(EventQueue.class);
-		service = new SecurityBoardParamsFactory(queueMock).produce(repoMock, new SymbolTID("foo", 5, "bar"));
+		service = new SecurityBoardParamsFactory(queueMock).produce(repoMock, new TSymbol("foo", "bar", "USD", SymbolType.UNKNOWN));
 	}
 	
 	private XMLStreamReader startReading(String filename, String expected_elem) throws Exception {

@@ -84,11 +84,11 @@ public class ConnectorTest {
 		conn.connect();
 		Thread.sleep(10000L);
 		try {
-			Set<ISecIDT> symbols = new LinkedHashSet<>();
-			symbols.add(new TQSecIDT("RIZ9", "FUT"));
+			//Set<ISecIDT> symbols = new LinkedHashSet<>();
+			//symbols.add(new TQSecIDT("RIZ9", "FUT"));
 			//symbols.add(new TQSecIDT("SBER", "TQBR"));
 			//conn.subscribe(symbols, StdConnector.SUBSCR_TYPE_QUOTATIONS);
-			conn.subscribe(symbols, symbols, symbols);
+			//conn.subscribe(symbols, symbols, symbols);
 			Thread.sleep(20000L);
 		} finally {
 			conn.disconnect();

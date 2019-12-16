@@ -290,5 +290,15 @@ public class StdConnectorTest {
 		
 		control.verify();
 	}
+	
+	@Test
+	public void testGetSecurities() throws Exception {
+		serverMock.SendCommand("<command id=\"get_securities\"/>");
+		control.replay();
+		
+		service.getSecurities();
+		
+		control.verify();
+	}
 
 }

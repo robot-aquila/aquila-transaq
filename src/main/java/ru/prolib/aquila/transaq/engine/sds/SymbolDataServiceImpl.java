@@ -89,21 +89,6 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 		return x > 0;
 	}
 	
-	private boolean syncSubscrStates() {
-		boolean x = false;
-		TQDirectory dir = services.getDirectory();
-		for ( SymbolSubscrCounter subscr : subscrCounters.getEntities() ) {
-			Symbol symbol = subscr.getSymbol();
-			ISecIDT idt = dir.toSecIDT(symbol, true);
-			if ( idt != null ) {
-				if ( syncSubscrState(getStateOfDataFeeds(idt), subscr) ) {
-					x = true;
-				}
-			}
-		}
-		return x;
-	}
-	
 	private StateOfDataFeeds getStateOfDataFeeds(ISecIDT idt) {
 		StateOfDataFeeds state = feedStateMap.get(idt);
 		if ( state == null ) {
@@ -225,7 +210,7 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 			_applyPendingChanges();
 		}
 	}
-
+	
 	@Override
 	public void onConnectionStatusChange(boolean connected) {
 		if ( this.connected = connected ) {
@@ -233,7 +218,20 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 			// subscription counters with state of data feeds
 			// for each existing counter. Then apply pending
 			// changes.
-			if ( syncSubscrStates() ) {
+			boolean x = false;
+			TQDirectory dir = services.getDirectory();
+			for ( SymbolSubscrCounter subscr : subscrCounters.getEntities() ) {
+				Symbol symbol = subscr.getSymbol();
+				//if ( dir.isKnownSymbol(symbol) ) {
+					ISecIDT idt = dir.toSecIDT(symbol, true);
+					if ( idt != null ) {
+						if ( syncSubscrState(getStateOfDataFeeds(idt), subscr) ) {
+							x = true;
+						}
+					}
+				//}
+			}
+			if ( x ) {
 				_applyPendingChanges();
 			}
 			

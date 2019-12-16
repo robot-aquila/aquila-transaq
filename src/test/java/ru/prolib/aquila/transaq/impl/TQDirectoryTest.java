@@ -37,12 +37,12 @@ public class TQDirectoryTest {
 	private OSCRepository<Integer, CKind> ckindsMock, ckinds;
 	private OSCRepository<Integer, Market> marketsMock, markets;
 	private OSCRepository<String, Board> boardsMock, boards;
-	private OSCRepository<SymbolGID, SecurityParams> secParamsMock, secParams;
-	private OSCRepository<SymbolTID, SecurityBoardParams> secBoardParamsMock, secBoardParams;
-	private OSCRepository<SymbolTID, SecurityQuotations> secQuotsMock, secQuots;
+	private OSCRepository<GSymbol, SecurityParams> secParamsMock, secParams;
+	private OSCRepository<TSymbol, SecurityBoardParams> secBoardParamsMock, secBoardParams;
+	private OSCRepository<TSymbol, SecurityQuotations> secQuotsMock, secQuots;
 	private DeltaUpdate duMock;
-	private Map<ISecIDG, SymbolGID> tq2gidMap;
-	private Map<SymbolGID, ISecIDF> gid2tqMap;
+	private Map<ISecIDG, GSymbol> tq2gidMap;
+	private Map<GSymbol, ISecIDF> gid2tqMap;
 	private TQDirectory service;
 
 	@SuppressWarnings("unchecked")
@@ -117,60 +117,74 @@ public class TQDirectoryTest {
 	
 	@Test
 	public void testUpdateSecurityParamsF_CommonType() {
+		markets.getOrCreate(1).consume(new DeltaUpdateBuilder()
+				.withToken(FMarket.ID, 1)
+				.withToken(FMarket.NAME, "MICEX")
+				.buildUpdate()
+			);
+		GSymbol gid = new GSymbol("GAZP", "MICEX", "RUB", SymbolType.STOCK);
+		TQSecIDF sec_idf = new TQSecIDF("GAZP", 1, "EQTB", "Gazprom AO", SecType.SHARE);
 		service = new TQDirectory(ckinds, markets, boards, secParamsMock, secBoardParams, secQuots, tq2gidMap, gid2tqMap);
 		SecurityParams entityMock = control.createMock(SecurityParams.class);
 		secParamsMock.lock();
-		expect(secParamsMock.getOrCreate(new SymbolGID("GAZP", 0))).andReturn(entityMock);
+		expect(secParamsMock.getOrCreate(gid)).andReturn(entityMock);
 		entityMock.consume(duMock);
 		secParamsMock.unlock();
 		control.replay();
 		
-		service.updateSecurityParamsF(new TQStateUpdate<>(
-				new TQSecIDF("GAZP", 0, "EQTB", "Gazprom AO", SecType.SHARE), duMock)
-			);
+		service.updateSecurityParamsF(new TQStateUpdate<>(sec_idf, duMock));
 
 		control.verify();
-		assertEquals(new SymbolGID("GAZP", 0), tq2gidMap.get(new TQSecIDG("GAZP", 0)));
-		assertEquals(new TQSecIDF("GAZP", 0, "EQTB", "Gazprom AO", SecType.SHARE), gid2tqMap.get(new SymbolGID("GAZP", 0)));
+		assertEquals(gid, tq2gidMap.get(new TQSecIDG("GAZP", 1)));
+		assertEquals(sec_idf, gid2tqMap.get(gid));
 	}
 	
 	@Test
 	public void testUpdateSecurityParamsF_Fut() {
+		markets.getOrCreate(4).consume(new DeltaUpdateBuilder()
+				.withToken(FMarket.ID, 4)
+				.withToken(FMarket.NAME, "FORTS")
+				.buildUpdate()
+			);
+		GSymbol gid = new GSymbol("RTS-12.19", "FORTS", "RUB", SymbolType.FUTURES);
+		TQSecIDF sec_idf = new TQSecIDF("RIZ9", 4, "FUT", "RTS-12.19", SecType.FUT);
 		service = new TQDirectory(ckinds, markets, boards, secParamsMock, secBoardParams, secQuots, tq2gidMap, gid2tqMap);
 		SecurityParams entityMock = control.createMock(SecurityParams.class);
 		secParamsMock.lock();
-		expect(secParamsMock.getOrCreate(new SymbolGID("RTS-12.19", 4))).andReturn(entityMock);
+		expect(secParamsMock.getOrCreate(gid)).andReturn(entityMock);
 		entityMock.consume(duMock);
 		secParamsMock.unlock();
 		control.replay();
 
-		service.updateSecurityParamsF(new TQStateUpdate<>(
-				new TQSecIDF("RIZ9", 4, "FUT", "RTS-12.19", SecType.FUT), duMock)
-			);
+		service.updateSecurityParamsF(new TQStateUpdate<>(sec_idf, duMock));
 		
 		control.verify();
-		assertEquals(new SymbolGID("RTS-12.19", 4), tq2gidMap.get(new TQSecIDG("RIZ9", 4)));
-		assertEquals(new TQSecIDF("RIZ9", 4, "FUT", "RTS-12.19", SecType.FUT), gid2tqMap.get(new SymbolGID("RTS-12.19", 4)));
+		assertEquals(gid, tq2gidMap.get(new TQSecIDG("RIZ9", 4)));
+		assertEquals(sec_idf, gid2tqMap.get(gid));
 	}
 
 	@Test
 	public void testUpdateSecurityParamsF_Opt() {
+		markets.getOrCreate(4).consume(new DeltaUpdateBuilder()
+				.withToken(FMarket.ID, 4)
+				.withToken(FMarket.NAME, "FORTS")
+				.buildUpdate()
+			);
+		GSymbol gid = new GSymbol("Eu-6.19M200619CA63500", "FORTS", "RUB", SymbolType.OPTION);
+		TQSecIDF sec_idf = new TQSecIDF("Eu63500BF9", 4, "OPT", "Eu-6.19M200619CA63500", SecType.OPT);
 		service = new TQDirectory(ckinds, markets, boards, secParamsMock, secBoardParams, secQuots, tq2gidMap, gid2tqMap);
 		SecurityParams entityMock = control.createMock(SecurityParams.class);
 		secParamsMock.lock();
-		expect(secParamsMock.getOrCreate(new SymbolGID("Eu-6.19M200619CA63500", 4))).andReturn(entityMock);
+		expect(secParamsMock.getOrCreate(gid)).andReturn(entityMock);
 		entityMock.consume(duMock);
 		secParamsMock.unlock();
 		control.replay();
 
-		service.updateSecurityParamsF(new TQStateUpdate<>(
-				new TQSecIDF("Eu63500BF9", 4, "OPT", "Eu-6.19M200619CA63500", SecType.OPT), duMock)
-			);
+		service.updateSecurityParamsF(new TQStateUpdate<>(sec_idf, duMock));
 		
 		control.verify();
-		assertEquals(new SymbolGID("Eu-6.19M200619CA63500", 4), tq2gidMap.get(new TQSecIDG("Eu63500BF9", 4)));
-		assertEquals(new TQSecIDF("Eu63500BF9", 4, "OPT", "Eu-6.19M200619CA63500", SecType.OPT),
-				gid2tqMap.get(new SymbolGID("Eu-6.19M200619CA63500", 4)));
+		assertEquals(gid, tq2gidMap.get(new TQSecIDG("Eu63500BF9", 4)));
+		assertEquals(sec_idf, gid2tqMap.get(gid));
 	}
 	
 	@Test
@@ -186,10 +200,11 @@ public class TQDirectoryTest {
 
 	@Test
 	public void testUpdateSecurityParamsP() {
-		tq2gidMap.put(new TQSecIDG("RIZ9", 4), new SymbolGID("RTS-12.19", 4));
+		GSymbol gid = new GSymbol("RTS-12.19", "FORTS", "RUB", SymbolType.FUTURES);
+		tq2gidMap.put(new TQSecIDG("RIZ9", 4), gid);
 		SecurityParams entityMock = control.createMock(SecurityParams.class);
 		secParamsMock.lock();
-		expect(secParamsMock.getOrCreate(new SymbolGID("RTS-12.19", 4))).andReturn(entityMock);
+		expect(secParamsMock.getOrCreate(gid)).andReturn(entityMock);
 		entityMock.consume(duMock);
 		secParamsMock.unlock();
 		control.replay();
@@ -236,9 +251,12 @@ public class TQDirectoryTest {
 				.withToken(FBoard.TYPE, 0)
 				.buildUpdate()
 			);
-		tq2gidMap.put(new TQSecIDG("RIZ9", 4), new SymbolGID("RTS-12.19", 4));
+		
+		GSymbol gid = new GSymbol("RTS-12.19", "FORTS", "RUB", SymbolType.FUTURES);
+		TSymbol tid = new TSymbol("RTS-12.19", "FUT", "RUB", SymbolType.FUTURES);
+		tq2gidMap.put(new TQSecIDG("RIZ9", 4), gid);
 		SecurityBoardParams entityMock = control.createMock(SecurityBoardParams.class);
-		expect(secBoardParamsMock.getOrCreate(new SymbolTID("RTS-12.19", 4, "FUT"))).andReturn(entityMock);
+		expect(secBoardParamsMock.getOrCreate(tid)).andReturn(entityMock);
 		entityMock.consume(duMock);
 		control.replay();
 		
@@ -284,9 +302,11 @@ public class TQDirectoryTest {
 				.withToken(FBoard.TYPE, 0)
 				.buildUpdate()
 			);
-		tq2gidMap.put(new TQSecIDG("RIZ9", 4), new SymbolGID("RTS-12.19", 4));
+		GSymbol gid = new GSymbol("RTS-12.19", "FORTS", "RUB", SymbolType.FUTURES);
+		TSymbol tid = new TSymbol("RTS-12.19", "FUT", "RUB", SymbolType.FUTURES);
+		tq2gidMap.put(new TQSecIDG("RIZ9", 4), gid);
 		SecurityQuotations entityMock = control.createMock(SecurityQuotations.class);
-		expect(secQuotsMock.getOrCreate(new SymbolTID("RTS-12.19", 4, "FUT"))).andReturn(entityMock);
+		expect(secQuotsMock.getOrCreate(tid)).andReturn(entityMock);
 		entityMock.consume(duMock);
 		control.replay();
 		
@@ -339,7 +359,7 @@ public class TQDirectoryTest {
 	
 	@Test
 	public void testGetSecurityParamsRepository() {
-		OSCRepository<SymbolGID, SecurityParams> actual = service.getSecurityParamsRepository();
+		OSCRepository<GSymbol, SecurityParams> actual = service.getSecurityParamsRepository();
 		
 		assertNotNull(actual);
 		assertNotSame(secParamsMock, actual);
@@ -349,7 +369,7 @@ public class TQDirectoryTest {
 	
 	@Test
 	public void testGetSecurityBoardParamsRepository() {
-		OSCRepository<SymbolTID, SecurityBoardParams> actual = service.getSecurityBoardParamsRepository();
+		OSCRepository<TSymbol, SecurityBoardParams> actual = service.getSecurityBoardParamsRepository();
 		
 		assertNotNull(actual);
 		assertNotSame(secBoardParamsMock, actual);
@@ -359,7 +379,7 @@ public class TQDirectoryTest {
 	
 	@Test
 	public void testGetSecurityQuotationsRepository() {
-		OSCRepository<SymbolTID, SecurityQuotations> actual = service.getSecurityQuotationsRepository();
+		OSCRepository<TSymbol, SecurityQuotations> actual = service.getSecurityQuotationsRepository();
 		
 		assertNotNull(actual);
 		assertNotSame(secQuotsMock, actual);
@@ -370,7 +390,7 @@ public class TQDirectoryTest {
 	@Test
 	public void testIsExistsSecurityParams_SecIDG() {
 		service = new TQDirectory(ckinds, markets, boards, secParams, secBoardParams, secQuots, tq2gidMap, gid2tqMap);
-		tq2gidMap.put(new TQSecIDG("RIZ9", 4),  new SymbolGID("RTS-12.19", 4));
+		tq2gidMap.put(new TQSecIDG("RIZ9", 4),  new GSymbol("RTS-12.19", "FORTS", "RUB", SymbolType.FUTURES));
 		control.replay();
 		
 		assertTrue(service.isExistsSecurityParams(new TQSecIDG("RIZ9", 4)));
@@ -381,24 +401,49 @@ public class TQDirectoryTest {
 	
 	@Test
 	public void testIsExistsSecurityParams_SymbolGID() {
-		expect(secParamsMock.contains(new SymbolGID("GAZP", 1))).andReturn(true);
-		expect(secParamsMock.contains(new SymbolGID("RIZ9", 4))).andReturn(false);
+		expect(secParamsMock.contains(new GSymbol("GAZP", "MICEX", "RUB", SymbolType.STOCK))).andReturn(true);
+		expect(secParamsMock.contains(new GSymbol("RIZ9", "FORTS", "RUB", SymbolType.FUTURES))).andReturn(false);
 		control.replay();
 		
-		assertTrue(service.isExistsSecurityParams(new SymbolGID("GAZP", 1)));
-		assertFalse(service.isExistsSecurityParams(new SymbolGID("RIZ9", 4)));
+		assertTrue(service.isExistsSecurityParams(new GSymbol("GAZP", "MICEX", "RUB", SymbolType.STOCK)));
+		assertFalse(service.isExistsSecurityParams(new GSymbol("RIZ9", "FORTS", "RUB", SymbolType.FUTURES)));
 		
 		control.verify();
 	}
 	
 	@Test
 	public void testIsExistsSecurityParams_SymbolTID() {
-		expect(secParamsMock.contains(new SymbolGID("GAZP", 1))).andReturn(true);
-		expect(secParamsMock.contains(new SymbolGID("RIZ9", 4))).andReturn(false);
+		service = new TQDirectory(ckinds, markets, boards, secParamsMock, secBoardParams, secQuots, tq2gidMap, gid2tqMap);
+		markets.getOrCreate(1).consume(new DeltaUpdateBuilder()
+				.withToken(FMarket.ID, 1)
+				.withToken(FMarket.NAME, "MICEX")
+				.buildUpdate()
+			);
+		markets.getOrCreate(4).consume(new DeltaUpdateBuilder()
+				.withToken(FMarket.ID, 4)
+				.withToken(FMarket.NAME, "FORTS")
+				.buildUpdate()
+			);
+		boards.getOrCreate("EQTB").consume(new DeltaUpdateBuilder()
+				.withToken(FBoard.CODE, "EQTB")
+				.withToken(FBoard.MARKET_ID, 1)
+				.withToken(FBoard.NAME, "EQTB XXX")
+				.withToken(FBoard.TYPE, 0)
+				.buildUpdate()
+			);
+		boards.getOrCreate("FUT").consume(new DeltaUpdateBuilder()
+				.withToken(FBoard.CODE, "FUT")
+				.withToken(FBoard.MARKET_ID, 4)
+				.withToken(FBoard.NAME, "FUT XXX")
+				.withToken(FBoard.TYPE, 0)
+				.buildUpdate()
+			);
+		expect(secParamsMock.contains(new GSymbol("GAZP", "MICEX", "RUB", SymbolType.STOCK))).andReturn(true);
+		expect(secParamsMock.contains(new GSymbol("RIZ9", "FORTS", "RUB", SymbolType.FUTURES))).andReturn(false);
 		control.replay();
 		
-		assertTrue(service.isExistsSecurityParams(new SymbolTID("GAZP", 1, "EQTB")));
-		assertFalse(service.isExistsSecurityParams(new SymbolTID("RIZ9", 4, "FUT")));
+		assertTrue(service.isExistsSecurityParams(new TSymbol("GAZP", "EQTB", "RUB", SymbolType.STOCK)));
+		assertFalse(service.isExistsSecurityParams(new TSymbol("RIZ9", "FUT", "RUB", SymbolType.FUTURES)));
 		
 		control.verify();
 	}
@@ -406,14 +451,19 @@ public class TQDirectoryTest {
 	@Test
 	public void testGetSecurityParams_SecIDG() {
 		service = new TQDirectory(queue);
+		service.updateMarket(new TQStateUpdate<>(4, new DeltaUpdateBuilder()
+				.withToken(FMarket.ID, 4)
+				.withToken(FMarket.NAME, "FORTS")
+				.buildUpdate()
+			));
 		service.updateSecurityParamsF(new TQStateUpdate<>(
 				new TQSecIDF("RIZ9", 4, "FUT", "RTS-12.19", SecType.FUT),
 				new DeltaUpdateBuilder()
 					.withToken(FSecurity.SECCODE, "RIZ9")
 					.withToken(FSecurity.DEFAULT_BOARDCODE, "FUT")
 					.withToken(FSecurity.SHORT_NAME, "RTS-12.19")
-					.buildUpdate())
-			);
+					.buildUpdate()
+			));
 		control.replay();
 		
 		SecurityParams actual = service.getSecurityParams(new TQSecIDG("RIZ9", 4));
@@ -428,6 +478,11 @@ public class TQDirectoryTest {
 	@Test
 	public void testGetSecurityParams_SymbolGID() {
 		service = new TQDirectory(queue);
+		service.updateMarket(new TQStateUpdate<>(4, new DeltaUpdateBuilder()
+				.withToken(FMarket.ID, 4)
+				.withToken(FMarket.NAME, "FORTS")
+				.buildUpdate()
+			));
 		service.updateSecurityParamsF(new TQStateUpdate<>(
 				new TQSecIDF("RIZ9", 4, "FUT", "RTS-12.19", SecType.FUT),
 				new DeltaUpdateBuilder()
@@ -438,7 +493,7 @@ public class TQDirectoryTest {
 			);
 		control.replay();
 
-		SecurityParams actual = service.getSecurityParams(new SymbolGID("RTS-12.19", 4));
+		SecurityParams actual = service.getSecurityParams(new GSymbol("RTS-12.19", "FORTS", "RUB", SymbolType.FUTURES));
 		
 		control.verify();
 		assertNotNull(actual);
@@ -450,6 +505,18 @@ public class TQDirectoryTest {
 	@Test
 	public void testGetSecurityParams_SymbolTID() {
 		service = new TQDirectory(queue);
+		service.updateMarket(new TQStateUpdate<>(4, new DeltaUpdateBuilder()
+				.withToken(FMarket.ID, 4)
+				.withToken(FMarket.NAME, "FORTS")
+				.buildUpdate()
+			));
+		service.updateBoard(new TQStateUpdate<>("FUT", new DeltaUpdateBuilder()
+				.withToken(FBoard.CODE, "FUT")
+				.withToken(FBoard.MARKET_ID, 4)
+				.withToken(FBoard.NAME, "FUT XXX")
+				.withToken(FBoard.TYPE, 0)
+				.buildUpdate()
+			));
 		service.updateSecurityParamsF(new TQStateUpdate<>(
 				new TQSecIDF("RIZ9", 4, "FUT", "RTS-12.19", SecType.FUT),
 				new DeltaUpdateBuilder()
@@ -460,7 +527,7 @@ public class TQDirectoryTest {
 			);
 		control.replay();
 
-		SecurityParams actual = service.getSecurityParams(new SymbolTID("RTS-12.19", 4, "FUT"));
+		SecurityParams actual = service.getSecurityParams(new TSymbol("RTS-12.19", "FUT", "RUB", SymbolType.FUTURES));
 		
 		control.verify();
 		assertNotNull(actual);
@@ -472,6 +539,11 @@ public class TQDirectoryTest {
 	@Test
 	public void testIsExistsSecurityBoardParams_SecIDT() {
 		service = new TQDirectory(queue);
+		service.updateMarket(new TQStateUpdate<>(4, new DeltaUpdateBuilder()
+				.withToken(FMarket.ID, 4)
+				.withToken(FMarket.NAME, "FORTS")
+				.buildUpdate()
+			));
 		service.updateBoard(new TQStateUpdate<>("FUT", new DeltaUpdateBuilder()
 				.withToken(FBoard.CODE, "FUT")
 				.withToken(FBoard.MARKET_ID, 4)
@@ -509,24 +581,30 @@ public class TQDirectoryTest {
 	
 	@Test
 	public void testIsExistsSecurityBoardParams_SymbolTID() {
-		expect(secBoardParamsMock.contains(new SymbolTID("RIZ9", 4, "FUT"))).andReturn(true);
-		expect(secBoardParamsMock.contains(new SymbolTID("GAZP", 1, "EQTB"))).andReturn(false);
+		service = new TQDirectory(ckinds, markets, boards, secParams, secBoardParamsMock, secQuots, tq2gidMap, gid2tqMap);
+		TSymbol tid1 = new TSymbol("RTS-12.19", "FUT", "RUB", SymbolType.FUTURES);
+		TSymbol tid2 = new TSymbol("GAZP", "EQTB", "RUB", SymbolType.STOCK);
+		expect(secBoardParamsMock.contains(tid1)).andReturn(true);
+		expect(secBoardParamsMock.contains(tid2)).andReturn(false);
 		control.replay();
 		
-		assertTrue(service.isExistsSecurityBoardParams(new SymbolTID("RIZ9", 4, "FUT")));
-		assertFalse(service.isExistsSecurityBoardParams(new SymbolTID("GAZP", 1, "EQTB")));
+		assertTrue(service.isExistsSecurityBoardParams(tid1));
+		assertFalse(service.isExistsSecurityBoardParams(tid2));
 		
 		control.verify();
 	}
 	
 	@Test
 	public void testIsExistsSecurityQuotations_SymbolTID() {
-		expect(secQuotsMock.contains(new SymbolTID("SBERP", 1, "EQTB"))).andReturn(false);
-		expect(secQuotsMock.contains(new SymbolTID("BOOM", 5, "KAPPA"))).andReturn(true);
+		service = new TQDirectory(ckinds, markets, boards, secParams, secBoardParams, secQuotsMock, tq2gidMap, gid2tqMap);
+		TSymbol tid1 = new TSymbol("SBERP", "EQTB", "RUB", SymbolType.STOCK);
+		TSymbol tid2 = new TSymbol("BOOM", "KAPPA", "RUB", SymbolType.STOCK);
+		expect(secQuotsMock.contains(tid1)).andReturn(false);
+		expect(secQuotsMock.contains(tid2)).andReturn(true);
 		control.replay();
 		
-		assertFalse(service.isExistsSecurityQuotations(new SymbolTID("SBERP", 1, "EQTB")));
-		assertTrue(service.isExistsSecurityQuotations(new SymbolTID("BOOM", 5, "KAPPA")));
+		assertFalse(service.isExistsSecurityQuotations(tid1));
+		assertTrue(service.isExistsSecurityQuotations(tid2));
 		
 		control.verify();
 	}
@@ -541,8 +619,9 @@ public class TQDirectoryTest {
 				.withToken(FBoard.TYPE, 0)
 				.buildUpdate()
 			));
-		tq2gidMap.put(new TQSecIDG("RIZ9", 4), new SymbolGID("RTS-12.19", 4));
-		SecurityBoardParams x = secBoardParams.getOrCreate(new SymbolTID("RTS-12.19", 4, "FUT"));
+		TSymbol tid = new TSymbol("RTS-12.19", "FUT", "RUB", SymbolType.FUTURES);
+		tq2gidMap.put(new TQSecIDG("RIZ9", 4), new GSymbol("RTS-12.19", "FORTS", "RUB", SymbolType.FUTURES));
+		SecurityBoardParams x = secBoardParams.getOrCreate(tid);
 		control.replay();
 		
 		SecurityBoardParams actual = service.getSecurityBoardParams(new TQSecIDT("RIZ9", "FUT"));
@@ -553,28 +632,47 @@ public class TQDirectoryTest {
 	
 	@Test
 	public void testGetSecurityBoardParams_SymbolTID() {
+		TSymbol tid = new TSymbol("Si-12.19", "FUT", "RUB", SymbolType.FUTURES);
 		SecurityBoardParams sbpMock = control.createMock(SecurityBoardParams.class);
-		expect(secBoardParamsMock.getOrThrow(new SymbolTID("Si-12.19", 4, "FUT"))).andReturn(sbpMock);
+		expect(secBoardParamsMock.getOrThrow(tid)).andReturn(sbpMock);
 		control.replay();
 		
-		assertSame(sbpMock, service.getSecurityBoardParams(new SymbolTID("Si-12.19", 4, "FUT")));
+		assertSame(sbpMock, service.getSecurityBoardParams(tid));
 		
 		control.verify();
 	}
 	
 	@Test
 	public void testGetSecurityQuotations_SymbolTID() {
+		TSymbol tid = new TSymbol("GAZP", "EQTB", "RUB", SymbolType.STOCK);
 		SecurityQuotations entityMock = control.createMock(SecurityQuotations.class);
-		expect(secQuotsMock.getOrThrow(new SymbolTID("GAZP", 1, "EQTB"))).andReturn(entityMock);
+		expect(secQuotsMock.getOrThrow(tid)).andReturn(entityMock);
 		control.replay();
 		
-		assertSame(entityMock, service.getSecurityQuotations(new SymbolTID("GAZP", 1, "EQTB")));
+		assertSame(entityMock, service.getSecurityQuotations(tid));
 		
 		control.verify();
 	}
 	
 	@Test
 	public void testToSymbol_SecIDF() {
+		service = new TQDirectory(queue);
+		service.updateMarket(new TQStateUpdate<>(0, new DeltaUpdateBuilder()
+				.withToken(FMarket.ID, 1)
+				.withToken(FMarket.NAME, "XXX 0")
+				.buildUpdate()
+			));
+		service.updateMarket(new TQStateUpdate<>(1, new DeltaUpdateBuilder()
+				.withToken(FMarket.ID, 1)
+				.withToken(FMarket.NAME, "XXX 1")
+				.buildUpdate()
+			));
+		service.updateMarket(new TQStateUpdate<>(2, new DeltaUpdateBuilder()
+				.withToken(FMarket.ID, 2)
+				.withToken(FMarket.NAME, "XXX 2")
+				.buildUpdate()
+			));
+		
 		assertEquals(new Symbol("U:boo@GAP:RUB"), service.toSymbol(new TQSecIDF("boo", 1, "GAP", "BAA", SecType.ADR)));
 		assertEquals(new Symbol("B:lol@ZOB:RUB"), service.toSymbol(new TQSecIDF("lol", 2, "ZOB", "KAA", SecType.BOND)));
 		assertEquals(new Symbol("C:JPY@FX:RUB"), service.toSymbol(new TQSecIDF("JPY", 0, "FX", "JAPAN", SecType.CURRENCY)));
@@ -597,6 +695,16 @@ public class TQDirectoryTest {
 	@Test
 	public void testToSymbol_SymbolTID() {
 		service = new TQDirectory(queue);
+		service.updateMarket(new TQStateUpdate<>(4, new DeltaUpdateBuilder()
+				.withToken(FMarket.ID, 4)
+				.withToken(FMarket.NAME, "FORTS")
+				.buildUpdate()
+			));
+		service.updateMarket(new TQStateUpdate<>(1, new DeltaUpdateBuilder()
+				.withToken(FMarket.ID, 1)
+				.withToken(FMarket.NAME, "MICEX")
+				.buildUpdate()
+			));
 		service.updateSecurityParamsF(new TQStateUpdate<>(new TQSecIDF("RIZ9", 4, "FUT", "RTS-12.19", SecType.FUT),
 				new DeltaUpdateBuilder()
 					.withToken(FSecurity.SECTYPE, SecType.FUT)
@@ -609,8 +717,8 @@ public class TQDirectoryTest {
 			));
 		control.replay();
 		
-		assertEquals(new Symbol("F:RTS-12.19@FUT:RUB"), service.toSymbol(new SymbolTID("RTS-12.19", 4, "FUT")));
-		assertEquals(new Symbol("S:GAZP@EQTB:RUB"), service.toSymbol(new SymbolTID("GAZP", 1, "EQTB")));
+		assertEquals(new Symbol("F:RTS-12.19@FUT:RUB"), service.toSymbol(new TSymbol("RTS-12.19", "FUT", "RUB", SymbolType.FUTURES)));
+		assertEquals(new Symbol("S:GAZP@EQTB:RUB"), service.toSymbol(new TSymbol("GAZP", "EQTB", "RUB", SymbolType.STOCK)));
 		
 		control.verify();
 	}
@@ -618,6 +726,20 @@ public class TQDirectoryTest {
 	@Test
 	public void testToSymbolTID_Symbol() {
 		service = new TQDirectory(queue);
+		control.replay();
+		
+		TSymbol expected = new TSymbol("RTS-12.19", "FUT", "RUB", SymbolType.FUTURES);
+		assertEquals(expected, service.toSymbolTID(new Symbol("F:RTS-12.19@FUT:RUB")));
+	}
+	
+	@Test
+	public void testToSecIDT2_Symbol() {
+		service = new TQDirectory(queue);
+		service.updateMarket(new TQStateUpdate<>(4, new DeltaUpdateBuilder()
+				.withToken(FMarket.ID, 4)
+				.withToken(FMarket.NAME, "FORTS")
+				.buildUpdate()
+			));
 		service.updateBoard(new TQStateUpdate<>("FUT", new DeltaUpdateBuilder()
 				.withToken(FBoard.CODE, "FUT")
 				.withToken(FBoard.MARKET_ID, 4)
@@ -625,30 +747,6 @@ public class TQDirectoryTest {
 				.withToken(FBoard.TYPE, 0)
 				.buildUpdate()
 			));
-		control.replay();
-		
-		assertEquals(new SymbolTID("RTS-12.19", 4, "FUT"), service.toSymbolTID(new Symbol("F:RTS-12.19@FUT:RUB")));
-	}
-	
-	@Test
-	public void testToSymbolTID_ThrowsIfBoardNotFound() {
-		service = new TQDirectory(queue);
-		eex.expect(IllegalArgumentException.class);
-		eex.expectMessage("Entity not exists: FUT");
-		control.replay();
-		
-		service.toSymbolTID(new Symbol("F:RTS-12.19@FUT:RUB"));
-	}
-	
-	@Test
-	public void testToSecIDT2_Symbol() {
-		service = new TQDirectory(queue);
-		service.updateBoard(new TQStateUpdate<>("FUT", new DeltaUpdateBuilder()
-				.withToken(FBoard.CODE, "FUT")
-				.withToken(FBoard.MARKET_ID, 4)
-				.withToken(FBoard.NAME, "Futures")
-				.withToken(FBoard.TYPE, 0)
-				.buildUpdate()));
 		service.updateSecurityParamsF(new TQStateUpdate<>(
 				new TQSecIDF("RIZ9", 4, "FUT", "RTS-12.09", SecType.FUT),
 				new DeltaUpdateBuilder().withToken(FSecurity.SECCODE, "N/A").buildUpdate()));

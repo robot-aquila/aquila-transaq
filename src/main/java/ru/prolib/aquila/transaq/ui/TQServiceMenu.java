@@ -22,8 +22,8 @@ import javax.swing.table.TableRowSorter;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCRepository;
 import ru.prolib.aquila.core.text.IMessages;
 import ru.prolib.aquila.core.text.MsgID;
-import ru.prolib.aquila.transaq.engine.sds.SymbolGID;
-import ru.prolib.aquila.transaq.engine.sds.SymbolTID;
+import ru.prolib.aquila.transaq.engine.sds.GSymbol;
+import ru.prolib.aquila.transaq.engine.sds.TSymbol;
 import ru.prolib.aquila.transaq.entity.Board;
 import ru.prolib.aquila.transaq.entity.CKind;
 import ru.prolib.aquila.transaq.entity.Market;
@@ -99,7 +99,7 @@ public class TQServiceMenu implements ActionListener {
 	}
 	
 	public OSCRepositoryTableModel<SecurityParams>
-		createSecurityParamsTableModel(OSCRepository<SymbolGID, SecurityParams> repository)
+		createSecurityParamsTableModel(OSCRepository<GSymbol, SecurityParams> repository)
 	{
 		List<Integer> column_id_list = new ArrayList<>();
 		column_id_list.add(FSecurity.SECID);
@@ -175,7 +175,7 @@ public class TQServiceMenu implements ActionListener {
 	}
 	
 	public OSCRepositoryTableModel<SecurityBoardParams>
-		createSecurityBoardParamsTableModel(OSCRepository<SymbolTID, SecurityBoardParams> repository)
+		createSecurityBoardParamsTableModel(OSCRepository<TSymbol, SecurityBoardParams> repository)
 	{
 		List<Integer> column_id_list = new ArrayList<>();
 		column_id_list.add(FSecurityBoard.SECCODE);
@@ -197,7 +197,7 @@ public class TQServiceMenu implements ActionListener {
 	}
 	
 	public OSCRepositoryTableModel<SecurityQuotations>
-		createSecurityQuotationsTableModel(OSCRepository<SymbolTID, SecurityQuotations> repository)
+		createSecurityQuotationsTableModel(OSCRepository<TSymbol, SecurityQuotations> repository)
 	{
 		List<Integer> column_id_list = new ArrayList<>();
 		column_id_list.add(FQuotation.SECID);
@@ -307,15 +307,15 @@ public class TQServiceMenu implements ActionListener {
 		return createTable(createCKindTableModel(repository));
 	}
 	
-	public JTable createSecParamsTable(OSCRepository<SymbolGID, SecurityParams> repository) {
+	public JTable createSecParamsTable(OSCRepository<GSymbol, SecurityParams> repository) {
 		return createTable(createSecurityParamsTableModel(repository));
 	}
 	
-	public JTable createSecBrdParamsTable(OSCRepository<SymbolTID, SecurityBoardParams> repository) {
+	public JTable createSecBrdParamsTable(OSCRepository<TSymbol, SecurityBoardParams> repository) {
 		return createTable(createSecurityBoardParamsTableModel(repository));
 	}
 	
-	public JTable createSecQuotationsTable(OSCRepository<SymbolTID, SecurityQuotations> repository) {
+	public JTable createSecQuotationsTable(OSCRepository<TSymbol, SecurityQuotations> repository) {
 		return createTable(createSecurityQuotationsTableModel(repository));
 	}
 	
@@ -348,7 +348,7 @@ public class TQServiceMenu implements ActionListener {
 		return createTableDialog(createCKindTable(repository), TQMessages.DIALOG_TITLE_CKINDS, new Dimension(200, 400));
 	}
 	
-	public JDialog createSecParamsDialog(OSCRepository<SymbolGID, SecurityParams> repository) {
+	public JDialog createSecParamsDialog(OSCRepository<GSymbol, SecurityParams> repository) {
 		return createTableDialog(
 				createSecParamsTable(repository),
 				TQMessages.DIALOG_TITLE_SEC_PARAMS,
@@ -356,7 +356,7 @@ public class TQServiceMenu implements ActionListener {
 			);
 	}
 	
-	public JDialog createSecBrdParamsDialog(OSCRepository<SymbolTID, SecurityBoardParams> repository) {
+	public JDialog createSecBrdParamsDialog(OSCRepository<TSymbol, SecurityBoardParams> repository) {
 		return createTableDialog(
 				createSecBrdParamsTable(repository),
 				TQMessages.DIALOG_TITLE_SEC_BRD_PARAMS,
@@ -364,7 +364,7 @@ public class TQServiceMenu implements ActionListener {
 			);
 	}
 	
-	public JDialog createSecQuotationsDialog(OSCRepository<SymbolTID, SecurityQuotations> repository) {
+	public JDialog createSecQuotationsDialog(OSCRepository<TSymbol, SecurityQuotations> repository) {
 		return createTableDialog(
 				createSecQuotationsTable(repository),
 				TQMessages.DIALOG_TITLE_SEC_QUOTATIONS,

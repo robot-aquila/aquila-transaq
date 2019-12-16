@@ -4,9 +4,9 @@ import ru.prolib.aquila.core.EventQueue;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCFactory;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCParamsBuilder;
 import ru.prolib.aquila.core.BusinessEntities.osc.OSCRepository;
-import ru.prolib.aquila.transaq.engine.sds.SymbolTID;
+import ru.prolib.aquila.transaq.engine.sds.TSymbol;
 
-public class SecurityBoardParamsFactory implements OSCFactory<SymbolTID, SecurityBoardParams> {
+public class SecurityBoardParamsFactory implements OSCFactory<TSymbol, SecurityBoardParams> {
 	private final EventQueue queue;
 	
 	public SecurityBoardParamsFactory(EventQueue queue) {
@@ -14,7 +14,7 @@ public class SecurityBoardParamsFactory implements OSCFactory<SymbolTID, Securit
 	}
 
 	@Override
-	public SecurityBoardParams produce(OSCRepository<SymbolTID, SecurityBoardParams> owner, SymbolTID key) {
+	public SecurityBoardParams produce(OSCRepository<TSymbol, SecurityBoardParams> owner, TSymbol key) {
 		return new SecurityBoardParams(new OSCParamsBuilder(queue)
 				.withID("SecurityBoardParams#" + key)
 				.buildParams()

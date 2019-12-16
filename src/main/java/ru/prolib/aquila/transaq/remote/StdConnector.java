@@ -206,5 +206,16 @@ public class StdConnector implements Connector {
 	public void unsubscribe(Set<ISecIDT> trades, Set<ISecIDT> quotations, Set<ISecIDT> quotes) throws TransaqException {
 		_manage_subscriptions(trades, quotations, quotes, "unsubscribe");
 	}
+
+	@Override
+	public void getSecurities() throws TransaqException {
+		try {
+			SendCommand("<command id=\"get_securities\"/>");
+		} catch ( TransaqException e ) {
+			throw e;
+		} catch ( Exception e ) {
+			throw new TransaqException("Get security list failed: ", e);
+		}
+	}
 	
 }
