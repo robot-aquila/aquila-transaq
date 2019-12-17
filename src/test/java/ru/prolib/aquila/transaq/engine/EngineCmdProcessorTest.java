@@ -19,6 +19,7 @@ import org.junit.Test;
 import ru.prolib.aquila.core.BusinessEntities.MDLevel;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.transaq.engine.mp.MessageRouter;
+import ru.prolib.aquila.transaq.engine.sds.SymbolDataService;
 import ru.prolib.aquila.transaq.remote.StdConnector;
 
 public class EngineCmdProcessorTest {

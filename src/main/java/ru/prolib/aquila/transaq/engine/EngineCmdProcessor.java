@@ -36,6 +36,7 @@ public class EngineCmdProcessor implements Runnable {
 					cmd.getResult().completeExceptionally(e);
 				}
 			}
+			logger.debug("Worker finished");
 		} catch ( InterruptedException e ) {
 			logger.error("Unexpected interruption: ", e);
 			Thread.currentThread().interrupt();

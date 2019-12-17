@@ -24,8 +24,6 @@ import ru.prolib.aquila.transaq.engine.sds.StateOfDataFeedsFactory;
 import ru.prolib.aquila.transaq.impl.TQDirectory;
 import ru.prolib.aquila.transaq.impl.TQFieldAssembler;
 import ru.prolib.aquila.transaq.impl.TQReactor;
-import ru.prolib.aquila.transaq.impl.TQSecurityHandlerFactory;
-import ru.prolib.aquila.transaq.impl.TQSecurityHandlerRegistry;
 import ru.prolib.aquila.transaq.remote.MessageParser;
 
 public class EngineBuilderRoutines {
@@ -64,11 +62,7 @@ public class EngineBuilderRoutines {
 	}
 	
 	public void initSecondary(ServiceLocator services, EditableTerminal terminal) {
-		TQReactor reactor = new TQReactor(
-				services,
-				new TQSecurityHandlerRegistry(),
-				new TQSecurityHandlerFactory(services)
-			);
+		TQReactor reactor = new TQReactor(services);
 		services.setReactor(reactor);
 		services.setTerminal(terminal);
 		services.setSymbolDataService(new SymbolDataServiceImpl(

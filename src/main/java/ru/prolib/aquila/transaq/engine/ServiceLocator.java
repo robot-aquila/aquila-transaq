@@ -3,6 +3,7 @@ package ru.prolib.aquila.transaq.engine;
 import ru.prolib.aquila.core.EventQueue;
 import ru.prolib.aquila.core.BusinessEntities.EditableTerminal;
 import ru.prolib.aquila.transaq.engine.mp.MessageRouter;
+import ru.prolib.aquila.transaq.engine.sds.SymbolDataService;
 import ru.prolib.aquila.transaq.impl.TQDirectory;
 import ru.prolib.aquila.transaq.impl.TQFieldAssembler;
 import ru.prolib.aquila.transaq.impl.TQReactor;

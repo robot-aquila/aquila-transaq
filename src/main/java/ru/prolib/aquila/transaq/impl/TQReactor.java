@@ -1,7 +1,7 @@
 package ru.prolib.aquila.transaq.impl;
 
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
-import ru.prolib.aquila.transaq.engine.SymbolDataService;
+import ru.prolib.aquila.transaq.engine.sds.SymbolDataService;
 import ru.prolib.aquila.transaq.remote.ISecIDF;
 import ru.prolib.aquila.transaq.remote.ISecIDG;
 import ru.prolib.aquila.transaq.remote.ISecIDT;
@@ -9,17 +9,10 @@ import ru.prolib.aquila.transaq.remote.entity.ServerStatus;
 
 public class TQReactor {
 	private final ServiceLocator services;
-	private final TQSecurityHandlerRegistry shr;
-	private final TQSecurityHandlerFactory shf;
 	private boolean connected = false;
 	
-	public TQReactor(ServiceLocator services,
-					 TQSecurityHandlerRegistry sh_registry,
-					 TQSecurityHandlerFactory sh_factory)
-	{
+	public TQReactor(ServiceLocator services) {
 		this.services = services;
-		this.shr = sh_registry;
-		this.shf = sh_factory;
 	}
 	
 	private TQDirectory getDir() {
@@ -43,25 +36,15 @@ public class TQReactor {
 	}
 
 	public void updateSecurity1(TQStateUpdate<ISecIDG> update) {
-		getDir().updateSecurityParamsP(update);
-		shr.getHandler(update.getID()).update(update.getUpdate());
+		getSDS().onSecurityUpdateG(update);
 	}
 
 	public void updateSecurityF(TQStateUpdate<ISecIDF> update) {
-		ISecIDF sec_id = update.getID();
-		getDir().updateSecurityParamsF(update);
-		TQSecurityHandler x = shr.getHandlerOrNull(sec_id);
-		if ( x == null ) {
-			x = shf.createHandler(sec_id);
-			x.update(update.getUpdate());
-			shr.registerHandler(x);
-		} else {
-			x.update(update.getUpdate());
-		}
+		getSDS().onSecurityUpdateF(update);
 	}
 	
 	public void updateSecurityBoard(TQStateUpdate<ISecIDT> update) {
-		getDir().updateSecurityBoardParams(update);
+		getSDS().onSecurityBoardUpdate(update);
 	}
 	
 	public void updateServerStatus(ServerStatus status) {
@@ -71,7 +54,7 @@ public class TQReactor {
 	}
 	
 	public void updateSecurityQuotations(TQStateUpdate<ISecIDT> update) {
-		getDir().updateSecurityQuotations(update);
+		getSDS().onSecurityQuotationUpdate(update);
 	}
 
 }

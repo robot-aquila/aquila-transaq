@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,16 +12,27 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ru.prolib.aquila.core.BusinessEntities.CDecimal;
+import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
+import ru.prolib.aquila.core.BusinessEntities.EditableSecurity;
+import ru.prolib.aquila.core.BusinessEntities.L1UpdateBuilder;
 import ru.prolib.aquila.core.BusinessEntities.MDLevel;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.core.BusinessEntities.SymbolSubscrCounter;
 import ru.prolib.aquila.core.BusinessEntities.SymbolSubscrCounter.Field;
 import ru.prolib.aquila.core.BusinessEntities.SymbolSubscrRepository;
-import ru.prolib.aquila.transaq.engine.SymbolDataService;
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
+import ru.prolib.aquila.transaq.entity.SecurityBoardParams;
+import ru.prolib.aquila.transaq.entity.SecurityParams;
+import ru.prolib.aquila.transaq.entity.SecurityQuotations;
 import ru.prolib.aquila.transaq.impl.TQDirectory;
+import ru.prolib.aquila.transaq.impl.TQFieldAssembler;
+import ru.prolib.aquila.transaq.impl.TQStateUpdate;
 import ru.prolib.aquila.transaq.impl.TransaqException;
+import ru.prolib.aquila.transaq.remote.ISecIDF;
+import ru.prolib.aquila.transaq.remote.ISecIDG;
 import ru.prolib.aquila.transaq.remote.ISecIDT;
+import ru.prolib.aquila.transaq.remote.MessageFields.FQuotation;
 
 public class SymbolDataServiceImpl implements SymbolDataService {
 	private static final Map<Integer, FeedID> token_to_feed;
@@ -60,6 +72,121 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 			SymbolSubscrRepository subscrCounters)
 	{
 		this(services, sodf_factory, subscrCounters, new Hashtable<>());
+	}
+	
+	private TQDirectory getDir() {
+		return services.getDirectory();
+	}
+	
+	private EditableSecurity getSecurity(Symbol symbol) {
+		return services.getTerminal().getEditableSecurity(symbol);
+	}
+	
+	private boolean hasSubscribers(Symbol symbol) {
+		return subscrCounters.contains(symbol) && subscrCounters.getOrThrow(symbol).getNumL0() > 0;
+	}
+	
+	private List<Symbol> getKnownSymbols(GSymbol gid) {
+		return getDir().getKnownSymbols(gid);
+	}
+	
+	private boolean isKnownSymbol(Symbol symbol) {
+		return getDir().isKnownSymbol(symbol);
+	}
+	
+	private void updateSecurity(Symbol symbol, SecurityParams general_params, SecurityBoardParams board_params) {
+		TQFieldAssembler asm = services.getAssembler();
+		DeltaUpdateBuilder builder = new DeltaUpdateBuilder();
+		if ( asm.toSecDisplayName(general_params, symbol.getExchangeID(), builder) > 0
+		  || asm.toSecInitialMargin(general_params, builder) > 0
+		  || asm.toSecUpperPriceLimit(general_params, builder) > 0
+		  || asm.toSecLowerPriceLimit(general_params, builder) > 0
+		  || asm.toSecSettlementPrice(general_params, builder) > 0
+		  || asm.toSecExpirationTime(general_params, builder) > 0
+		  || asm.toSecLotSize(board_params, builder) > 0
+		  || asm.toSecTickSize(board_params, builder) > 0
+		  || asm.toSecTickValue(board_params, builder) > 0 )
+		{
+			getSecurity(symbol).consume(builder.buildUpdate());
+		}
+	}
+	
+	private void updateSecurity(Symbol symbol, SecurityParams general_params) {
+		TQDirectory dir = getDir();
+		TSymbol tid = dir.toSymbolTID(symbol);
+		if ( dir.isExistsSecurityBoardParams(tid) ) {
+			updateSecurity(symbol, general_params, dir.getSecurityBoardParams(tid));
+		}
+	}
+	
+	private void updateSecurity(Symbol symbol) {
+		TQDirectory dir = getDir();
+		TSymbol tid = dir.toSymbolTID(symbol);
+		if ( dir.isExistsSecurityParams(tid) ) {
+			updateSecurity(symbol, dir.getSecurityParams(tid));
+		}
+	}
+	
+	private void updateSecurityOHLC(EditableSecurity security, SecurityQuotations params) {
+		TQFieldAssembler asm = services.getAssembler();
+		DeltaUpdateBuilder builder = new DeltaUpdateBuilder();
+		if ( asm.toSecOpenPrice(params, builder) > 0
+		  || asm.toSecHighPrice(params, builder) > 0
+		  || asm.toSecLowPrice(params, builder) > 0
+		  || asm.toSecClosePrice(params, builder) > 0 )
+		{
+			security.consume(builder.buildUpdate());
+		}
+	}
+	
+	private void updateSecurityBestBid(EditableSecurity security, SecurityQuotations params) {
+		Integer scale = security.getScale();
+		CDecimal price = params.getBid();
+		if ( scale != null ) {
+			price = price.withScale(scale);
+		}
+		Integer size = params.getBidDepth();
+		if ( size == null ) {
+			size = 0;
+		}
+		security.consume(new L1UpdateBuilder()
+			.withBid()
+			.withPrice(price)
+			.withSize((long) size)
+			.withSymbol(security.getSymbol())
+			.withTime(services.getTerminal().getCurrentTime())
+			.buildL1Update());
+	}
+	
+	private void updateSecurityBestAsk(EditableSecurity security, SecurityQuotations params) {
+		Integer scale = security.getScale();
+		CDecimal price = params.getOffer();
+		if ( scale != null ) {
+			price = price.abs().withScale(scale);
+		}
+		Integer size = params.getOfferDepth();
+		if ( size == null ) {
+			size = 0;
+		}
+		security.consume(new L1UpdateBuilder()
+			.withAsk()
+			.withPrice(price)
+			.withSize((long) size)
+			.withSymbol(security.getSymbol())
+			.withTime(services.getTerminal().getCurrentTime())
+			.buildL1Update());
+	}
+	
+	private void cascadeSecurityUpdate(GSymbol gid, SecurityParams general_params) {
+		if ( ! connected ) {
+			return;
+		}
+		List<Symbol> symbol_list = getKnownSymbols(gid);
+		for ( Symbol symbol : symbol_list ) {
+			if ( hasSubscribers(symbol) ) {
+				updateSecurity(symbol, general_params);
+			}
+		}
 	}
 	
 	/**
@@ -189,6 +316,10 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 			return;
 		}
 		
+		if ( isKnownSymbol(symbol) ) {
+			updateSecurity(symbol);
+		}
+		
 		if ( syncSubscrState(state, subscr) ) {
 			_applyPendingChanges();
 		}
@@ -222,14 +353,16 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 			TQDirectory dir = services.getDirectory();
 			for ( SymbolSubscrCounter subscr : subscrCounters.getEntities() ) {
 				Symbol symbol = subscr.getSymbol();
-				//if ( dir.isKnownSymbol(symbol) ) {
+				if ( isKnownSymbol(symbol) ) {
+					updateSecurity(symbol);
+					
 					ISecIDT idt = dir.toSecIDT(symbol, true);
 					if ( idt != null ) {
 						if ( syncSubscrState(getStateOfDataFeeds(idt), subscr) ) {
 							x = true;
 						}
 					}
-				//}
+				}
 			}
 			if ( x ) {
 				_applyPendingChanges();
@@ -243,6 +376,72 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 			}
 
 		}
+	}
+	
+	@Override
+	public void onSecurityUpdateF(TQStateUpdate<ISecIDF> update) {
+		TQDirectory dir = getDir();
+		SecurityParams params = dir.updateSecurityParamsF(update);
+		cascadeSecurityUpdate(dir.toSymbolGID(update.getID()), params);
+	}
+
+	@Override
+	public void onSecurityUpdateG(TQStateUpdate<ISecIDG> update) {
+		TQDirectory dir = getDir();
+		SecurityParams params = dir.updateSecurityParamsP(update);
+		cascadeSecurityUpdate(dir.toSymbolGID(update.getID()), params);
+	}
+
+	@Override
+	public void onSecurityBoardUpdate(TQStateUpdate<ISecIDT> update) {
+		TQDirectory dir = getDir();
+		SecurityBoardParams params = dir.updateSecurityBoardParams(update);
+		if ( ! connected ) {
+			return;
+		}
+		TSymbol tid = dir.toSymbolTID(update.getID());
+		Symbol symbol = dir.toSymbol(tid);
+		if ( dir.isExistsSecurityParams(tid) && hasSubscribers(symbol) ) {
+			updateSecurity(symbol, dir.getSecurityParams(tid), params);
+		}
+	}
+
+	@Override
+	public void onSecurityQuotationUpdate(TQStateUpdate<ISecIDT> update) {
+		TQDirectory dir = getDir();
+		SecurityQuotations params = dir.updateSecurityQuotations(update);
+		if ( ! connected ) {
+			return;
+		}
+		TSymbol tid = dir.toSymbolTID(update.getID());
+		Symbol symbol = dir.toSymbolTID(tid);
+		if ( hasSubscribers(symbol) ) {
+			EditableSecurity security = getSecurity(symbol);
+			final int[] c1 = { FQuotation.OPEN, FQuotation.HIGH, FQuotation.LOW, FQuotation.CLOSE_PRICE };
+			if ( params.atLeastOneHasChanged(c1) ) {
+				updateSecurityOHLC(security, params);
+			}
+			final int[] c2 = { FQuotation.BID, FQuotation.BID_DEPTH };
+			if ( params.atLeastOneHasChanged(c2) ) {
+				updateSecurityBestBid(security, params);
+			}
+			final int[] c3 = { FQuotation.OFFER, FQuotation.OFFER_DEPTH };
+			if ( params.atLeastOneHasChanged(c3) ) {
+				updateSecurityBestAsk(security, params);
+			}
+		}
+	}
+
+	@Override
+	public void onSecurityTrades(List<TQStateUpdate<ISecIDT>> update_list) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onSecurityQuotes(List<TQStateUpdate<ISecIDT>> update_list) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

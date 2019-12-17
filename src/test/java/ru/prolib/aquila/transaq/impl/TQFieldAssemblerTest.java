@@ -10,44 +10,70 @@ import java.time.ZonedDateTime;
 import org.junit.Before;
 import org.junit.Test;
 
+import ru.prolib.aquila.core.EventQueue;
+import ru.prolib.aquila.core.EventQueueImpl;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdate;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.core.BusinessEntities.SecurityField;
-import ru.prolib.aquila.core.BusinessEntities.UpdatableStateContainer;
-import ru.prolib.aquila.core.BusinessEntities.UpdatableStateContainerImpl;
+import ru.prolib.aquila.core.BusinessEntities.SymbolType;
+import ru.prolib.aquila.transaq.engine.sds.GSymbol;
+import ru.prolib.aquila.transaq.engine.sds.TSymbol;
+import ru.prolib.aquila.transaq.entity.SecurityBoardParams;
+import ru.prolib.aquila.transaq.entity.SecurityBoardParamsFactory;
+import ru.prolib.aquila.transaq.entity.SecurityParams;
+import ru.prolib.aquila.transaq.entity.SecurityParamsFactory;
+import ru.prolib.aquila.transaq.entity.SecurityQuotations;
+import ru.prolib.aquila.transaq.entity.SecurityQuotationsFactory;
+import ru.prolib.aquila.transaq.remote.MessageFields.FQuotation;
 import ru.prolib.aquila.transaq.remote.MessageFields.FSecurity;
+import ru.prolib.aquila.transaq.remote.MessageFields.FSecurityBoard;
 
 public class TQFieldAssemblerTest {
+	private EventQueue queue;
 	private TQFieldAssembler service;
-	private UpdatableStateContainer sec_state;
+	private SecurityQuotations sec_quots;
+	private SecurityParams sec_state;
+	private SecurityBoardParams sec_brd_state;
 	private DeltaUpdateBuilder builder;
 
 	@Before
 	public void setUp() throws Exception {
+		queue = new EventQueueImpl();
 		service = new TQFieldAssembler();
-		sec_state = new UpdatableStateContainerImpl("X");
+		sec_state = new SecurityParamsFactory(queue).produce(null, new GSymbol("GAZP", "MICEX", "RUB", SymbolType.STOCK));
+		sec_quots = new SecurityQuotationsFactory(queue).produce(null, new TSymbol("GAZP", "EQTB", "RUB", SymbolType.STOCK));
+		sec_brd_state = new SecurityBoardParamsFactory(queue).produce(null, new TSymbol("GAZP", "EQTB", "RUB",SymbolType.STOCK));
 		builder = new DeltaUpdateBuilder();
 	}
 
 	@Test
 	public void testToSecDisplayName() {
-		sec_state.update(FSecurity.SHORT_NAME, "zulu24");
-		assertTrue(sec_state.hasChanged(FSecurity.SHORT_NAME));
+		sec_state.update(FSecurity.SHORT_NAME, "Zulu24");
 		
-		assertEquals(1, service.toSecDisplayName(sec_state, builder));
+		assertEquals(1, service.toSecDisplayName(sec_state, "MyBoard", builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
-				.withToken(SecurityField.DISPLAY_NAME, "zulu24")
+				.withToken(SecurityField.DISPLAY_NAME, "Zulu24 @ MyBoard")
 				.buildUpdate();
 		assertEquals(expected, builder.buildUpdate());
 	}
 	
 	@Test
-	public void testToSecDisplayName_NoChanges() {
-		sec_state.update(FSecurity.SHORT_NAME, "zulu24");
-		sec_state.resetChanges();
+	public void testToSecDisplayName_HasNoShortName() {
+		sec_state.update(FSecurity.SHORT_NAME, null);
 		
-		assertEquals(0, service.toSecDisplayName(sec_state, builder));
+		assertEquals(0, service.toSecDisplayName(sec_state, "MyBoard", builder));
+		
+		DeltaUpdate expected = new DeltaUpdateBuilder()
+				.buildUpdate();
+		assertEquals(expected, builder.buildUpdate());
+	}
+	
+	@Test
+	public void testToSecDisplayName_HasNoBoardName() {
+		sec_state.update(FSecurity.SHORT_NAME, "Zulu24");
+		
+		assertEquals(0, service.toSecDisplayName(sec_state, null, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -56,9 +82,9 @@ public class TQFieldAssemblerTest {
 	
 	@Test
 	public void testToSecLotSize() {
-		sec_state.update(FSecurity.LOTSIZE, of(100L));
+		sec_brd_state.update(FSecurityBoard.LOTSIZE, of(100L));
 		
-		assertEquals(1, service.toSecLotSize(sec_state, builder));
+		assertEquals(1, service.toSecLotSize(sec_brd_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.LOT_SIZE, of(100L))
@@ -68,10 +94,10 @@ public class TQFieldAssemblerTest {
 	
 	@Test
 	public void testToSecLotSize_NoChanges() {
-		sec_state.update(FSecurity.LOTSIZE, of(100L));
-		sec_state.resetChanges();
+		sec_brd_state.update(FSecurityBoard.LOTSIZE, of(100L));
+		sec_brd_state.resetChanges();
 		
-		assertEquals(0, service.toSecLotSize(sec_state, builder));
+		assertEquals(0, service.toSecLotSize(sec_brd_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -80,9 +106,9 @@ public class TQFieldAssemblerTest {
 	
 	@Test
 	public void testToSecTickSize() {
-		sec_state.update(FSecurity.MINSTEP, of("0.01"));
+		sec_brd_state.update(FSecurityBoard.MINSTEP, of("0.01"));
 		
-		assertEquals(1, service.toSecTickSize(sec_state, builder));
+		assertEquals(1, service.toSecTickSize(sec_brd_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.TICK_SIZE, of("0.01"))
@@ -92,10 +118,10 @@ public class TQFieldAssemblerTest {
 	
 	@Test
 	public void testToSecTickSize_NoChanges() {
-		sec_state.update(FSecurity.MINSTEP, of("0.01"));
-		sec_state.resetChanges();
+		sec_brd_state.update(FSecurityBoard.MINSTEP, of("0.01"));
+		sec_brd_state.resetChanges();
 		
-		assertEquals(0, service.toSecTickSize(sec_state, builder));
+		assertEquals(0, service.toSecTickSize(sec_brd_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -104,11 +130,11 @@ public class TQFieldAssemblerTest {
 	
 	@Test
 	public void testToTickValue_Case1() {
-		sec_state.update(FSecurity.DECIMALS, 2);
-		sec_state.update(FSecurity.MINSTEP, of("0.02"));
-		sec_state.update(FSecurity.POINT_COST, of("1"));
+		sec_brd_state.update(FSecurityBoard.DECIMALS, 2);
+		sec_brd_state.update(FSecurityBoard.MINSTEP, of("0.02"));
+		sec_brd_state.update(FSecurityBoard.POINT_COST, of("1"));
 
-		assertEquals(1, service.toSecTickValue(sec_state, builder));
+		assertEquals(1, service.toSecTickValue(sec_brd_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.TICK_VALUE, ofRUB5("0.02000"))
@@ -118,11 +144,11 @@ public class TQFieldAssemblerTest {
 
 	@Test
 	public void testToTickValue_Case2_RTS_6_19() {
-		sec_state.update(FSecurity.DECIMALS, 0);
-		sec_state.update(FSecurity.MINSTEP, of("10"));
-		sec_state.update(FSecurity.POINT_COST, of("129.073"));
+		sec_brd_state.update(FSecurityBoard.DECIMALS, 0);
+		sec_brd_state.update(FSecurityBoard.MINSTEP, of("10"));
+		sec_brd_state.update(FSecurityBoard.POINT_COST, of("129.073"));
 		
-		assertEquals(1, service.toSecTickValue(sec_state, builder));
+		assertEquals(1, service.toSecTickValue(sec_brd_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.TICK_VALUE, ofRUB5("12.90730"))
@@ -132,11 +158,11 @@ public class TQFieldAssemblerTest {
 	
 	@Test
 	public void testToTickValue_Case3_GOLD_9_19() {
-		sec_state.update(FSecurity.DECIMALS, 1);
-		sec_state.update(FSecurity.MINSTEP, of("0.1"));
-		sec_state.update(FSecurity.POINT_COST, of("645.364"));
+		sec_brd_state.update(FSecurityBoard.DECIMALS, 1);
+		sec_brd_state.update(FSecurityBoard.MINSTEP, of("0.1"));
+		sec_brd_state.update(FSecurityBoard.POINT_COST, of("645.364"));
 		
-		assertEquals(1, service.toSecTickValue(sec_state, builder));
+		assertEquals(1, service.toSecTickValue(sec_brd_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.TICK_VALUE, ofRUB5("6.45364"))
@@ -146,12 +172,12 @@ public class TQFieldAssemblerTest {
 	
 	@Test
 	public void testToTickValue_NoChanges() {
-		sec_state.update(FSecurity.DECIMALS, 2);
-		sec_state.update(FSecurity.MINSTEP, of("0.02"));
-		sec_state.update(FSecurity.POINT_COST, of("1"));
-		sec_state.resetChanges();
+		sec_brd_state.update(FSecurityBoard.DECIMALS, 2);
+		sec_brd_state.update(FSecurityBoard.MINSTEP, of("0.02"));
+		sec_brd_state.update(FSecurityBoard.POINT_COST, of("1"));
+		sec_brd_state.resetChanges();
 
-		assertEquals(0, service.toSecTickValue(sec_state, builder));
+		assertEquals(0, service.toSecTickValue(sec_brd_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -160,11 +186,10 @@ public class TQFieldAssemblerTest {
 	
 	@Test
 	public void testToTickValue_DecimalsNotDefined() {
-		//sec_state.update(TQSecField.DECIMALS, 2);
-		sec_state.update(FSecurity.MINSTEP, of("0.02"));
-		sec_state.update(FSecurity.POINT_COST, of("1"));
+		sec_brd_state.update(FSecurityBoard.MINSTEP, of("0.02"));
+		sec_brd_state.update(FSecurityBoard.POINT_COST, of("1"));
 		
-		assertEquals(0, service.toSecTickValue(sec_state, builder));
+		assertEquals(0, service.toSecTickValue(sec_brd_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -173,11 +198,10 @@ public class TQFieldAssemblerTest {
 	
 	@Test
 	public void testToTickValue_PointCostNotDefined() {
-		sec_state.update(FSecurity.DECIMALS, 2);
-		sec_state.update(FSecurity.MINSTEP, of("0.02"));
-		//sec_state.update(TQSecField.POINT_COST, of("1"));
+		sec_brd_state.update(FSecurityBoard.DECIMALS, 2);
+		sec_brd_state.update(FSecurityBoard.MINSTEP, of("0.02"));
 		
-		assertEquals(0, service.toSecTickValue(sec_state, builder));
+		assertEquals(0, service.toSecTickValue(sec_brd_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -186,11 +210,10 @@ public class TQFieldAssemblerTest {
 	
 	@Test
 	public void testToTickValue_MinStepNotDefined() {
-		sec_state.update(FSecurity.DECIMALS, 2);
-		//sec_state.update(TQSecField.MINSTEP, of("0.02"));
-		sec_state.update(FSecurity.POINT_COST, of("1"));
+		sec_brd_state.update(FSecurityBoard.DECIMALS, 2);
+		sec_brd_state.update(FSecurityBoard.POINT_COST, of("1"));
 		
-		assertEquals(0, service.toSecTickValue(sec_state, builder));
+		assertEquals(0, service.toSecTickValue(sec_brd_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -199,13 +222,13 @@ public class TQFieldAssemblerTest {
 	
 	@Test
 	public void testToTickValue_PartialUpdate_Deciamls() {
-		sec_state.update(FSecurity.DECIMALS, 2);
-		sec_state.update(FSecurity.MINSTEP, of("0.02"));
-		sec_state.update(FSecurity.POINT_COST, of("1"));
-		sec_state.resetChanges();
-		sec_state.update(FSecurity.DECIMALS, 3);
+		sec_brd_state.update(FSecurityBoard.DECIMALS, 2);
+		sec_brd_state.update(FSecurityBoard.MINSTEP, of("0.02"));
+		sec_brd_state.update(FSecurityBoard.POINT_COST, of("1"));
+		sec_brd_state.resetChanges();
+		sec_brd_state.update(FSecurityBoard.DECIMALS, 3);
 		
-		assertEquals(1, service.toSecTickValue(sec_state, builder));
+		assertEquals(1, service.toSecTickValue(sec_brd_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.TICK_VALUE, ofRUB5("0.20000"))
@@ -215,13 +238,13 @@ public class TQFieldAssemblerTest {
 
 	@Test
 	public void testToTickValue_PartialUpdate_PointCost() {
-		sec_state.update(FSecurity.DECIMALS, 2);
-		sec_state.update(FSecurity.MINSTEP, of("0.02"));
-		sec_state.update(FSecurity.POINT_COST, of("1"));
-		sec_state.resetChanges();
-		sec_state.update(FSecurity.MINSTEP, of("0.05"));
+		sec_brd_state.update(FSecurityBoard.DECIMALS, 2);
+		sec_brd_state.update(FSecurityBoard.MINSTEP, of("0.02"));
+		sec_brd_state.update(FSecurityBoard.POINT_COST, of("1"));
+		sec_brd_state.resetChanges();
+		sec_brd_state.update(FSecurityBoard.MINSTEP, of("0.05"));
 		
-		assertEquals(1, service.toSecTickValue(sec_state, builder));
+		assertEquals(1, service.toSecTickValue(sec_brd_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.TICK_VALUE, ofRUB5("0.05000"))
@@ -231,13 +254,13 @@ public class TQFieldAssemblerTest {
 	
 	@Test
 	public void testToTickValue_PartialUpdate_MinStep() {
-		sec_state.update(FSecurity.DECIMALS, 2);
-		sec_state.update(FSecurity.MINSTEP, of("0.02"));
-		sec_state.update(FSecurity.POINT_COST, of("1"));
-		sec_state.resetChanges();
-		sec_state.update(FSecurity.MINSTEP, of("0.01"));
+		sec_brd_state.update(FSecurityBoard.DECIMALS, 2);
+		sec_brd_state.update(FSecurityBoard.MINSTEP, of("0.02"));
+		sec_brd_state.update(FSecurityBoard.POINT_COST, of("1"));
+		sec_brd_state.resetChanges();
+		sec_brd_state.update(FSecurityBoard.MINSTEP, of("0.01"));
 		
-		assertEquals(1, service.toSecTickValue(sec_state, builder));
+		assertEquals(1, service.toSecTickValue(sec_brd_state, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.withToken(SecurityField.TICK_VALUE, ofRUB5("0.01000"))
@@ -382,8 +405,22 @@ public class TQFieldAssemblerTest {
 	
 	@Test
 	public void testToSecOpenPrice() {
+		sec_quots.update(FQuotation.OPEN, of("556.209"));
 		
-		assertEquals(0, service.toSecOpenPrice(sec_state, builder));
+		assertEquals(1, service.toSecOpenPrice(sec_quots, builder));
+		
+		DeltaUpdate expected = new DeltaUpdateBuilder()
+				.withToken(SecurityField.OPEN_PRICE, of("556.209"))
+				.buildUpdate();
+		assertEquals(expected, builder.buildUpdate());
+	}
+	
+	@Test
+	public void testToSecOpenPrice_NoChanges() {
+		sec_quots.update(FQuotation.OPEN, of("556.209"));
+		sec_quots.resetChanges();
+		
+		assertEquals(0, service.toSecOpenPrice(sec_quots, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -392,8 +429,22 @@ public class TQFieldAssemblerTest {
 	
 	@Test
 	public void testToSecHighPrice() {
+		sec_quots.update(FQuotation.HIGH, of("201.001"));
 		
-		assertEquals(0, service.toSecHighPrice(sec_state, builder));
+		assertEquals(1, service.toSecHighPrice(sec_quots, builder));
+		
+		DeltaUpdate expected = new DeltaUpdateBuilder()
+				.withToken(SecurityField.HIGH_PRICE, of("201.001"))
+				.buildUpdate();
+		assertEquals(expected, builder.buildUpdate());
+	}
+	
+	@Test
+	public void testToSecHighPrice_NoChanges() {
+		sec_quots.update(FQuotation.HIGH, of("201.001"));
+		sec_quots.resetChanges();
+
+		assertEquals(0, service.toSecHighPrice(sec_quots, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -402,8 +453,22 @@ public class TQFieldAssemblerTest {
 	
 	@Test
 	public void testToSecLowPrice() {
+		sec_quots.update(FQuotation.LOW, of("501.600"));
 		
-		assertEquals(0, service.toSecLowPrice(sec_state, builder));
+		assertEquals(1, service.toSecLowPrice(sec_quots, builder));
+		
+		DeltaUpdate expected = new DeltaUpdateBuilder()
+				.withToken(SecurityField.LOW_PRICE, of("501.600"))
+				.buildUpdate();
+		assertEquals(expected, builder.buildUpdate());		
+	}
+	
+	@Test
+	public void testToSecLowPrice_NoChanges() {
+		sec_quots.update(FQuotation.LOW, of("501.600"));
+		sec_quots.resetChanges();
+		
+		assertEquals(0, service.toSecLowPrice(sec_quots, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();
@@ -412,8 +477,22 @@ public class TQFieldAssemblerTest {
 	
 	@Test
 	public void testToSecClosePrice() {
+		sec_quots.update(FQuotation.CLOSE_PRICE, of("112.920"));
 		
-		assertEquals(0, service.toSecClosePrice(sec_state, builder));
+		assertEquals(1, service.toSecClosePrice(sec_quots, builder));
+		
+		DeltaUpdate expected = new DeltaUpdateBuilder()
+				.withToken(SecurityField.CLOSE_PRICE, of("112.920"))
+				.buildUpdate();
+		assertEquals(expected, builder.buildUpdate());
+	}
+	
+	@Test
+	public void testToSecClosePrice_NoChanges() {
+		sec_quots.update(FQuotation.CLOSE_PRICE, of("112.920"));
+		sec_quots.resetChanges();
+		
+		assertEquals(0, service.toSecClosePrice(sec_quots, builder));
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
 				.buildUpdate();

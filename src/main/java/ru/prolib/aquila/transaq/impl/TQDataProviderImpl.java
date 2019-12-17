@@ -1,5 +1,8 @@
 package ru.prolib.aquila.transaq.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ru.prolib.aquila.core.BusinessEntities.Account;
 import ru.prolib.aquila.core.BusinessEntities.EditableOrder;
 import ru.prolib.aquila.core.BusinessEntities.EditableTerminal;
@@ -14,6 +17,12 @@ import ru.prolib.aquila.transaq.engine.EngineBuilderRoutines;
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
 
 public class TQDataProviderImpl implements DataProvider {
+	private static final Logger logger;
+	
+	static {
+		logger = LoggerFactory.getLogger(TQDataProviderImpl.class);
+	}
+	
 	private final Engine engine;
 	private final EngineBuilderRoutines engineBuilder;
 	private final ServiceLocator engineServices;
@@ -71,6 +80,7 @@ public class TQDataProviderImpl implements DataProvider {
 	
 	@Override
 	public void close() {
+		logger.debug("Closing data provider...");
 		engine.shutdown();
 	}
 
