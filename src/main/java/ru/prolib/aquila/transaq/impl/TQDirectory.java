@@ -351,6 +351,12 @@ public class TQDirectory {
 	public String getMarketName(int market_id) {
 		return markets.getOrThrow(market_id).getName();
 	}
+	
+	public String getBoardName(String board_code) {
+		Board board = boards.getOrThrow(board_code);
+		String board_name = board.getName();
+		return (board_name == null || board_name.length() == 0) ? board_code : board_name;
+	}
 
 	public Symbol toSymbol(TSymbol tid) {
 		return new Symbol(

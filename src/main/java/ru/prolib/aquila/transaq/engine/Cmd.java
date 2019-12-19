@@ -6,9 +6,13 @@ abstract public class Cmd {
 	private final CmdType type;
 	private final CompletableFuture<Boolean> result;
 	
-	public Cmd(CmdType type) {
+	public Cmd(CmdType type, CompletableFuture<Boolean> result) {
 		this.type = type;
-		this.result = new CompletableFuture<>();
+		this.result = result;
+	}
+	
+	public Cmd(CmdType type) {
+		this(type, new CompletableFuture<>());
 	}
 	
 	public CmdType getType() {

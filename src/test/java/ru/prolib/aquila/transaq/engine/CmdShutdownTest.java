@@ -2,6 +2,8 @@ package ru.prolib.aquila.transaq.engine;
 
 import static org.junit.Assert.*;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,12 +27,23 @@ public class CmdShutdownTest {
 		assertEquals(0, service.getPhase());
 		assertFalse(service.getResult().isDone());
 	}
-
+	
 	@Test
-	public void testGetters() {
+	public void testCtor1() {
 		assertEquals(CmdType.SHUTDOWN, service.getType());
 		assertEquals(4, service.getPhase());
 		assertFalse(service.getResult().isDone());
+	}
+	
+	@Test
+	public void testCtor2() {
+		CompletableFuture<Boolean> f = new CompletableFuture<>();
+		
+		service = new CmdShutdown(f, 6);
+		
+		assertEquals(CmdType.SHUTDOWN, service.getType());
+		assertEquals(6, service.getPhase());
+		assertSame(f, service.getResult());
 	}
 	
 	@Test

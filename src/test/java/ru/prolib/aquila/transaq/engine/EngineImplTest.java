@@ -3,6 +3,7 @@ package ru.prolib.aquila.transaq.engine;
 import static org.junit.Assert.*;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -39,9 +40,12 @@ public class EngineImplTest {
 	
 	@Test
 	public void testShutdown() throws Exception {
-		service.shutdown();
+		CompletableFuture<Boolean> result = service.shutdown();
 
-		assertEquals(new CmdShutdown(), queue.poll(1, TimeUnit.SECONDS));
+		Cmd actual = queue.poll(1, TimeUnit.SECONDS);
+		assertEquals(new CmdShutdown(), actual);
+		assertNotNull(result);
+		assertSame(result, actual.getResult());
 	}
 	
 	@Test

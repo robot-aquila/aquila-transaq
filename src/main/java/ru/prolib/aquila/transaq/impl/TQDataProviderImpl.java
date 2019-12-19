@@ -1,5 +1,8 @@
 package ru.prolib.aquila.transaq.impl;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,8 +83,12 @@ public class TQDataProviderImpl implements DataProvider {
 	
 	@Override
 	public void close() {
-		logger.debug("Closing data provider...");
-		engine.shutdown();
+		CompletableFuture<Boolean> closed = engine.shutdown();
+		try {
+			closed.get(5, TimeUnit.SECONDS);
+		} catch ( Exception e ) {
+			logger.error("Unexpected exception: ", e);
+		}
 	}
 
 }

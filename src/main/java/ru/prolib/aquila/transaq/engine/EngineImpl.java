@@ -1,6 +1,7 @@
 package ru.prolib.aquila.transaq.engine;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CompletableFuture;
 
 import ru.prolib.aquila.core.BusinessEntities.MDLevel;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
@@ -12,9 +13,10 @@ public class EngineImpl implements Engine {
 		this.cmdQueue = cmd_queue;
 	}
 	
-	private void enqueue(Cmd cmd) {
+	private CompletableFuture<Boolean> enqueue(Cmd cmd) {
 		try {
 			cmdQueue.put(cmd);
+			return cmd.getResult();
 		} catch ( InterruptedException e ) {
 			throw new IllegalStateException("Unexpected interruption: ", e);
 		}
@@ -31,8 +33,8 @@ public class EngineImpl implements Engine {
 	}
 
 	@Override
-	public void shutdown() {
-		enqueue(new CmdShutdown());
+	public CompletableFuture<Boolean> shutdown() {
+		return enqueue(new CmdShutdown());
 	}
 
 	@Override

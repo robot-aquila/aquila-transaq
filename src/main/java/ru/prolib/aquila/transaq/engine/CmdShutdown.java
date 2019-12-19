@@ -1,10 +1,17 @@
 package ru.prolib.aquila.transaq.engine;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class CmdShutdown extends Cmd {
 	private final int phase;
+	
+	public CmdShutdown(CompletableFuture<Boolean> result, int phase) {
+		super(CmdType.SHUTDOWN, result);
+		this.phase = phase;
+	}
 
 	public CmdShutdown(int phase) {
 		super(CmdType.SHUTDOWN);

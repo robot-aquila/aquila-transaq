@@ -1,5 +1,6 @@
 package ru.prolib.aquila.transaq.engine.sds;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -17,10 +18,12 @@ import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.core.BusinessEntities.EditableSecurity;
 import ru.prolib.aquila.core.BusinessEntities.L1UpdateBuilder;
 import ru.prolib.aquila.core.BusinessEntities.MDLevel;
+import ru.prolib.aquila.core.BusinessEntities.Security;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.core.BusinessEntities.SymbolSubscrCounter;
 import ru.prolib.aquila.core.BusinessEntities.SymbolSubscrCounter.Field;
 import ru.prolib.aquila.core.BusinessEntities.SymbolSubscrRepository;
+import ru.prolib.aquila.core.BusinessEntities.TickType;
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
 import ru.prolib.aquila.transaq.entity.SecurityBoardParams;
 import ru.prolib.aquila.transaq.entity.SecurityParams;
@@ -32,7 +35,6 @@ import ru.prolib.aquila.transaq.impl.TransaqException;
 import ru.prolib.aquila.transaq.remote.ISecIDF;
 import ru.prolib.aquila.transaq.remote.ISecIDG;
 import ru.prolib.aquila.transaq.remote.ISecIDT;
-import ru.prolib.aquila.transaq.remote.MessageFields.FQuotation;
 
 public class SymbolDataServiceImpl implements SymbolDataService {
 	private static final Map<Integer, FeedID> token_to_feed;
@@ -83,7 +85,7 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 	}
 	
 	private boolean hasSubscribers(Symbol symbol) {
-		return subscrCounters.contains(symbol) && subscrCounters.getOrThrow(symbol).getNumL0() > 0;
+		return subscrCounters.contains(symbol) && subscrCounters.getOrThrow(symbol).getNumL0() > 0; 
 	}
 	
 	private List<Symbol> getKnownSymbols(GSymbol gid) {
@@ -94,99 +96,75 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 		return getDir().isKnownSymbol(symbol);
 	}
 	
-	private void updateSecurity(Symbol symbol, SecurityParams general_params, SecurityBoardParams board_params) {
+	private DeltaUpdateBuilder toUpdate(DeltaUpdateBuilder builder,
+			SecurityParams general_params,
+			SecurityBoardParams board_params)
+	{
 		TQFieldAssembler asm = services.getAssembler();
-		DeltaUpdateBuilder builder = new DeltaUpdateBuilder();
-		if ( asm.toSecDisplayName(general_params, symbol.getExchangeID(), builder) > 0
-		  || asm.toSecInitialMargin(general_params, builder) > 0
-		  || asm.toSecUpperPriceLimit(general_params, builder) > 0
-		  || asm.toSecLowerPriceLimit(general_params, builder) > 0
-		  || asm.toSecSettlementPrice(general_params, builder) > 0
-		  || asm.toSecExpirationTime(general_params, builder) > 0
-		  || asm.toSecLotSize(board_params, builder) > 0
-		  || asm.toSecTickSize(board_params, builder) > 0
-		  || asm.toSecTickValue(board_params, builder) > 0 )
-		{
-			getSecurity(symbol).consume(builder.buildUpdate());
-		}
+		asm.toSecDisplayName(general_params, getDir().getBoardName(board_params.getBoardCode()), builder);
+		asm.toSecInitialMargin(general_params, builder);
+		asm.toSecUpperPriceLimit(general_params, builder);
+		asm.toSecLowerPriceLimit(general_params, builder);
+		asm.toSecSettlementPrice(general_params, builder);
+		asm.toSecExpirationTime(general_params, builder);
+		asm.toSecLotSize(board_params, builder);
+		asm.toSecTickSize(board_params, builder);
+		asm.toSecTickValue(board_params, builder);
+		return builder;
 	}
 	
-	private void updateSecurity(Symbol symbol, SecurityParams general_params) {
-		TQDirectory dir = getDir();
-		TSymbol tid = dir.toSymbolTID(symbol);
-		if ( dir.isExistsSecurityBoardParams(tid) ) {
-			updateSecurity(symbol, general_params, dir.getSecurityBoardParams(tid));
-		}
+	private DeltaUpdateBuilder toUpdate(SecurityParams general_params,
+			SecurityBoardParams board_params)
+	{
+		return toUpdate(new DeltaUpdateBuilder(), general_params, board_params);
 	}
 	
-	private void updateSecurity(Symbol symbol) {
-		TQDirectory dir = getDir();
-		TSymbol tid = dir.toSymbolTID(symbol);
-		if ( dir.isExistsSecurityParams(tid) ) {
-			updateSecurity(symbol, dir.getSecurityParams(tid));
-		}
-	}
-	
-	private void updateSecurityOHLC(EditableSecurity security, SecurityQuotations params) {
+	private DeltaUpdateBuilder toUpdate(DeltaUpdateBuilder builder, SecurityQuotations params) {
 		TQFieldAssembler asm = services.getAssembler();
-		DeltaUpdateBuilder builder = new DeltaUpdateBuilder();
-		if ( asm.toSecOpenPrice(params, builder) > 0
-		  || asm.toSecHighPrice(params, builder) > 0
-		  || asm.toSecLowPrice(params, builder) > 0
-		  || asm.toSecClosePrice(params, builder) > 0 )
-		{
-			security.consume(builder.buildUpdate());
-		}
+		asm.toSecOpenPrice(params, builder);
+		asm.toSecHighPrice(params, builder);
+		asm.toSecLowPrice(params, builder);
+		asm.toSecClosePrice(params, builder);
+		return builder;
 	}
 	
-	private void updateSecurityBestBid(EditableSecurity security, SecurityQuotations params) {
-		Integer scale = security.getScale();
-		CDecimal price = params.getBid();
-		if ( scale != null ) {
-			price = price.withScale(scale);
+	private DeltaUpdateBuilder toUpdate(SecurityQuotations params) {
+		return toUpdate(new DeltaUpdateBuilder(), params);
+	}
+	
+	private boolean toLevel1Update(L1UpdateBuilder builder,
+			Security security,
+			TickType type,
+			CDecimal price,
+			Integer size,
+			Instant time)
+	{
+		if ( price == null || size == null ) {
+			return false;
 		}
-		Integer size = params.getBidDepth();
-		if ( size == null ) {
-			size = 0;
-		}
-		security.consume(new L1UpdateBuilder()
-			.withBid()
-			.withPrice(price)
+		builder.withType(type)
+			.withPrice(security.isAvailable() ? security.round(price) : price)
 			.withSize((long) size)
 			.withSymbol(security.getSymbol())
-			.withTime(services.getTerminal().getCurrentTime())
-			.buildL1Update());
+			.withTime(time);
+		return true;
 	}
 	
-	private void updateSecurityBestAsk(EditableSecurity security, SecurityQuotations params) {
-		Integer scale = security.getScale();
-		CDecimal price = params.getOffer();
-		if ( scale != null ) {
-			price = price.abs().withScale(scale);
-		}
-		Integer size = params.getOfferDepth();
-		if ( size == null ) {
-			size = 0;
-		}
-		security.consume(new L1UpdateBuilder()
-			.withAsk()
-			.withPrice(price)
-			.withSize((long) size)
-			.withSymbol(security.getSymbol())
-			.withTime(services.getTerminal().getCurrentTime())
-			.buildL1Update());
+	private boolean toLevel1Update(L1UpdateBuilder builder,
+			Security security,
+			TickType type,
+			CDecimal price,
+			Integer size)
+	{
+		return toLevel1Update(builder, security, type, price, size, security.getTerminal().getCurrentTime());
 	}
 	
-	private void cascadeSecurityUpdate(GSymbol gid, SecurityParams general_params) {
-		if ( ! connected ) {
-			return;
-		}
-		List<Symbol> symbol_list = getKnownSymbols(gid);
-		for ( Symbol symbol : symbol_list ) {
-			if ( hasSubscribers(symbol) ) {
-				updateSecurity(symbol, general_params);
-			}
-		}
+	private boolean toBidUpdate(L1UpdateBuilder builder, Security security, SecurityQuotations params) {
+		return toLevel1Update(builder, security, TickType.BID, params.getBid(), params.getBidDepth());
+	}
+	
+	private boolean toAskUpdate(L1UpdateBuilder builder, Security security, SecurityQuotations params) {
+		return toLevel1Update(builder, security, TickType.ASK, params.getOffer(), params.getOfferDepth());
 	}
 	
 	/**
@@ -316,9 +294,7 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 			return;
 		}
 		
-		if ( isKnownSymbol(symbol) ) {
-			updateSecurity(symbol);
-		}
+		initialUpdateSecurity(symbol);
 		
 		if ( syncSubscrState(state, subscr) ) {
 			_applyPendingChanges();
@@ -354,7 +330,7 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 			for ( SymbolSubscrCounter subscr : subscrCounters.getEntities() ) {
 				Symbol symbol = subscr.getSymbol();
 				if ( isKnownSymbol(symbol) ) {
-					updateSecurity(symbol);
+					initialUpdateSecurity(symbol);
 					
 					ISecIDT idt = dir.toSecIDT(symbol, true);
 					if ( idt != null ) {
@@ -378,10 +354,60 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 		}
 	}
 	
+	/**
+	 * Does not check anything. Just does update up to maximum available data.
+	 * <p>
+	 * @param symbol - symbol of security
+	 */
+	private void initialUpdateSecurity(Symbol symbol) {
+		TQDirectory dir = getDir();
+		TSymbol tid = dir.toSymbolTID(symbol);
+		EditableSecurity security = getSecurity(symbol);
+		DeltaUpdateBuilder builder = new DeltaUpdateBuilder();
+		if ( dir.isExistsSecurityParams(tid) && dir.isExistsSecurityBoardParams(tid) ) {
+			builder = toUpdate(builder, dir.getSecurityParams(tid), dir.getSecurityBoardParams(tid));
+		}
+		SecurityQuotations quotations = null;
+		if ( dir.isExistsSecurityQuotations(tid) ) {
+			builder = toUpdate(builder, quotations = dir.getSecurityQuotations(tid));
+		}
+		if ( builder.hasTokens() ) {
+			security.consume(builder.buildUpdate());
+		}
+		
+		if ( quotations != null ) {
+			L1UpdateBuilder l1_builder = null;
+			if ( toAskUpdate(l1_builder = new L1UpdateBuilder(), security, quotations) ) {
+				security.consume(l1_builder.buildL1Update());
+			}
+			if ( toBidUpdate(l1_builder = new L1UpdateBuilder(), security, quotations) ) {
+				security.consume(l1_builder.buildL1Update());
+			}
+		}		
+	}
+	
+	private void cascadeSecurityUpdate(GSymbol gid, SecurityParams general_params) {
+		TQDirectory dir = getDir();
+		List<Symbol> symbol_list = getKnownSymbols(gid);
+		for ( Symbol symbol : symbol_list ) {
+			TSymbol tid = dir.toSymbolTID(symbol);
+			if ( hasSubscribers(symbol) && dir.isExistsSecurityBoardParams(tid) ) {
+				EditableSecurity security = getSecurity(symbol);
+				DeltaUpdateBuilder builder = toUpdate(general_params, dir.getSecurityBoardParams(tid));
+				if ( builder.hasTokens() ) {
+					security.consume(builder.buildUpdate());
+				}
+			}
+		}
+	}
+
 	@Override
 	public void onSecurityUpdateF(TQStateUpdate<ISecIDF> update) {
 		TQDirectory dir = getDir();
 		SecurityParams params = dir.updateSecurityParamsF(update);
+		if ( ! connected ) {
+			return;
+		}
 		cascadeSecurityUpdate(dir.toSymbolGID(update.getID()), params);
 	}
 
@@ -389,6 +415,9 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 	public void onSecurityUpdateG(TQStateUpdate<ISecIDG> update) {
 		TQDirectory dir = getDir();
 		SecurityParams params = dir.updateSecurityParamsP(update);
+		if ( ! connected ) {
+			return;
+		}
 		cascadeSecurityUpdate(dir.toSymbolGID(update.getID()), params);
 	}
 
@@ -401,8 +430,12 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 		}
 		TSymbol tid = dir.toSymbolTID(update.getID());
 		Symbol symbol = dir.toSymbol(tid);
-		if ( dir.isExistsSecurityParams(tid) && hasSubscribers(symbol) ) {
-			updateSecurity(symbol, dir.getSecurityParams(tid), params);
+		if ( hasSubscribers(symbol) && dir.isExistsSecurityParams(tid) ) {
+			EditableSecurity security = getSecurity(symbol);
+			DeltaUpdateBuilder builder = toUpdate(dir.getSecurityParams(tid), params);
+			if ( builder.hasTokens() ) {
+				security.consume(builder.buildUpdate());
+			}
 		}
 	}
 
@@ -414,20 +447,19 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 			return;
 		}
 		TSymbol tid = dir.toSymbolTID(update.getID());
-		Symbol symbol = dir.toSymbolTID(tid);
+		Symbol symbol = dir.toSymbol(tid);
 		if ( hasSubscribers(symbol) ) {
 			EditableSecurity security = getSecurity(symbol);
-			final int[] c1 = { FQuotation.OPEN, FQuotation.HIGH, FQuotation.LOW, FQuotation.CLOSE_PRICE };
-			if ( params.atLeastOneHasChanged(c1) ) {
-				updateSecurityOHLC(security, params);
+			DeltaUpdateBuilder builder = toUpdate(params);
+			if ( builder.hasTokens() ) {
+				security.consume(builder.buildUpdate());
 			}
-			final int[] c2 = { FQuotation.BID, FQuotation.BID_DEPTH };
-			if ( params.atLeastOneHasChanged(c2) ) {
-				updateSecurityBestBid(security, params);
+			L1UpdateBuilder l1_builder = null;
+			if ( toAskUpdate(l1_builder = new L1UpdateBuilder(), security, params) ) {
+				security.consume(l1_builder.buildL1Update());
 			}
-			final int[] c3 = { FQuotation.OFFER, FQuotation.OFFER_DEPTH };
-			if ( params.atLeastOneHasChanged(c3) ) {
-				updateSecurityBestAsk(security, params);
+			if ( toBidUpdate(l1_builder = new L1UpdateBuilder(), security, params) ) {
+				security.consume(l1_builder.buildL1Update());
 			}
 		}
 	}

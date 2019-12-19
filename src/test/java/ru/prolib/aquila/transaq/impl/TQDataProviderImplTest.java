@@ -3,6 +3,8 @@ package ru.prolib.aquila.transaq.impl;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
@@ -103,8 +105,10 @@ public class TQDataProviderImplTest {
 	
 	@Test
 	public void testClose() {
-		engMock.shutdown();
+		CompletableFuture<Boolean> r = new CompletableFuture<>();
+		expect(engMock.shutdown()).andReturn(r);
 		control.replay();
+		r.complete(true);
 		
 		service.close();
 		

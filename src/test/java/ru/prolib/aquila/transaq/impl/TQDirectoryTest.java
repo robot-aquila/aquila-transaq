@@ -939,5 +939,28 @@ public class TQDirectoryTest {
 		assertTrue(service.isKnownSymbol(new Symbol("FOO", "BAR", "RUB", SymbolType.STOCK)));
 		assertFalse(service.isKnownSymbol(new Symbol("GOO", "BOO", "RUB", SymbolType.STOCK)));
 	}
+	
+	@Test
+	public void testGetBoardName() {
+		service = new TQDirectory(queue);
+		service.updateBoard(new TQStateUpdate<>("EQDB", new DeltaUpdateBuilder()
+				.withToken(FBoard.CODE, "EQBD")
+				.withToken(FBoard.NAME, "Main market: D bonds")
+				.withToken(FBoard.MARKET_ID, 1)
+				.buildUpdate()));
+		service.updateBoard(new TQStateUpdate<>("EQNL", new DeltaUpdateBuilder()
+				.withToken(FBoard.CODE, "EQNL")
+				.withToken(FBoard.NAME, "")
+				.withToken(FBoard.MARKET_ID, 2)
+				.buildUpdate()));
+		service.updateBoard(new TQStateUpdate<>("AETS", new DeltaUpdateBuilder()
+				.withToken(FBoard.CODE, "AETS")
+				.withToken(FBoard.MARKET_ID, 2)
+				.buildUpdate()));
+		
+		assertEquals("Main market: D bonds", service.getBoardName("EQDB"));
+		assertEquals("EQNL", service.getBoardName("EQNL"));
+		assertEquals("AETS", service.getBoardName("AETS"));
+	}
 
 }

@@ -58,7 +58,7 @@ public class TransaqBuilder {
 		BlockingQueue<Cmd> cmd_queue = new LinkedBlockingQueue<>();
 		Engine engine = new EngineImpl(cmd_queue);
 		Thread t = new Thread(new EngineCmdProcessor(cmd_queue, services));
-		t.setDaemon(true);
+		//t.setDaemon(true);
 		t.setName(_service_id);
 		t.start();
 		JTransaqHandler _handler = new TransaqHandler(engine);
