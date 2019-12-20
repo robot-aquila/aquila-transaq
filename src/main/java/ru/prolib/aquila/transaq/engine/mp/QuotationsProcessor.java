@@ -2,21 +2,12 @@ package ru.prolib.aquila.transaq.engine.mp;
 
 import javax.xml.stream.XMLStreamReader;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
 import ru.prolib.aquila.transaq.impl.TQReactor;
 import ru.prolib.aquila.transaq.impl.TQStateUpdate;
 import ru.prolib.aquila.transaq.remote.ISecIDT;
 
-public class QuotationsProcessor implements MessageProcessor {
-	private static final Logger logger;
-	
-	static {
-		logger = LoggerFactory.getLogger(QuotationsProcessor.class);
-	}
-	
+public class QuotationsProcessor implements MessageProcessor {	
 	private final ServiceLocator services;
 	
 	public QuotationsProcessor(ServiceLocator services) {
@@ -25,9 +16,7 @@ public class QuotationsProcessor implements MessageProcessor {
 
 	@Override
 	public void processRawMessage(String message) throws Exception {
-		if ( logger.isDebugEnabled() ) {
-			logger.debug("RAW: {}", message);
-		}
+
 	}
 
 	@Override

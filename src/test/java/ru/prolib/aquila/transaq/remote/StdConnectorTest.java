@@ -24,6 +24,7 @@ public class StdConnectorTest {
 	private IMocksControl control;
 	private JTransaqServer serverMock;
 	private Section configMock;
+	private MessageInterceptor interceptorMock;
 	private StdConnector service;
 	private JTransaqHandler handlerMock;
 
@@ -33,7 +34,8 @@ public class StdConnectorTest {
 		serverMock = control.createMock(JTransaqServer.class);
 		configMock = control.createMock(Section.class);
 		handlerMock = control.createMock(JTransaqHandler.class);
-		service = new StdConnector(configMock, serverMock, handlerMock);
+		interceptorMock = control.createMock(MessageInterceptor.class);
+		service = new StdConnector(configMock, serverMock, handlerMock, interceptorMock);
 	}
 	
 	@Test
@@ -50,10 +52,26 @@ public class StdConnectorTest {
 	
 	@Test
 	public void testConnect() throws Exception {
-		expect(configMock.get("login")).andReturn("user");
-		expect(configMock.get("password")).andReturn("12345");
-		expect(configMock.get("host")).andReturn("123.456.789");
-		expect(configMock.get("port")).andReturn("915");
+		expect(configMock.get("login")).andStubReturn("user");
+		expect(configMock.get("password")).andStubReturn("12345");
+		expect(configMock.get("host")).andStubReturn("123.456.789");
+		expect(configMock.get("port")).andStubReturn("915");
+		interceptorMock.outgoing(new StringBuilder()
+				.append("<command id=\"connect\">")
+				.append("<login>***</login>")
+				.append("<password>***</password>")
+				.append("<host>123.456.789</host>")
+				.append("<port>915</port>")
+				.append("<language>en</language>")
+				.append("<autopos>true</autopos>")
+				.append("<micex_registers>true</micex_registers>")
+				.append("<milliseconds>true</milliseconds>")
+				.append("<utc_time>false</utc_time>")
+				.append("<rqdelay>1000</rqdelay>")
+				.append("<push_u_limits>5</push_u_limits>")
+				.append("<push_pos_equity>5</push_pos_equity>")
+				.append("</command>")
+				.toString());
 		serverMock.SendCommand(new StringBuilder()
 				.append("<command id=\"connect\">")
 				.append("<login>user</login>")
@@ -79,7 +97,9 @@ public class StdConnectorTest {
 	
 	@Test
 	public void testDisconnect() throws Exception {
-		serverMock.SendCommand("<command id=\"disconnect\"/>");
+		String message = "<command id=\"disconnect\"/>";
+		interceptorMock.outgoing(message);
+		serverMock.SendCommand(message);
 		control.replay();
 		
 		service.disconnect();
@@ -92,6 +112,7 @@ public class StdConnectorTest {
 		serverMock.UnInitialize();
 		expect(handlerMock.Handle("<dump_stats/>")).andReturn(true);
 		handlerMock.delete();
+		interceptorMock.close();
 		control.replay();
 		
 		service.close();
@@ -105,8 +126,7 @@ public class StdConnectorTest {
 		symbols.add(new TQSecIDT("foo", "EX1"));
 		symbols.add(new TQSecIDT("bar", "EX2"));
 		symbols.add(new TQSecIDT("buz", "EX3"));
-		serverMock.SendCommand(
-				"<command id=\"subscribe\">\n" +
+		String message = "<command id=\"subscribe\">\n" +
 		
 				"\t<alltrades>\n" +
 				"\t\t<security>\n" +
@@ -153,8 +173,10 @@ public class StdConnectorTest {
 				"\t\t</security>\n" +
 				"\t</quotes>\n" +
 				
-				"</command>"
-			);
+				"</command>";
+		
+		interceptorMock.outgoing(message);
+		serverMock.SendCommand(message);
 		control.replay();
 		
 		service.subscribe(symbols, StdConnector.SUBSCR_TYPE_ALL_TRADES |
@@ -169,8 +191,7 @@ public class StdConnectorTest {
 		symbols.add(new TQSecIDT("foo", "EX1"));
 		symbols.add(new TQSecIDT("bar", "EX2"));
 		symbols.add(new TQSecIDT("buz", "EX3"));
-		serverMock.SendCommand(
-				"<command id=\"unsubscribe\">\n" +
+		String message = "<command id=\"unsubscribe\">\n" +
 		
 				"\t<alltrades>\n" +
 				"\t\t<security>\n" +
@@ -217,8 +238,9 @@ public class StdConnectorTest {
 				"\t\t</security>\n" +
 				"\t</quotes>\n" +
 				
-				"</command>"
-			);
+				"</command>";
+		interceptorMock.outgoing(message);
+		serverMock.SendCommand(message);
 		control.replay();
 		
 		service.unsubscribe(symbols, StdConnector.SUBSCR_TYPE_ALL_TRADES |
@@ -239,15 +261,17 @@ public class StdConnectorTest {
 		Set<ISecIDT> quotes = new LinkedHashSet<>();
 		quotes.add(new TQSecIDT("RIZ9", "FUT"));
 		quotes.add(new TQSecIDT("SiZ9", "FUT"));
-		Capture<String> my_cap = Capture.newInstance();
-		serverMock.SendCommand(capture(my_cap));
+		Capture<String> my_cap1 = Capture.newInstance(), my_cap2 = Capture.newInstance();
+		interceptorMock.outgoing(capture(my_cap1));
+		serverMock.SendCommand(capture(my_cap2));
 		control.replay();
 		
 		service.subscribe(alltrades, quotations, quotes);
 		
 		control.verify();
 		String expected = FileUtils.readFileToString(new File("fixture/connector-subscribe3.xml"), "UTF8");
-		assertEquals(expected, my_cap.getValue());
+		assertEquals(expected, my_cap1.getValue());
+		assertEquals(expected, my_cap2.getValue());
 	}
 	
 	@Test
@@ -271,15 +295,17 @@ public class StdConnectorTest {
 		quotations.add(new TQSecIDT("GAZP", "EQTB"));
 		Set<ISecIDT> quotes = new LinkedHashSet<>();
 		quotes.add(new TQSecIDT("SiZ9", "FUT"));
-		Capture<String> my_cap = Capture.newInstance();
-		serverMock.SendCommand(capture(my_cap));
+		Capture<String> my_cap1 = Capture.newInstance(), my_cap2 = Capture.newInstance();
+		interceptorMock.outgoing(capture(my_cap1));
+		serverMock.SendCommand(capture(my_cap2));
 		control.replay();
 		
 		service.unsubscribe(alltrades, quotations, quotes);
 		
 		control.verify();
 		String expected = FileUtils.readFileToString(new File("fixture/connector-unsubscribe3.xml"), "UTF8");
-		assertEquals(expected, my_cap.getValue());
+		assertEquals(expected, my_cap1.getValue());
+		assertEquals(expected, my_cap2.getValue());
 	}
 	
 	@Test
@@ -293,7 +319,9 @@ public class StdConnectorTest {
 	
 	@Test
 	public void testGetSecurities() throws Exception {
-		serverMock.SendCommand("<command id=\"get_securities\"/>");
+		String message = "<command id=\"get_securities\"/>";
+		interceptorMock.outgoing(message);
+		serverMock.SendCommand(message);
 		control.replay();
 		
 		service.getSecurities();

@@ -25,11 +25,17 @@ public class StdConnector implements Connector {
 	private final Section config;
 	private final JTransaqServer server;
 	private final JTransaqHandler handler;
+	private final MessageInterceptor interceptor;
 	
-	public StdConnector(Section config, JTransaqServer server, JTransaqHandler handler) {
+	public StdConnector(Section config, JTransaqServer server, JTransaqHandler handler, MessageInterceptor interceptor) {
 		this.config = config;
 		this.server = server;
 		this.handler = handler;
+		this.interceptor = interceptor;
+	}
+	
+	public StdConnector(Section config, JTransaqServer server, JTransaqHandler handler) {
+		this(config, server, handler, new MessageInterceptorStub());
 	}
 	
 	private String cfg_var(String key) throws TransaqException {
@@ -40,11 +46,13 @@ public class StdConnector implements Connector {
 		return x;
 	}
 	
-	private void SendCommand(String data) throws Exception {
-		if ( logger.isDebugEnabled() ) {
-			logger.debug("OUT> {}", data);
-		}
-		server.SendCommand(data);
+	private void SendCommand(String message_to_send, String message_to_dump) throws Exception {
+		interceptor.outgoing(message_to_dump);
+		server.SendCommand(message_to_send);
+	}
+	
+	private void SendCommand(String message_to_send) throws Exception {
+		SendCommand(message_to_send, message_to_send);
 	}
 	
 	@Override
@@ -58,23 +66,27 @@ public class StdConnector implements Connector {
 		}
 	}
 	
+	private String form_connect_msg(boolean secure) throws TransaqException {
+		return "<command id=\"connect\">"
+				+ "<login>" + (secure ? "***" : cfg_var("login")) + "</login>"
+				+ "<password>" + (secure ? "***" : cfg_var("password")) + "</password>"
+				+ "<host>" + cfg_var("host") + "</host>"
+				+ "<port>" + cfg_var("port") + "</port>"
+				+ "<language>en</language>"
+				+ "<autopos>true</autopos>"
+				+ "<micex_registers>true</micex_registers>"
+				+ "<milliseconds>true</milliseconds>"
+				+ "<utc_time>false</utc_time>"
+				+ "<rqdelay>1000</rqdelay>"
+				+ "<push_u_limits>5</push_u_limits>"
+				+ "<push_pos_equity>5</push_pos_equity>"
+				+ "</command>";
+	}
+	
 	@Override
 	public void connect() throws TransaqException {
 		try {
-			SendCommand("<command id=\"connect\">"
-					+ "<login>" + cfg_var("login") + "</login>"
-					+ "<password>" + cfg_var("password") + "</password>"
-					+ "<host>" + cfg_var("host") + "</host>"
-					+ "<port>" + cfg_var("port") + "</port>"
-					+ "<language>en</language>"
-					+ "<autopos>true</autopos>"
-					+ "<micex_registers>true</micex_registers>"
-					+ "<milliseconds>true</milliseconds>"
-					+ "<utc_time>false</utc_time>"
-					+ "<rqdelay>1000</rqdelay>"
-					+ "<push_u_limits>5</push_u_limits>"
-					+ "<push_pos_equity>5</push_pos_equity>"
-					+ "</command>");
+			SendCommand(form_connect_msg(false), form_connect_msg(true));
 		} catch ( TransaqException e ) {
 			throw e;
 		} catch ( Exception e ) {
@@ -100,6 +112,7 @@ public class StdConnector implements Connector {
 		}
 		handler.Handle(DefaultMessageProcessor.DUMP_PROC_TAG);
 		handler.delete();
+		interceptor.close();
 	}
 	
 	private void manageSubscriptions(Set<TQSecIDT> symbols, int subscr_type, String command) throws TransaqException {

@@ -2,7 +2,7 @@ package ru.prolib.aquila.transaq.engine.mp;
 
 import javax.xml.stream.XMLStreamReader;
 
-public class ClientProcessor implements MessageProcessor {
+public class MessageProcessorStub implements MessageProcessor {
 
 	@Override
 	public void processRawMessage(String message) throws Exception {

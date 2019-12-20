@@ -14,7 +14,7 @@ import ru.prolib.aquila.transaq.engine.mp.MessageRouterImpl;
 import ru.prolib.aquila.transaq.engine.mp.PitsProcessor;
 import ru.prolib.aquila.transaq.engine.mp.ProcessorRegistryBuilder;
 import ru.prolib.aquila.transaq.engine.mp.QuotationsProcessor;
-import ru.prolib.aquila.transaq.engine.mp.RawMessageDumper;
+import ru.prolib.aquila.transaq.engine.mp.MessageProcessorStub;
 import ru.prolib.aquila.transaq.engine.mp.SecInfoProcessor;
 import ru.prolib.aquila.transaq.engine.mp.SecInfoUpdProcessor;
 import ru.prolib.aquila.transaq.engine.mp.SecuritiesProcessor;
@@ -44,12 +44,12 @@ public class EngineBuilderRoutines {
 				.withProcessor("quotations", new QuotationsProcessor(services))
 				// TODO: do it
 				.withProcessor("client", new ClientProcessor())
-				.withProcessor("messages", new RawMessageDumper())
-				.withProcessor("positions", new RawMessageDumper())
-				.withProcessor("union", new RawMessageDumper())
-				.withProcessor("overnight", new RawMessageDumper())
-				.withProcessor("alltrades", new RawMessageDumper())
-				.withProcessor("quotes", new RawMessageDumper())
+				.withProcessor("messages", new MessageProcessorStub())
+				.withProcessor("positions", new MessageProcessorStub())
+				.withProcessor("union", new MessageProcessorStub())
+				.withProcessor("overnight", new MessageProcessorStub())
+				.withProcessor("alltrades", new MessageProcessorStub())
+				.withProcessor("quotes", new MessageProcessorStub())
 				
 				.build());
 	}

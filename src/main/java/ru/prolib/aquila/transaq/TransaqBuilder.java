@@ -19,6 +19,8 @@ import ru.prolib.aquila.transaq.impl.TQDataProviderImpl;
 import ru.prolib.aquila.transaq.impl.TransaqException;
 import ru.prolib.aquila.transaq.impl.TransaqHandler;
 import ru.prolib.aquila.transaq.remote.ConnectorFactory;
+import ru.prolib.aquila.transaq.remote.MessageInterceptor;
+import ru.prolib.aquila.transaq.remote.MessageInterceptorStub;
 import ru.prolib.aquila.transaq.remote.StdConnectorFactory;
 
 public class TransaqBuilder {
@@ -26,6 +28,7 @@ public class TransaqBuilder {
 	private String serviceID;
 	private EventQueue queue;
 	private ConnectorFactory connectorFactory;
+	private MessageInterceptor interceptor = new MessageInterceptorStub();
 
 	public TransaqBuilder withServiceID(String service_id) {
 		this.serviceID = service_id;
@@ -42,13 +45,16 @@ public class TransaqBuilder {
 		return this;
 	}
 	
-	public TransaqBuilder withConnectorFactoryStd(Section config) {
-		return withConnectorFactory(new StdConnectorFactory(config));
+	public TransaqBuilder withConnectorFactoryStd(Section config, MessageInterceptor interceptor) {
+		return withConnectorFactory(new StdConnectorFactory(config, this.interceptor = interceptor));
 	}
 
 	public DataProvider build() throws TransaqException {
 		if ( connectorFactory == null ) {
 			throw new IllegalStateException("Connector factory was not defined");
+		}
+		if ( interceptor == null ) {
+			throw new IllegalStateException("Message interceptor was not defined");
 		}
 
 		String _service_id = serviceID == null ? DEFAULT_SERVICE_ID : serviceID;
@@ -61,7 +67,7 @@ public class TransaqBuilder {
 		//t.setDaemon(true);
 		t.setName(_service_id);
 		t.start();
-		JTransaqHandler _handler = new TransaqHandler(engine);
+		JTransaqHandler _handler = new TransaqHandler(engine, interceptor);
 
 		services.setConnector(connectorFactory.produce(_handler));
 		new EngineBuilderRoutines().initPrimary(services);
