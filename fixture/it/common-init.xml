@@ -1,0 +1,216 @@
+<script>
+	<phase>
+		<expectation type="Initialize" log_path="C:/is/not/bad/work" log_level="5" />
+	</phase>
+	<phase>
+		<expectation type="SendCommand">
+			<command id="connect">
+				<login>dummy</login>
+				<password>blotter</password>
+				<host>frozen.throne</host>
+				<port>4512</port>
+				<language>en</language>
+				<autopos>true</autopos>
+				<micex_registers>true</micex_registers>
+				<milliseconds>true</milliseconds>
+				<utc_time>false</utc_time>
+				<rqdelay>1000</rqdelay>
+				<push_u_limits>5</push_u_limits>
+				<push_pos_equity>5</push_pos_equity>
+			</command>
+		</expectation>
+		<actions>
+			<action type="SendXml" >
+				<markets>
+					<market id="0">Collateral</market>
+					<market id="1">MICEX</market>
+					<market id="4">FORTS</market>
+					<market id="7">SPBEX</market>
+					<market id="8">INF</market>
+					<market id="9"></market>
+					<market id="12"></market>
+					<market id="14">MMA</market>
+					<market id="15">ETS</market>
+				</markets>
+			</action>
+			<action type="SendXml" >
+				<boards>
+					<board id="AUCT"><name>Auction</name><market>1</market><type>2</type></board>
+					<board id="EQDB"><name>Main market: D bonds</name><market>1</market><type>2</type></board>
+					<board id="EQDP"><name>Dark Pool</name><market>1</market><type>2</type></board>
+					<board id="EQEO"><name>Main market: bonds EUR</name><market>1</market><type>2</type></board>
+					<board id="EQEU"><name>Main Market: bonds USD</name><market>1</market><type>2</type></board>
+					<board id="EQNE"><name>Main market: not listed stocks</name><market>1</market><type>2</type></board>
+					<board id="EQOB"><name>Main market: bonds</name><market>1</market><type>2</type></board>
+					<board id="EQQI"><name>Qualified inv.-Main market</name><market>1</market><type>2</type></board>
+					<board id="EQRD"><name>REPO with CCP 1 day USD</name><market>1</market><type>1</type></board>
+					<board id="EQRE"><name>REPO with CCP 1 day EUR</name><market>1</market><type>1</type></board>
+					<board id="EQRP"><name>REPO with CCP 1 day</name><market>1</market><type>1</type></board>
+					<board id="EQYO"><name>Main market: bonds CNY</name><market>1</market><type>2</type></board>
+					<board id="FBCB"><name>REPO CB</name><market>1</market><type>2</type></board>
+					<board id="FBFX"><name>REPO fix versus CB</name><market>1</market><type>2</type></board>
+					<board id="INDEXM"><name>MICEX indexes</name><market>1</market><type>2</type></board>
+					<board id="PSAU"><name>Auction:Negotiated deals</name><market>1</market><type>2</type></board>
+					<board id="PSDB"><name>Neg. deals: D bonds</name><market>1</market><type>2</type></board>
+					<board id="PSDE"><name>Neg. deals: D stocks</name><market>1</market><type>2</type></board>
+					<board id="PSEO"><name>Neg. deals: bonds EUR</name><market>1</market><type>2</type></board>
+					<board id="PSEQ"><name>Neg. deals: stocks</name><market>1</market><type>2</type></board>
+					<board id="PSEU"><name>Neg. deals: bonds USD</name><market>1</market><type>2</type></board>
+					<board id="PSIF"><name>Neg. deals: investment funds</name><market>1</market><type>2</type></board>
+					<board id="PSOB"><name>Neg. deals: bonds</name><market>1</market><type>2</type></board>
+					<board id="PSQI"><name>Qualified inv. - Neg.deals</name><market>1</market><type>2</type></board>
+					<board id="PSRD"><name>REPO with CCP Negdeal USD</name><market>1</market><type>1</type></board>
+					<board id="PSRE"><name>REPO with CCP Negdeal EUR</name><market>1</market><type>1</type></board>
+					<board id="PSRP"><name>REPO with CCP Negdeal</name><market>1</market><type>1</type></board>
+					<board id="PSTF"><name>Neg. deals: ETF</name><market>1</market><type>2</type></board>
+					<board id="PSYO"><name>Neg. deals: bonds CNY</name><market>1</market><type>2</type></board>
+					<board id="PTDE"><name>NDM with CCP: D stocks</name><market>1</market><type>1</type></board>
+					<board id="PTEQ"><name>NDM with CCP: stocks  DRs</name><market>1</market><type>1</type></board>
+					<board id="PTIF"><name>NDM with CCP: investment funds</name><market>1</market><type>1</type></board>
+					<board id="PTOB"><name>NDM with CCP: bonds</name><market>1</market><type>1</type></board>
+					<board id="PTOD"><name>Neg. deals with CCP: Bonds USD</name><market>1</market><type>1</type></board>
+					<board id="PTQI"><name>Qualified inv. - NDM with CCP</name><market>1</market><type>1</type></board>
+					<board id="PTTF"><name>NDM with CCP: ETF</name><market>1</market><type>1</type></board>
+					<board id="RPEO"><name>REPO (EUR settle)</name><market>1</market><type>2</type></board>
+					<board id="RPEU"><name>REPO (USD settle)</name><market>1</market><type>2</type></board>
+					<board id="RPEY"><name>REPO (CNY settle)</name><market>1</market><type>2</type></board>
+					<board id="RPMA"><name>REPO with stocks  RDRs</name><market>1</market><type>2</type></board>
+					<board id="RPMO"><name>REPO with bonds</name><market>1</market><type>2</type></board>
+					<board id="RPQI"><name>Qualified inv. - REPO</name><market>1</market><type>2</type></board>
+					<board id="RPUA"><name>REPO with stocks (USD settle)</name><market>1</market><type>2</type></board>
+					<board id="RPUO"><name>REPO with bonds (USD settle)</name><market>1</market><type>2</type></board>
+					<board id="SMAL"><name>Odd lot trading</name><market>1</market><type>1</type></board>
+					<board id="TQBR"><name>T+: stocks  DRs</name><market>1</market><type>1</type></board>
+					<board id="TQCB"><name>Corp. Bonds T+</name><market>1</market><type>1</type></board>
+					<board id="TQDE"><name>T+: D stocks</name><market>1</market><type>1</type></board>
+					<board id="TQIF"><name>T+: investment funds</name><market>1</market><type>1</type></board>
+					<board id="TQOB"><name>T+: bonds</name><market>1</market><type>1</type></board>
+					<board id="TQOD"><name>T+ Bonds USD</name><market>1</market><type>1</type></board>
+					<board id="TQQD"><name>Qualified inv.-T+ USD</name><market>1</market><type>1</type></board>
+					<board id="TQQI"><name>Qualified inv.-T+</name><market>1</market><type>1</type></board>
+					<board id="TQTD"><name>T+: ETF USD</name><market>1</market><type>1</type></board>
+					<board id="TQTE"><name>T+: ETF EUR</name><market>1</market><type>1</type></board>
+					<board id="TQTF"><name>T+: ETF</name><market>1</market><type>1</type></board>
+					<board id="FUT"><name>FORTS-Futures</name><market>4</market><type>0</type></board>
+					<board id="INDEXR"><name>RTS indexes</name><market>4</market><type>0</type></board>
+					<board id="OPT"><name>FORTS-Options</name><market>4</market><type>0</type></board>
+					<board id="SPFEQ"><name>Foreign equities</name><market>7</market><type>1</type></board>
+					<board id="FRNF"><name>FRNF-Frankfurt</name><market>9</market><type>2</type></board>
+					<board id="SCOH"><name>SCOH-Frankfurt</name><market>9</market><type>2</type></board>
+					<board id="MCT"><name>MCT-Contracts</name><market>14</market><type>2</type></board>
+					<board id="CETS"><name>ETS session</name><market>15</market><type>2</type></board>
+					<board id="CNGD"><name>ETS Neg. deals</name><market>15</market><type>2</type></board>
+					<board id="INDEXE"><name>ETS indexes</name><market>15</market><type>2</type></board>
+					<board id="ZLG"><name>Залоговые инструменты</name><market>0</market><type>2</type></board>
+					<board id="EQNL"><name></name><market>255</market><type>2</type></board>
+					<board id="INDE"><name>?????????</name><market>8</market><type>2</type></board>
+					<board id="CUR"><name>???????? ????</name><market>8</market><type>2</type></board>
+					<board id="ADR"><name>???</name><market>8</market><type>2</type></board>
+					<board id="LME"><name>??????</name><market>8</market><type>2</type></board>
+					<board id="ICE"><name>?????</name><market>8</market><type>2</type></board>
+					<board id="DVP"><name>?????????????</name><market>8</market><type>2</type></board>
+					<board id="AETS"><name>Дополнительная сессия</name><market>15</market><type>2</type></board>
+					<board id="AUCB"><name>Аукцион ЦБР</name><market>15</market><type>2</type></board>
+					<board id="FIXN"><name>Фиксинг внесистемный</name><market>15</market><type>2</type></board>
+					<board id="FIXS"><name>Фиксинг системный</name><market>15</market><type>2</type></board>
+					<board id="FUTN"><name>Фьючерсы внесистемные</name><market>15</market><type>2</type></board>
+					<board id="FUTS"><name>Фьючерсы системные</name><market>15</market><type>2</type></board>
+					<board id="LICU"><name>Внесист. сделки урегулирования</name><market>15</market><type>2</type></board>
+					<board id="RFSM"><name>Внебиржевые сделки RFS</name><market>15</market><type>2</type></board>
+					<board id="RSKC"><name>Управление рисками</name><market>15</market><type>2</type></board>
+					<board id="SDBP"><name>Крупные сделки</name><market>15</market><type>2</type></board>
+					<board id="SHFT"><name>Перенос исполнения сделок</name><market>15</market><type>2</type></board>
+					<board id="SPEC"><name>Поставка драгметаллов</name><market>15</market><type>2</type></board>
+					<board id="WAPN"><name>Внесистемные средневзвешенные</name><market>15</market><type>2</type></board>
+					<board id="WAPS"><name>Системные средневзвешенные</name><market>15</market><type>2</type></board>
+				</boards>
+			</action>
+			<action type="SendXml" >
+				<securities>
+					<security secid="1544" active="true">
+						<sec_tz><![CDATA[Russian Standard Time]]></sec_tz>
+						<seccode>GAZP</seccode>
+						<instrclass>E</instrclass>
+						<board>TQBR</board>
+						<shortname>Gazprom</shortname>
+						<decimals>2</decimals>
+						<market>1</market>
+						<sectype>SHARE</sectype>
+						<opmask usecredit="yes" bymarket="yes" nosplit="yes" fok="yes" ioc="yes" immorcancel="yes" cancelbalance="yes"/>
+						<minstep>0.01</minstep>
+						<lotsize>10</lotsize>
+						<point_cost>1</point_cost>
+						<quotestype>1</quotestype>
+					</security>
+					<security secid="44576" active="true">
+						<sec_tz><![CDATA[Russian Standard Time]]></sec_tz>
+						<seccode>RIH0</seccode>
+						<instrclass>F</instrclass>
+						<board>FUT</board>
+						<shortname>RTS-3.20</shortname>
+						<decimals>0</decimals>
+						<market>4</market>
+						<sectype>FUT</sectype>
+						<opmask usecredit="no" bymarket="yes" nosplit="no" fok="no" ioc="yes" immorcancel="no" cancelbalance="yes"/>
+						<minstep>10</minstep>
+						<lotsize>1</lotsize>
+						<point_cost>124.56</point_cost>
+						<quotestype>1</quotestype>
+					</security>
+					<security secid="45092" active="true">
+						<sec_tz><![CDATA[Russian Standard Time]]></sec_tz>
+						<seccode>SiH0</seccode>
+						<instrclass>F</instrclass>
+						<board>FUT</board>
+						<shortname>Si-3.20</shortname>
+						<decimals>0</decimals>
+						<market>4</market>
+						<sectype>FUT</sectype>
+						<opmask usecredit="no" bymarket="yes" nosplit="no" fok="no" ioc="yes" immorcancel="no" cancelbalance="yes"/>
+						<minstep>1</minstep>
+						<lotsize>1</lotsize>
+						<point_cost>100</point_cost>
+						<quotestype>1</quotestype>
+					</security>
+				</securities>
+			</action>
+			<action type="SendXml" >
+				<pits>
+            		<pit seccode="GAZP" board ="TQBR"><market>1</market><decimals>2</decimals><minstep>0.01</minstep><lotsize>10</lotsize><point_cost>1</point_cost></pit>
+					<pit seccode="GAZP" board ="SMAL"><market>1</market><decimals>2</decimals><minstep>0.01</minstep><lotsize>1</lotsize><point_cost>1</point_cost></pit>
+					<pit seccode="GAZP" board ="EQRP"><market>1</market><decimals>3</decimals><minstep>0.01</minstep><lotsize>10</lotsize><point_cost>0.1</point_cost></pit>
+					<pit seccode="GAZP" board ="PSEQ"><market>1</market><decimals>2</decimals><minstep>0.01</minstep><lotsize>1</lotsize><point_cost>1</point_cost></pit>
+					<pit seccode="GAZP" board ="PSRP"><market>1</market><decimals>3</decimals><minstep>0.01</minstep><lotsize>10</lotsize><point_cost>0.1</point_cost></pit>
+					<pit seccode="GAZP" board ="PTEQ"><market>1</market><decimals>2</decimals><minstep>0.01</minstep><lotsize>1</lotsize><point_cost>1</point_cost></pit>
+					<pit seccode="GAZP" board ="RPEU"><market>1</market><decimals>4</decimals><minstep>0.0001</minstep><lotsize>1</lotsize><point_cost>0.625283</point_cost></pit>
+					<pit seccode="GAZP" board ="RPMA"><market>1</market><decimals>4</decimals><minstep>0.0001</minstep><lotsize>1</lotsize><point_cost>0.01</point_cost></pit>
+					<pit seccode="GAZP" board ="RPMO"><market>1</market><decimals>4</decimals><minstep>0.0001</minstep><lotsize>1</lotsize><point_cost>0.01</point_cost></pit>
+					<pit seccode="RIH0" board ="FUT"><market>4</market><decimals>0</decimals><minstep>10</minstep><lotsize>1</lotsize><point_cost>124.56</point_cost></pit>
+					<pit seccode="SiH0" board ="FUT"><market>4</market><decimals>0</decimals><minstep>1</minstep><lotsize>1</lotsize><point_cost>100</point_cost></pit>
+				</pits>
+			</action>
+			<action type="SendXml" >
+				<sec_info_upd>
+					<secid>44576</secid>
+					<seccode>RIH0</seccode>
+					<market>4</market>
+					<buy_deposit>22700.12</buy_deposit>
+					<sell_deposit>23031.50</sell_deposit>
+					<point_cost>124.56</point_cost>
+					<minprice>144100</minprice>
+					<maxprice>160480</maxprice>
+				</sec_info_upd>
+				<sec_info_upd>
+					<secid>45092</secid>
+					<seccode>SiH0</seccode>
+					<market>4</market>
+					<buy_deposit>4179.90</buy_deposit>
+					<sell_deposit>4239.57</sell_deposit>
+					<point_cost>100</point_cost>
+					<minprice>60618</minprice>
+					<maxprice>65248</maxprice>
+				</sec_info_upd>
+			</action>
+		</actions>
+	</phase>
+</script>

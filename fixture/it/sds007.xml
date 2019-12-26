@@ -1,0 +1,20 @@
+<script>
+	<phase>
+		<expectation type="SendCommand" >
+			<command id="subscribe" >
+				<alltrades>
+					<security>
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+					</security>
+				</alltrades>
+				<quotations>
+					<security>
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+					</security>
+				</quotations>
+			</command>
+		</expectation>
+	</phase>
+</script>

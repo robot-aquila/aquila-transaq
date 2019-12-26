@@ -50,6 +50,9 @@ public class DefaultMessageProcessor implements MessageProcessor {
 	}
 
 	private void dump_stats() {
+		if ( unprocMessagesCount.size() == 0 ) {
+			return;
+		}
 		logger.debug("Dumping map of unprocessed messages: ");
 		Iterator<Map.Entry<String, Integer>> it = unprocMessagesCount.entrySet().iterator();
 		while ( it.hasNext() ) {

@@ -49,6 +49,7 @@ public class TQReactor {
 	
 	public void updateServerStatus(ServerStatus status) {
 		if ( status.isConnected() != connected ) {
+			getDir().updateConnectionStatus(status.isConnected());
 			getSDS().onConnectionStatusChange(connected = status.isConnected());
 		}
 	}

@@ -48,5 +48,12 @@ public class CmdUnsubscrSymbol extends Cmd {
 				.append(o.level, level)
 				.build();
 	}
+	
+	@Override
+	public String toString() {
+		return new StringBuilder().append(getClass().getSimpleName())
+				.append("[symbol=").append(symbol)
+				.append(",level=").append(level).append("]").toString();
+	}
 
 }

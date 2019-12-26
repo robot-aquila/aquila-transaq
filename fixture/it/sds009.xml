@@ -1,0 +1,10 @@
+<script>
+	<phase>
+		<expectation type="ExplicitCall" />
+		<actions>
+			<action type="SendXml" >
+				<server_status server_tz="Russian Standard Time" id="5" connected="false" />
+			</action>
+		</actions>
+	</phase>
+</script>

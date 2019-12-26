@@ -1,10 +1,9 @@
 package ru.prolib.aquila.transaq.engine.sds;
 
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,6 +34,7 @@ import ru.prolib.aquila.transaq.impl.TransaqException;
 import ru.prolib.aquila.transaq.remote.ISecIDF;
 import ru.prolib.aquila.transaq.remote.ISecIDG;
 import ru.prolib.aquila.transaq.remote.ISecIDT;
+import ru.prolib.aquila.transaq.remote.MessageFields.FQuotation;
 
 public class SymbolDataServiceImpl implements SymbolDataService {
 	private static final Map<Integer, FeedID> token_to_feed;
@@ -73,7 +73,7 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 			StateOfDataFeedsFactory sodf_factory,
 			SymbolSubscrRepository subscrCounters)
 	{
-		this(services, sodf_factory, subscrCounters, new Hashtable<>());
+		this(services, sodf_factory, subscrCounters, new LinkedHashMap<>());
 	}
 	
 	private TQDirectory getDir() {
@@ -228,9 +228,9 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 		//	  - to unsubscribe of quotes
 
 		Map<FeedID, Pair<Set<ISecIDT>, Set<ISecIDT>>> cache = new LinkedHashMap<>();
-		cache.put(FeedID.SYMBOL_QUOTATIONS, Pair.of(new HashSet<>(), new HashSet<>()));
-		cache.put(FeedID.SYMBOL_ALLTRADES, Pair.of(new HashSet<>(), new HashSet<>()));
-		cache.put(FeedID.SYMBOL_QUOTES, Pair.of(new HashSet<>(), new HashSet<>()));
+		cache.put(FeedID.SYMBOL_QUOTATIONS, Pair.of(new LinkedHashSet<>(), new LinkedHashSet<>()));
+		cache.put(FeedID.SYMBOL_ALLTRADES, Pair.of(new LinkedHashSet<>(), new LinkedHashSet<>()));
+		cache.put(FeedID.SYMBOL_QUOTES, Pair.of(new LinkedHashSet<>(), new LinkedHashSet<>()));
 		for ( StateOfDataFeeds state : feedStateMap.values() ) {
 			for ( FeedID feed_id : cache.keySet() ) {
 				switch ( state.getFeedStatus(feed_id) ) {
@@ -455,10 +455,16 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 				security.consume(builder.buildUpdate());
 			}
 			L1UpdateBuilder l1_builder = null;
-			if ( toAskUpdate(l1_builder = new L1UpdateBuilder(), security, params) ) {
+			int ask_fields[] = { FQuotation.OFFER, FQuotation.OFFER_DEPTH };
+			if ( params.atLeastOneHasChanged(ask_fields)
+			  && toAskUpdate(l1_builder = new L1UpdateBuilder(), security, params) )
+			{
 				security.consume(l1_builder.buildL1Update());
 			}
-			if ( toBidUpdate(l1_builder = new L1UpdateBuilder(), security, params) ) {
+			int bid_fields[] = { FQuotation.BID, FQuotation.BID_DEPTH };
+			if ( params.atLeastOneHasChanged(bid_fields)
+			  && toBidUpdate(l1_builder = new L1UpdateBuilder(), security, params) )
+			{
 				security.consume(l1_builder.buildL1Update());
 			}
 		}

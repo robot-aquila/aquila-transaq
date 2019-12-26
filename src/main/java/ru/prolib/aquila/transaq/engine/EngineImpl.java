@@ -3,10 +3,19 @@ package ru.prolib.aquila.transaq.engine;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ru.prolib.aquila.core.BusinessEntities.MDLevel;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 
 public class EngineImpl implements Engine {
+	protected static final Logger logger;
+	
+	static {
+		logger = LoggerFactory.getLogger(EngineImpl.class);
+	}
+	
 	private final BlockingQueue<Cmd> cmdQueue;
 	
 	public EngineImpl(BlockingQueue<Cmd> cmd_queue) {
@@ -15,6 +24,7 @@ public class EngineImpl implements Engine {
 	
 	private CompletableFuture<Boolean> enqueue(Cmd cmd) {
 		try {
+			//logger.debug("enqueue({})", cmd.getClass().getSimpleName());
 			cmdQueue.put(cmd);
 			return cmd.getResult();
 		} catch ( InterruptedException e ) {

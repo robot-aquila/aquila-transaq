@@ -14,12 +14,11 @@ import ru.prolib.aquila.core.BusinessEntities.OrderException;
 import ru.prolib.aquila.core.BusinessEntities.SubscrHandler;
 import ru.prolib.aquila.core.BusinessEntities.SubscrHandlerStub;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
-import ru.prolib.aquila.core.data.DataProvider;
 import ru.prolib.aquila.transaq.engine.Engine;
 import ru.prolib.aquila.transaq.engine.EngineBuilderRoutines;
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
 
-public class TQDataProviderImpl implements DataProvider {
+public class TQDataProviderImpl implements TQDataProvider {
 	private static final Logger logger;
 	
 	static {
@@ -40,8 +39,11 @@ public class TQDataProviderImpl implements DataProvider {
 		this.engineServices = engine_services;
 	}
 	
-	public ServiceLocator getServices() {
-		return engineServices;
+	@Override
+	public TQDirectory getDirectory() {
+		// Do not return locator itself because most of services aren't safe to
+		// use among threads and do not intended to use outside of engine dispatching queue
+		return engineServices.getDirectory();
 	}
 
 	@Override

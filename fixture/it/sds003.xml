@@ -1,0 +1,38 @@
+<script>
+	<phase>
+		<expectation type="SendCommand" >
+			<command id="subscribe" >
+				<alltrades>
+					<security>
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+					</security>
+					<security>
+						<board>TQBR</board>
+						<seccode>GAZP</seccode>
+					</security>
+				</alltrades>
+				<quotations>
+					<security>
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+					</security>
+					<security>
+						<board>TQBR</board>
+						<seccode>GAZP</seccode>
+					</security>
+					<security>
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+					</security>
+				</quotations>
+				<quotes>
+					<security>
+						<board>TQBR</board>
+						<seccode>GAZP</seccode>
+					</security>
+				</quotes>
+			</command>
+		</expectation>
+	</phase>
+</script>

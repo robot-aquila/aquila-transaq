@@ -1,0 +1,7 @@
+<script>
+	<phase>
+		<expectation type="SendCommand" >
+			<command id="disconnect" />
+		</expectation>
+	</phase>
+</script>

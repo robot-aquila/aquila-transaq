@@ -27,6 +27,7 @@ import ru.prolib.aquila.transaq.entity.SecurityParams;
 import ru.prolib.aquila.transaq.entity.SecurityParamsFactory;
 import ru.prolib.aquila.transaq.entity.SecurityQuotations;
 import ru.prolib.aquila.transaq.entity.SecurityQuotationsFactory;
+import ru.prolib.aquila.transaq.remote.ConnectionStatus;
 import ru.prolib.aquila.transaq.remote.ISecIDF;
 import ru.prolib.aquila.transaq.remote.ISecIDG;
 import ru.prolib.aquila.transaq.remote.ISecIDT;
@@ -54,6 +55,7 @@ public class TQDirectory {
 	private final OSCRepository<GSymbol, SecurityParams> secParams;
 	private final OSCRepository<TSymbol, SecurityBoardParams> secBoardParams;
 	private final OSCRepository<TSymbol, SecurityQuotations> secQuots;
+	private final ConnectionStatus connectionStatus;
 	
 	/**
 	 * Map TRANSAQ/MOEX general security identifier to local symbol general identifier.
@@ -81,6 +83,7 @@ public class TQDirectory {
 			OSCRepository<GSymbol, SecurityParams> secParams,
 			OSCRepository<TSymbol, SecurityBoardParams> secBoardParams,
 			OSCRepository<TSymbol, SecurityQuotations> secQuotations,
+			ConnectionStatus connection_status,
 			Map<ISecIDG, GSymbol> tq2gid_map,
 			Map<GSymbol, ISecIDF> gid2tq_map)
 	{
@@ -90,6 +93,7 @@ public class TQDirectory {
 		this.secParams = secParams;
 		this.secBoardParams = secBoardParams;
 		this.secQuots = secQuotations;
+		this.connectionStatus = connection_status;
 		this.tq2gidMap = tq2gid_map;
 		this.gid2tqMap = gid2tq_map;
 	}
@@ -101,6 +105,7 @@ public class TQDirectory {
 			 new OSCRepositoryImpl<>(new SecurityParamsFactory(queue), "SEC_PARAMS"),
 			 new OSCRepositoryImpl<>(new SecurityBoardParamsFactory(queue), "SEC_BRD_PARAMS"),
 			 new OSCRepositoryImpl<>(new SecurityQuotationsFactory(queue), "SEC_QUOTATIONS"),
+			 new ConnectionStatus(queue, "CONNECTION_STATUS"),
 			 new Hashtable<>(),
 			 new Hashtable<>()
 		);
@@ -210,6 +215,10 @@ public class TQDirectory {
 			);
 	}
 	
+	public ConnectionStatus getConnectionStatus() {
+		return connectionStatus;
+	}
+	
 	public OSCRepository<Integer, CKind> getCKindRepository() {
 		return new OSCRepositoryDecoratorRO<>(ckinds);
 	}
@@ -232,6 +241,14 @@ public class TQDirectory {
 	
 	public OSCRepository<TSymbol, SecurityQuotations> getSecurityQuotationsRepository() {
 		return new OSCRepositoryDecoratorRO<>(secQuots);
+	}
+	
+	public void updateConnectionStatus(boolean connected) {
+		if ( connected ) {
+			connectionStatus.setConnected();
+		} else {
+			connectionStatus.setDisconnected();
+		}
 	}
 	
 	public void updateCKind(TQStateUpdate<Integer> ckind_update) {
@@ -408,9 +425,13 @@ public class TQDirectory {
 	 */
 	public ISecIDT toSecIDT(Symbol symbol, boolean only_if_actual) {
 		TSymbol tid = toSymbolTID(symbol);
+		String board_code = tid.getExchangeID();
+		if ( ! boards.contains(board_code) ) {
+			return null;
+		}
 		GSymbol gid = new GSymbol(
 				tid.getCode(),
-				getMarketName(boards.getOrThrow(tid.getExchangeID()).getMarketID()),
+				getMarketName(boards.getOrThrow(board_code).getMarketID()),
 				tid.getCurrencyCode(),
 				tid.getType()
 			);

@@ -59,17 +59,16 @@ public class EngineBuilderRoutines {
 		services.setDirectory(new TQDirectory(services.getEventQueue()));
 		services.setParser(MessageParser.getInstance());
 		services.setAssembler(new TQFieldAssembler());
-	}
-	
-	public void initSecondary(ServiceLocator services, EditableTerminal terminal) {
-		TQReactor reactor = new TQReactor(services);
-		services.setReactor(reactor);
-		services.setTerminal(terminal);
+		services.setReactor(new TQReactor(services));
 		services.setSymbolDataService(new SymbolDataServiceImpl(
 				services,
 				new StateOfDataFeedsFactory(),
 				new SymbolSubscrRepository(services.getEventQueue(), "TRANSAQ-SUBSCR")
 			));
+	}
+	
+	public void initSecondary(ServiceLocator services, EditableTerminal terminal) {
+		services.setTerminal(terminal);
 	}
 
 }

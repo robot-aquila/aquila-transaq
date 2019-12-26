@@ -1,0 +1,61 @@
+<script>
+	<phase>
+		<expectation type="SendCommand" >
+			<command id="subscribe" >
+				<quotations>
+					<security>
+						<board>TQBR</board>
+						<seccode>GAZP</seccode>
+					</security>
+				</quotations>
+			</command>
+		</expectation>
+		<actions>
+			<action type="SendXml" >
+				<!-- send tick1 -->
+				<quotations>
+					<quotation secid="1544">
+						<board>TQBR</board>
+						<seccode>GAZP</seccode>
+						<offer>100</offer>
+						<offerdepth>1</offerdepth>
+					</quotation>
+				</quotations>
+			</action>
+		</actions>
+	</phase>
+	<phase>
+		<expectation type="SendCommand" >
+			<command id="disconnect" />
+		</expectation>
+		<actions>
+			<action type="SendXml" >
+				<!-- send tick2 -->
+				<quotations>
+					<quotation secid="1544">
+						<board>TQBR</board>
+						<seccode>GAZP</seccode>
+						<offer>200</offer>
+						<offerdepth>12</offerdepth>
+					</quotation>
+				</quotations>
+			</action>
+		</actions>
+	</phase>
+	<phase>
+		<expectation type="ExplicitCall" />
+		<actions>
+			<action type="SendXml" >
+				<!-- send tick3 -->
+				<quotations>
+					<quotation secid="1544">
+						<board>TQBR</board>
+						<seccode>GAZP</seccode>
+						<offer>300</offer>
+						<offerdepth>12</offerdepth>
+					</quotation>
+				</quotations>
+			</action>
+		</actions>
+	</phase>
+</script>

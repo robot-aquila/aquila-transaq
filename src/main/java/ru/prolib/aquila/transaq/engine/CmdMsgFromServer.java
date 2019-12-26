@@ -37,5 +37,10 @@ public class CmdMsgFromServer extends Cmd {
 				.append(o.message, message)
 				.build();
 	}
+	
+	@Override
+	public String toString() {
+		return new StringBuilder().append(getClass().getSimpleName()).append("[").append(message).append("]").toString();
+	}
 
 }

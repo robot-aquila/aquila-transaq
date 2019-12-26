@@ -15,5 +15,10 @@ public class CmdConnect extends Cmd {
 	public boolean equals(Object other) {
 		return other != null && other.getClass() == CmdConnect.class;
 	}
+	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
+	}
 
 }

@@ -107,6 +107,7 @@ public class StdConnector implements Connector {
 	public void close() {
 		try {
 			server.UnInitialize();
+			server.delete();
 		} catch ( Exception e ) {
 			logger.error("Error shutting down: ", e);
 		}

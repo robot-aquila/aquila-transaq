@@ -109,13 +109,16 @@ public class TQReactorTest {
 	}
 	
 	@Test
-	public void testUpdateServerStatus() {
+	public void testUpdateServerStatus_Case1() {
+		dirMock.updateConnectionStatus(true);
 		sdsMock.onConnectionStatusChange(true);
+		dirMock.updateConnectionStatus(false);
 		sdsMock.onConnectionStatusChange(false);
 		control.replay();
 		
 		service.updateServerStatus(new ServerStatus(true));
 		service.updateServerStatus(new ServerStatus(false));
+
 		
 		control.verify();
 	}

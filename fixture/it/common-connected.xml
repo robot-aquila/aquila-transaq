@@ -1,0 +1,9 @@
+<script>
+	<appendix>
+		<actions>
+			<action type="SendXml" >
+				<server_status server_tz="Russian Standard Time" id="5" connected="true" />
+			</action>
+		</actions>
+	</appendix>
+</script>

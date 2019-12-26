@@ -20,6 +20,8 @@ import ru.prolib.aquila.core.BusinessEntities.MDLevel;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.transaq.engine.mp.MessageRouter;
 import ru.prolib.aquila.transaq.engine.sds.SymbolDataService;
+import ru.prolib.aquila.transaq.impl.TQDirectory;
+import ru.prolib.aquila.transaq.remote.ConnectionStatus;
 import ru.prolib.aquila.transaq.remote.StdConnector;
 
 public class EngineCmdProcessorTest {
@@ -37,6 +39,8 @@ public class EngineCmdProcessorTest {
 	private StdConnector connMock;
 	private MessageRouter mrouterMock;
 	private SymbolDataService sdsMock;
+	private TQDirectory dirMock;
+	private ConnectionStatus connStatMock;
 	private EngineCmdProcessor service;
 	private Thread thread;
 	private Cmd cmd;
@@ -50,6 +54,8 @@ public class EngineCmdProcessorTest {
 		serviceLocator.setConnector(connMock = control.createMock(StdConnector.class));
 		serviceLocator.setMessageRouter(mrouterMock = control.createMock(MessageRouter.class));
 		serviceLocator.setSymbolDataService(sdsMock = control.createMock(SymbolDataService.class));
+		serviceLocator.setDirectory(dirMock = control.createMock(TQDirectory.class));
+		connStatMock = control.createMock(ConnectionStatus.class);
 		service = new EngineCmdProcessor(queue, serviceLocator);
 		thread = new Thread(service);
 		thread.start();
@@ -73,7 +79,9 @@ public class EngineCmdProcessorTest {
 	}
 	
 	@Test
-	public void testConnect() throws Exception {
+	public void testConnect_IfNotConnected() throws Exception {
+		expect(dirMock.getConnectionStatus()).andStubReturn(connStatMock);
+		expect(connStatMock.isConnected()).andReturn(false);
 		connMock.connect();
 		control.replay();
 		
@@ -84,12 +92,38 @@ public class EngineCmdProcessorTest {
 	}
 	
 	@Test
-	public void testDisconnect() throws Exception {
+	public void testConnect_IfConnected() throws Exception {
+		expect(dirMock.getConnectionStatus()).andStubReturn(connStatMock);
+		expect(connStatMock.isConnected()).andReturn(true);
+		control.replay();
+		
+		queue.put(cmd = new CmdConnect());
+		
+		assertTrue(cmd.getResult().get(1, TimeUnit.SECONDS));
+		control.verify();
+	}
+	
+	@Test
+	public void testDisconnect_IfConnected() throws Exception {
+		expect(dirMock.getConnectionStatus()).andStubReturn(connStatMock);
+		expect(connStatMock.isConnected()).andReturn(true);
 		connMock.disconnect();
 		control.replay();
 		
 		queue.put(cmd = new CmdDisconnect());
 
+		assertTrue(cmd.getResult().get(1, TimeUnit.SECONDS));
+		control.verify();
+	}
+	
+	@Test
+	public void testDisconnect_IfNotConnected() throws Exception {
+		expect(dirMock.getConnectionStatus()).andStubReturn(connStatMock);
+		expect(connStatMock.isConnected()).andReturn(false);
+		control.replay();
+		
+		queue.put(cmd = new CmdDisconnect());
+		
 		assertTrue(cmd.getResult().get(1, TimeUnit.SECONDS));
 		control.verify();
 	}

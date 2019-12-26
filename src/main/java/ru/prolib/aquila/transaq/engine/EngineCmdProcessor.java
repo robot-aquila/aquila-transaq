@@ -47,12 +47,12 @@ public class EngineCmdProcessor implements Runnable {
 		{
 			switch ( ((CmdShutdown) cmd).getPhase() ) {
 			case 1:
-				logger.debug("Shutdown phase 1");
+				//logger.debug("Shutdown phase 1");
 				cmd.getResult().complete(true);
 				return true;
 			case 0:
 			default:
-				logger.debug("Shutdown phase 0");
+				//logger.debug("Shutdown phase 0");
 				services.getConnector().close();
 				try {
 					cmdQueue.put(new CmdShutdown(cmd.getResult(), 1));
@@ -68,7 +68,9 @@ public class EngineCmdProcessor implements Runnable {
 		{
 			try {
 				// TODO: This should start some controller to track connection state.
-				services.getConnector().connect();
+				if ( ! services.getDirectory().getConnectionStatus().isConnected() ) {
+					services.getConnector().connect();
+				}
 				cmd.getResult().complete(true);
 			} catch ( TransaqException e ) {
 				logger.error("Connect failed: ", e);
@@ -78,7 +80,9 @@ public class EngineCmdProcessor implements Runnable {
 		}
 		case DISCONNECT:
 		{
-			services.getConnector().disconnect();
+			if ( services.getDirectory().getConnectionStatus().isConnected() ) {
+				services.getConnector().disconnect();
+			}
 			cmd.getResult().complete(true);
 			break;
 		}

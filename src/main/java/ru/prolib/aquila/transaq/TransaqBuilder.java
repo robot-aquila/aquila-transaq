@@ -8,13 +8,13 @@ import org.ini4j.Profile.Section;
 import ru.prolib.JTransaq.JTransaqHandler;
 import ru.prolib.aquila.core.EventQueue;
 import ru.prolib.aquila.core.EventQueueImpl;
-import ru.prolib.aquila.core.data.DataProvider;
 import ru.prolib.aquila.transaq.engine.Cmd;
 import ru.prolib.aquila.transaq.engine.Engine;
 import ru.prolib.aquila.transaq.engine.EngineBuilderRoutines;
 import ru.prolib.aquila.transaq.engine.EngineCmdProcessor;
 import ru.prolib.aquila.transaq.engine.EngineImpl;
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
+import ru.prolib.aquila.transaq.impl.TQDataProvider;
 import ru.prolib.aquila.transaq.impl.TQDataProviderImpl;
 import ru.prolib.aquila.transaq.impl.TransaqException;
 import ru.prolib.aquila.transaq.impl.TransaqHandler;
@@ -49,7 +49,7 @@ public class TransaqBuilder {
 		return withConnectorFactory(new StdConnectorFactory(config, this.interceptor = interceptor));
 	}
 
-	public DataProvider build() throws TransaqException {
+	public TQDataProvider build() throws TransaqException {
 		if ( connectorFactory == null ) {
 			throw new IllegalStateException("Connector factory was not defined");
 		}

@@ -1,0 +1,121 @@
+<script>
+	<phase>
+		<expectation type="SendCommand" >
+			<command id="subscribe" >
+				<quotations>
+					<security>
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+					</security>
+				</quotations>
+			</command>
+		</expectation>
+		<actions>
+			<action type="SendXml" >
+				<quotations>
+					<quotation secid="44576">
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+						<point_cost>124.56</point_cost>
+						<tradingstatus>1</tradingstatus>
+						<last>152670</last>
+						<quantity>1</quantity>
+						<time>20.12.2019 22:35:10.000</time>
+						<change>380</change>
+						<priceminusprevwaprice>380</priceminusprevwaprice>
+						<bid>152670</bid>
+						<biddepth>15</biddepth>
+						<biddeptht>9677</biddeptht>
+						<numbids>1701</numbids>
+						<offer>152680</offer>
+						<offerdepth>8</offerdepth>
+						<offerdeptht>3399</offerdeptht>
+						<numoffers>870</numoffers>
+						<open>152420</open>
+						<high>152770</high>
+						<low>152290</low>
+						<voltoday>32446</voltoday>
+						<numtrades>15870</numtrades>
+						<valtoday>6167.37</valtoday>
+						<openpositions>418856</openpositions>
+						<deltapositions>12142</deltapositions>
+						<waprice>152600</waprice>
+						<closeprice>152290</closeprice>
+						<lcurrentprice>152690</lcurrentprice>
+						<buydeposit>22700.12</buydeposit>
+						<selldeposit>23031.5</selldeposit>
+					</quotation>
+				</quotations>
+			</action>
+			<action type="SendXml" >
+				<quotations>
+					<quotation secid="44576">
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+						<biddepth>16</biddepth>
+						<biddeptht>9678</biddeptht>
+						<numbids>1702</numbids>
+						<offerdepth>9</offerdepth>
+						<offerdeptht>3425</offerdeptht>
+						<numoffers>872</numoffers>
+					</quotation>
+				</quotations>
+			</action>
+			<action type="SendXml" >
+				<quotations>
+					<quotation secid="44576">
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+						<time>20.12.2019 22:35:14.000</time>
+						<biddepth>8</biddepth>
+						<biddeptht>9666</biddeptht>
+						<numbids>1695</numbids>
+						<offerdepth>11</offerdepth>
+						<offerdeptht>3427</offerdeptht>
+						<numoffers>874</numoffers>
+						<voltoday>32447</voltoday>
+						<numtrades>15871</numtrades>
+						<valtoday>6167.561</valtoday>
+					</quotation>
+				</quotations>
+			</action>
+			<action type="SendXml" >
+				<quotations>
+					<quotation secid="44576">
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+						<bid>152690</bid>
+						<biddepth>9</biddepth>
+						<biddeptht>9678</biddeptht>
+						<numbids>1702</numbids>
+						<offerdepth>10</offerdepth>
+						<offerdeptht>3425</offerdeptht>
+						<numoffers>872</numoffers>
+					</quotation>
+				</quotations>
+			</action>
+			<action type="SendXml" >
+				<quotations>
+					<!-- same bid (duplicate), diff offer -->
+					<quotation secid="44576">
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+						<bid>152690</bid>
+						<biddepth>9</biddepth>
+						<offer>152700</offer>
+						<offerdepth>10</offerdepth>
+					</quotation>
+					<!-- diff bid, same offer (duplicate) -->
+					<quotation secid="44576">
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+						<bid>152620</bid>
+						<biddepth>17</biddepth>
+						<offer>152700</offer>
+						<offerdepth>10</offerdepth>
+					</quotation>
+				</quotations>
+			</action>
+		</actions>
+	</phase>
+</script>

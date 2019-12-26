@@ -1,0 +1,67 @@
+<script>
+	<phase>
+		<expectation type="SendCommand" >
+			<command id="subscribe" >
+				<quotations>
+					<security>
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+					</security>
+				</quotations>
+			</command>
+		</expectation>
+		<actions>
+			<action type="SendXml" >
+				<quotations>
+					<quotation secid="44576">
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+						<open>152420</open>
+						<high>152770</high>
+						<low>152290</low>
+						<closeprice>152290</closeprice>
+					</quotation>
+				</quotations>
+			</action>
+			<action type="SendXml" >
+				<quotations>
+					<!-- no changes, should be ignored -->
+					<quotation secid="44576">
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+						<open>152420</open>
+						<high>152770</high>
+						<low>152290</low>
+						<closeprice>152290</closeprice>
+					</quotation>
+				</quotations>
+			</action>
+			<action type="SendXml" >
+				<quotations>
+					<quotation secid="44576">
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+						<open>152810</open><!-- changed -->
+						<high>152770</high>
+						<low>152110</low><!-- changed -->
+						<closeprice>152290</closeprice>
+					</quotation>
+				</quotations>
+			</action>
+			<action type="SendXml" >
+				<quotations>
+					<quotation secid="44576">
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+						<high>152830</high>
+					</quotation>
+					<quotation secid="44576">
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+						<closeprice>153010</closeprice>
+					</quotation>
+				</quotations>
+			</action>
+		</actions>
+	</phase>
+</script>

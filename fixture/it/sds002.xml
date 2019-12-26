@@ -1,0 +1,14 @@
+<script>
+	<phase>
+		<expectation type="SendCommand" >
+			<command id="subscribe" >
+				<quotations>
+					<security>
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+					</security>
+				</quotations>
+			</command>
+		</expectation>
+	</phase>
+</script>

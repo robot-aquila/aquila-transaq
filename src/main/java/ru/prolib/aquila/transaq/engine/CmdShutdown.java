@@ -46,5 +46,10 @@ public class CmdShutdown extends Cmd {
 				.append(o.phase, phase)
 				.build();
 	}
+	
+	@Override
+	public String toString() {
+		return new StringBuilder().append(getClass().getSimpleName()).append("[phase=").append(phase).append("]").toString();
+	}
 
 }

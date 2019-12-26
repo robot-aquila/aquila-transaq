@@ -15,5 +15,10 @@ public class CmdDisconnect extends Cmd {
 	public boolean equals(Object other) {
 		return other != null && other.getClass() == CmdDisconnect.class;
 	}
+	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
+	}
 
 }

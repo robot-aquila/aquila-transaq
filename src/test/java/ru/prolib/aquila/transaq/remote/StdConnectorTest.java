@@ -110,6 +110,7 @@ public class StdConnectorTest {
 	@Test
 	public void testClose() throws Exception {
 		serverMock.UnInitialize();
+		serverMock.delete();
 		expect(handlerMock.Handle("<dump_stats/>")).andReturn(true);
 		handlerMock.delete();
 		interceptorMock.close();
