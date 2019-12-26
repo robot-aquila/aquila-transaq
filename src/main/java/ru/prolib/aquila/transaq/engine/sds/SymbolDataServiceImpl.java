@@ -1,6 +1,8 @@
 package ru.prolib.aquila.transaq.engine.sds;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -23,6 +25,8 @@ import ru.prolib.aquila.core.BusinessEntities.SymbolSubscrCounter;
 import ru.prolib.aquila.core.BusinessEntities.SymbolSubscrCounter.Field;
 import ru.prolib.aquila.core.BusinessEntities.SymbolSubscrRepository;
 import ru.prolib.aquila.core.BusinessEntities.TickType;
+import ru.prolib.aquila.core.BusinessEntities.UpdatableStateContainer;
+import ru.prolib.aquila.core.BusinessEntities.UpdatableStateContainerImpl;
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
 import ru.prolib.aquila.transaq.entity.SecurityBoardParams;
 import ru.prolib.aquila.transaq.entity.SecurityParams;
@@ -35,10 +39,12 @@ import ru.prolib.aquila.transaq.remote.ISecIDF;
 import ru.prolib.aquila.transaq.remote.ISecIDG;
 import ru.prolib.aquila.transaq.remote.ISecIDT;
 import ru.prolib.aquila.transaq.remote.MessageFields.FQuotation;
+import ru.prolib.aquila.transaq.remote.MessageFields.FTrade;
 
 public class SymbolDataServiceImpl implements SymbolDataService {
 	private static final Map<Integer, FeedID> token_to_feed;
 	private static final Logger logger;
+	private static final ZoneId zoneID = ZoneId.of("Europe/Moscow");
 	
 	static {
 		logger = LoggerFactory.getLogger(SymbolDataServiceImpl.class);
@@ -471,9 +477,28 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 	}
 
 	@Override
-	public void onSecurityTrades(List<TQStateUpdate<ISecIDT>> update_list) {
-		// TODO Auto-generated method stub
-		
+	public void onSecurityTrade(TQStateUpdate<ISecIDT> update) {
+		if ( ! connected ) {
+			return;
+		}
+		TSymbol tid = getDir().toSymbolTID(update.getID());
+		Symbol symbol = getDir().toSymbol(tid);
+		if ( hasSubscribers(symbol) ) {
+			UpdatableStateContainer cont = new UpdatableStateContainerImpl("XXX");
+			cont.consume(update.getUpdate());
+			int expected_fields[] = { FTrade.TIME, FTrade.PRICE, FTrade.QUANTITY };
+			if ( cont.isDefined(expected_fields) ) {
+				EditableSecurity security = getSecurity(symbol);
+				CDecimal price = cont.getCDecimal(FTrade.PRICE);
+				price = price.withScale(Math.max(security.getScale(), price.getScale()));
+				L1UpdateBuilder builder = new L1UpdateBuilder(symbol)
+						.withTrade()
+						.withTime(((LocalDateTime)cont.getObject(FTrade.TIME)).atZone(zoneID).toInstant())
+						.withPrice(price)
+						.withSize(cont.getCDecimal(FTrade.QUANTITY));
+				security.consume(builder.buildL1Update());
+			}
+		}
 	}
 
 	@Override

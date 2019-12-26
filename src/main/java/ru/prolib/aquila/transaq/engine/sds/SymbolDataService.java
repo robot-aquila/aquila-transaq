@@ -17,6 +17,6 @@ public interface SymbolDataService {
 	void onSecurityUpdateG(TQStateUpdate<ISecIDG> update);
 	void onSecurityBoardUpdate(TQStateUpdate<ISecIDT> update);
 	void onSecurityQuotationUpdate(TQStateUpdate<ISecIDT> update);
-	void onSecurityTrades(List<TQStateUpdate<ISecIDT>> update_list);
+	void onSecurityTrade(TQStateUpdate<ISecIDT> update);
 	void onSecurityQuotes(List<TQStateUpdate<ISecIDT>> update_list);
 }

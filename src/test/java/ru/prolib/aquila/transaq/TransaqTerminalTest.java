@@ -6,6 +6,8 @@ import static ru.prolib.aquila.transaq.remote.MessageFields.*;
 import static ru.prolib.aquila.transaq.TestServer.*;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -59,6 +61,10 @@ public class TransaqTerminalTest {
 	
 	static {
 		logger = LoggerFactory.getLogger(TransaqTerminalTest.class);
+	}
+	
+	static Instant MT(String time_string) {
+		return LocalDateTime.parse(time_string).atZone(ZoneId.of("Europe/Moscow")).toInstant();
 	}
 	
 	static class CountDownOnEvent implements EventListener {
@@ -639,6 +645,41 @@ public class TransaqTerminalTest {
 			Thread.sleep(50L);
 		}
 		assertTrue(terminal.isClosed());
+	}
+	
+	@Test
+	public void testCaseSDS011_Trades() throws Exception {
+		CountDownLatch finished = new CountDownLatch(1);
+		testService.addScript("fixture/it/common-init.xml");
+		testService.addScript("fixture/it/common-connected.xml");
+		testService.addScript("fixture/it/sds011.xml");
+		testService.addScript("fixture/it/common-disconnected.xml");
+		testService.addScript("fixture/it/common-end.xml");
+		createTerminal();
+		terminal.subscribe(new Symbol("F:RTS-3.20@FUT:RUB"), MDLevel.L1);
+		terminal.onSecurityLastTrade().addListener(listenerStub);
+		dataProvider.getDirectory().getConnectionStatus().onDisconnected().addListener(new CountDownOnEvent(finished));
+		
+		terminal.start();
+
+		assertTrue(finished.await(1, TimeUnit.SECONDS));
+		Instant now = Instant.now();
+		List<Tick> expected = new ArrayList<>();
+		expected.add(Tick.ofTrade(MT("2019-12-20T23:00:19.199"), of(152900L), of(2L)));
+		expected.add(Tick.ofTrade(MT("2019-12-20T23:00:20.005"), of(152700L), of(1L)));
+		expected.add(Tick.ofTrade(MT("2019-12-20T23:00:25.097"), of(152890L), of(5L)));
+		expected.add(Tick.ofTrade(MT("2019-12-20T23:05:00.100"), of(152850L), of(7L)));
+		assertEquals(expected.size(), listenerStub.getEventCount());
+		List<Tick> actual = new ArrayList<>();
+		for ( int i = 0; i < expected.size(); i ++ ) {
+			SecurityTickEvent event = (SecurityTickEvent) listenerStub.getEvent(i);
+			String msg = "At #" + i;
+			assertEquals(msg, new Symbol("F:RTS-3.20@FUT:RUB"), event.getSecurity().getSymbol());
+			assertTrue(msg, ChronoUnit.MILLIS.between(event.getTime(), now) <= 100L);
+			actual.add(event.getTick());
+		}
+		assertEquals(expected, actual);
+		assertEquals(expected.get(3), terminal.getSecurity(new Symbol("F:RTS-3.20@FUT:RUB")).getLastTrade());
 	}
 	
 }

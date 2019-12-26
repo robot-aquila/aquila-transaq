@@ -57,5 +57,9 @@ public class TQReactor {
 	public void updateSecurityQuotations(TQStateUpdate<ISecIDT> update) {
 		getSDS().onSecurityQuotationUpdate(update);
 	}
+	
+	public void registerTrade(TQStateUpdate<ISecIDT> update) {
+		getSDS().onSecurityTrade(update);
+	}
 
 }

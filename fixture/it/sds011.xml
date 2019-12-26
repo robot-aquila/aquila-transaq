@@ -1,0 +1,70 @@
+<script>
+	<phase>
+		<expectation type="SendCommand" >
+			<command id="subscribe" >
+				<alltrades>
+					<security>
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+					</security>
+				</alltrades>
+				<quotations>
+					<security>
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+					</security>
+				</quotations>
+			</command>
+		</expectation>
+		<actions>
+			<action type="SendXml" >
+				<alltrades>
+					<trade secid="44576">
+						<tradeno>25524990767150</tradeno>
+						<board>FUT</board>
+						<time>20.12.2019 23:00:19.199</time>
+						<price>152900</price>
+						<quantity>2</quantity>
+						<buysell>S</buysell>
+						<openinterest>417716</openinterest>
+						<seccode>RIH0</seccode>
+						<period/>
+					</trade>
+					<trade secid="44576">
+						<tradeno>25524990767151</tradeno>
+						<board>FUT</board>
+						<time>20.12.2019 23:00:20.005</time>
+						<price>152700</price>
+						<quantity>1</quantity>
+						<buysell>S</buysell>
+						<openinterest>417720</openinterest>
+						<seccode>RIH0</seccode>
+						<period/>
+					</trade>
+					<trade secid="44576">
+						<tradeno>25524990767152</tradeno>
+						<board>FUT</board>
+						<time>20.12.2019 23:00:25.097</time>
+						<price>152890</price>
+						<quantity>5</quantity>
+						<buysell>S</buysell>
+						<openinterest>417720</openinterest>
+						<seccode>RIH0</seccode>
+						<period/>
+					</trade>
+					<trade secid="44576">
+						<tradeno>25524990767153</tradeno>
+						<board>FUT</board>
+						<time>20.12.2019 23:05:00.100</time>
+						<price>152850</price>
+						<quantity>7</quantity>
+						<buysell>S</buysell>
+						<openinterest>417720</openinterest>
+						<seccode>RIH0</seccode>
+						<period/>
+					</trade>
+				</alltrades>
+			</action>
+		</actions>
+	</phase>
+</script>

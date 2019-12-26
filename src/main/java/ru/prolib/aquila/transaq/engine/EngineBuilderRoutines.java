@@ -2,6 +2,7 @@ package ru.prolib.aquila.transaq.engine;
 
 import ru.prolib.aquila.core.BusinessEntities.EditableTerminal;
 import ru.prolib.aquila.core.BusinessEntities.SymbolSubscrRepository;
+import ru.prolib.aquila.transaq.engine.mp.AlltradesProcessor;
 import ru.prolib.aquila.transaq.engine.mp.BoardsProcessor;
 import ru.prolib.aquila.transaq.engine.mp.CandleKindsProcessor;
 import ru.prolib.aquila.transaq.engine.mp.ClientProcessor;
@@ -42,14 +43,14 @@ public class EngineBuilderRoutines {
 				.withProcessor("candlekinds", new CandleKindsProcessor(services))
 				.withProcessor("pits", new PitsProcessor(services))
 				.withProcessor("quotations", new QuotationsProcessor(services))
+				.withProcessor("alltrades", new AlltradesProcessor(services))
 				// TODO: do it
+				.withProcessor("quotes", new MessageProcessorStub())
 				.withProcessor("client", new ClientProcessor())
 				.withProcessor("messages", new MessageProcessorStub())
 				.withProcessor("positions", new MessageProcessorStub())
 				.withProcessor("union", new MessageProcessorStub())
 				.withProcessor("overnight", new MessageProcessorStub())
-				.withProcessor("alltrades", new MessageProcessorStub())
-				.withProcessor("quotes", new MessageProcessorStub())
 				
 				.build());
 	}

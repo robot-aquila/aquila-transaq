@@ -134,5 +134,17 @@ public class TQReactorTest {
 		
 		control.verify();
 	}
+	
+	@Test
+	public void testRegisterTrade() {
+		ISecIDT sec_id = new TQSecIDT("GAZP", "TQBR");
+		TQStateUpdate<ISecIDT> update = new TQStateUpdate<>(sec_id, duMock);
+		sdsMock.onSecurityTrade(update);
+		control.replay();
+		
+		service.registerTrade(update);
+		
+		control.verify();
+	}
 
 }
