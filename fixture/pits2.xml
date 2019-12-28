@@ -1,0 +1,10 @@
+<pits>
+	<pit seccode="ZOO" board ="BAR">
+		<market>1</market>
+		<decimals>2</decimals>
+		<minstep>0.02</minstep>
+		<lotsize>100</lotsize>
+		<!-- Don't ask. Just have a look Dev Manual section 2.1 -->
+		<point_cost>2.5e-002</point_cost>
+	</pit>
+</pits>

@@ -1,0 +1,100 @@
+<script>
+	<phase>
+		<expectation type="SendCommand" >
+			<command id="subscribe" >
+				<alltrades>
+					<security>
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+					</security>
+					<security>
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+					</security>
+				</alltrades>
+				<quotations>
+					<security>
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+					</security>
+					<security>
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+					</security>
+				</quotations>
+				<quotes>
+					<security>
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+					</security>
+					<security>
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+					</security>
+				</quotes>
+			</command>
+		</expectation>
+		<actions>
+			<action type="SendXml" >
+				<quotes>
+					<quote secid="45092">
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+						<price>62697</price>
+						<yield>0</yield>
+						<sell>85</sell>
+					</quote>
+					<quote secid="44576">
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+						<price>152890</price>
+						<yield>0</yield>
+						<sell>20</sell>
+					</quote>
+					<quote secid="45092">
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+						<price>62690</price>
+						<yield>0</yield>
+						<buy>10</buy>
+					</quote>
+					<quote secid="44576">
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+						<price>152880</price>
+						<yield>0</yield>
+						<buy>7</buy>
+					</quote>
+					<quote secid="45092">
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+						<price>62695</price>
+						<yield>0</yield>
+						<sell>18</sell>
+					</quote>
+					<quote secid="44576">
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+						<price>152820</price>
+						<yield>0</yield>
+						<buy>6</buy>
+					</quote>
+					<quote secid="45092">
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+						<price>62683</price>
+						<yield>0</yield>
+						<buy>12</buy>
+					</quote>
+					<quote secid="44576">
+						<board>FUT</board>
+						<seccode>RIH0</seccode>
+						<price>152900</price>
+						<yield>0</yield>
+						<sell>44</sell>
+					</quote>
+				</quotes>
+			</action>
+		</actions>
+	</phase>
+</script>

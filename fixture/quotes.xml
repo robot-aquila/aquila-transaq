@@ -10,6 +10,7 @@
 		<board>FUT</board>
 		<seccode>RIZ9</seccode>
 		<price>141290</price>
+		<source>BUBBA-5</source>
 		<yield>0</yield>
 		<buy>10</buy>
 	</quote>
@@ -24,6 +25,7 @@
 		<board>FUT</board>
 		<seccode>RIZ9</seccode>
 		<price>141300</price>
+		<source>BABBA-12</source>
 		<yield>0</yield>
 		<sell>10</sell>
 	</quote>

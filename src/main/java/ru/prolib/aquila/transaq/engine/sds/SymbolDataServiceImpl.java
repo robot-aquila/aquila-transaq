@@ -3,9 +3,12 @@ package ru.prolib.aquila.transaq.engine.sds;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,10 +18,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.prolib.aquila.core.BusinessEntities.CDecimal;
+import ru.prolib.aquila.core.BusinessEntities.CDecimalBD;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.core.BusinessEntities.EditableSecurity;
 import ru.prolib.aquila.core.BusinessEntities.L1UpdateBuilder;
+import ru.prolib.aquila.core.BusinessEntities.MDBuilder;
 import ru.prolib.aquila.core.BusinessEntities.MDLevel;
+import ru.prolib.aquila.core.BusinessEntities.MDUpdate;
+import ru.prolib.aquila.core.BusinessEntities.MDUpdateBuilder;
+import ru.prolib.aquila.core.BusinessEntities.MDUpdateType;
 import ru.prolib.aquila.core.BusinessEntities.Security;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.core.BusinessEntities.SymbolSubscrCounter;
@@ -40,6 +48,7 @@ import ru.prolib.aquila.transaq.remote.ISecIDG;
 import ru.prolib.aquila.transaq.remote.ISecIDT;
 import ru.prolib.aquila.transaq.remote.MessageFields.FQuotation;
 import ru.prolib.aquila.transaq.remote.MessageFields.FTrade;
+import ru.prolib.aquila.transaq.remote.entity.Quote;
 
 public class SymbolDataServiceImpl implements SymbolDataService {
 	private static final Map<Integer, FeedID> token_to_feed;
@@ -59,6 +68,7 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 	private final StateOfDataFeedsFactory feedStateFactory;
 	private final Map<ISecIDT, StateOfDataFeeds> feedStateMap;
 	private final SymbolSubscrRepository subscrCounters;
+	private final Map<Symbol, MDBuilder> mdbuilderMap;
 	
 	private boolean connected = false;
 	
@@ -72,6 +82,7 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 		this.feedStateFactory = sodf_factory;
 		this.subscrCounters = subscrCounters;
 		this.feedStateMap = feed_state_map;
+		this.mdbuilderMap = new Hashtable<>();
 	}
 	
 	public SymbolDataServiceImpl(
@@ -237,11 +248,15 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 		cache.put(FeedID.SYMBOL_QUOTATIONS, Pair.of(new LinkedHashSet<>(), new LinkedHashSet<>()));
 		cache.put(FeedID.SYMBOL_ALLTRADES, Pair.of(new LinkedHashSet<>(), new LinkedHashSet<>()));
 		cache.put(FeedID.SYMBOL_QUOTES, Pair.of(new LinkedHashSet<>(), new LinkedHashSet<>()));
+		TQDirectory dir = getDir();
 		for ( StateOfDataFeeds state : feedStateMap.values() ) {
 			for ( FeedID feed_id : cache.keySet() ) {
 				switch ( state.getFeedStatus(feed_id) ) {
 				case PENDING_SUBSCR:
 					cache.get(feed_id).getLeft().add(state.getSecIDT());
+					if ( feed_id == FeedID.SYMBOL_QUOTES ) {
+						mdbuilderMap.remove(dir.toSymbol(dir.toSymbolTID(state.getSecIDT())));
+					}
 					break;
 				case PENDING_UNSUBSCR:
 					cache.get(feed_id).getRight().add(state.getSecIDT());
@@ -356,7 +371,7 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 			for ( StateOfDataFeeds state : feedStateMap.values() ) {
 				state.markAllNotSubscribed();
 			}
-
+			mdbuilderMap.clear();
 		}
 	}
 	
@@ -502,9 +517,71 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 	}
 
 	@Override
-	public void onSecurityQuotes(List<TQStateUpdate<ISecIDT>> update_list) {
-		// TODO Auto-generated method stub
+	public void onSecurityQuotes(List<Quote> quotes) {
+		Map<ISecIDT, List<Quote>> map = new HashMap<>();
+		for ( Quote quote : quotes ) {
+			ISecIDT sec_id = quote.getID();
+			List<Quote> sub_list = map.get(sec_id);
+			if ( sub_list == null ) {
+				map.put(sec_id, sub_list = new LinkedList<>());
+			}
+			sub_list.add(quote);
+		}
 		
+		Instant time = services.getTerminal().getCurrentTime();
+		Iterator<Map.Entry<ISecIDT, List<Quote>>> it = map.entrySet().iterator();
+		while ( it.hasNext() ) {
+			Map.Entry<ISecIDT, List<Quote>> entry = it.next();
+			updateMD(entry.getKey(), entry.getValue(), time);
+		}
+	}
+	
+	private MDBuilder getMDBuilder(Symbol symbol) {
+		MDBuilder md_builder = mdbuilderMap.get(symbol);
+		if ( md_builder == null ) {
+			mdbuilderMap.put(symbol, md_builder = new MDBuilder(symbol));
+		}
+		return md_builder;
+	}
+	
+	private boolean isMDBuilderExists(Symbol symbol) {
+		return mdbuilderMap.containsKey(symbol);
+	}
+	
+	private void updateMD(ISecIDT sec_id, List<Quote> quotes, Instant time) {
+		TSymbol tid = getDir().toSymbolTID(sec_id);
+		Symbol symbol = getDir().toSymbol(tid);
+		MDUpdateBuilder mdu_builder = new MDUpdateBuilder(symbol)
+				.withTime(time)
+				.withType(isMDBuilderExists(symbol) ? MDUpdateType.UPDATE : MDUpdateType.REFRESH);
+		for ( Quote quote : quotes ) {
+			Long qty_b = quote.getBuy(), qty_s = quote.getSell();
+			CDecimal price = quote.getPrice();
+			if ( qty_b != null ) {
+				if ( qty_b == -1 ) {
+					mdu_builder.deleteBid(price);
+				} else if ( qty_b > 0 ) {
+					mdu_builder.replaceBid(price, CDecimalBD.of(qty_b));
+				} else {
+					logger.warn("Incorrect buy value of {} quote: {}", symbol, qty_b);
+				}
+			}
+			if ( qty_s != null ) {
+				if ( qty_s == -1 ) {
+					mdu_builder.deleteAsk(price);
+				} else if ( qty_s > 0 ) {
+					mdu_builder.replaceAsk(price, CDecimalBD.of(qty_s));
+				} else {
+					logger.warn("Incorrect sell value of {} quote: {}", symbol, qty_s);
+				}
+			}
+		}
+		MDUpdate md_update = mdu_builder.buildMDUpdate();
+		getSecurity(symbol).consume(md_update);
+		
+		// Actually, we do not need this right now.
+		MDBuilder md_builder = getMDBuilder(symbol);
+		md_builder.consume(md_update);
 	}
 
 }

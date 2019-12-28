@@ -1,10 +1,13 @@
 package ru.prolib.aquila.transaq.impl;
 
+import java.util.List;
+
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
 import ru.prolib.aquila.transaq.engine.sds.SymbolDataService;
 import ru.prolib.aquila.transaq.remote.ISecIDF;
 import ru.prolib.aquila.transaq.remote.ISecIDG;
 import ru.prolib.aquila.transaq.remote.ISecIDT;
+import ru.prolib.aquila.transaq.remote.entity.Quote;
 import ru.prolib.aquila.transaq.remote.entity.ServerStatus;
 
 public class TQReactor {
@@ -60,6 +63,10 @@ public class TQReactor {
 	
 	public void registerTrade(TQStateUpdate<ISecIDT> update) {
 		getSDS().onSecurityTrade(update);
+	}
+	
+	public void registerQuotes(List<Quote> quotes) {
+		getSDS().onSecurityQuotes(quotes);
 	}
 
 }

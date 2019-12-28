@@ -1,0 +1,141 @@
+<script>
+	<phase>
+		<expectation type="SendCommand" >
+			<command id="subscribe" >
+				<alltrades>
+					<security>
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+					</security>
+				</alltrades>
+				<quotations>
+					<security>
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+					</security>
+				</quotations>
+				<quotes>
+					<security>
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+					</security>
+				</quotes>
+			</command>
+		</expectation>
+		<actions>
+			<action type="SendXml" >
+				<quotes>
+					<quote secid="45092">
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+						<price>62697</price>
+						<yield>0</yield>
+						<sell>28</sell>
+					</quote>
+					<quote secid="45092">
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+						<price>62696</price>
+						<yield>0</yield>
+						<sell>1050</sell>
+					</quote>
+					<quote secid="45092">
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+						<price>62695</price>
+						<yield>0</yield>
+						<sell>15</sell>
+					</quote>
+					<quote secid="45092">
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+						<price>62694</price>
+						<yield>0</yield>
+						<sell>63</sell>
+					</quote>
+					<quote secid="45092">
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+						<price>62693</price>
+						<yield>0</yield>
+						<sell>12</sell>
+					</quote>
+					<quote secid="45092">
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+						<price>62690</price>
+						<yield>0</yield>
+						<buy>2</buy>
+					</quote>
+					<quote secid="45092">
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+						<price>62689</price>
+						<yield>0</yield>
+						<buy>19</buy>
+					</quote>
+					<quote secid="45092">
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+						<price>62688</price>
+						<yield>0</yield>
+						<buy>27</buy>
+					</quote>
+					<quote secid="45092">
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+						<price>62687</price>
+						<yield>0</yield>
+						<buy>74</buy>
+					</quote>
+					<quote secid="45092">
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+						<price>62686</price>
+						<yield>0</yield>
+						<buy>82</buy>
+					</quote>
+					<quote secid="45092">
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+						<price>62692</price>
+						<yield>0</yield>
+						<buy>8</buy>
+						<sell>1</sell>
+					</quote>
+				</quotes>
+			</action>
+		</actions>
+	</phase>
+	<phase>
+		<expectation type="ExplicitCall" />
+		<actions>
+			<action type="SendXml" >
+				<quotes>
+					<quote secid="45092">
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+						<price>62694</price>
+						<yield>0</yield>
+						<sell>-1</sell>
+					</quote>
+					<quote secid="45092">
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+						<price>62689</price>
+						<yield>0</yield>
+						<buy>-1</buy>
+					</quote>
+					<quote secid="45092">
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+						<price>62692</price>
+						<yield>0</yield>
+						<buy>-1</buy>
+						<sell>-1</sell>
+					</quote>
+				</quotes>
+			</action>
+		</actions>
+	</phase>
+</script>

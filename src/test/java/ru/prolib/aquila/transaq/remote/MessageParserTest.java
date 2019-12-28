@@ -33,6 +33,7 @@ import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.transaq.entity.SecType;
 import ru.prolib.aquila.transaq.impl.TQStateUpdate;
 import ru.prolib.aquila.transaq.remote.TQSecIDT;
+import ru.prolib.aquila.transaq.remote.entity.Quote;
 import ru.prolib.aquila.transaq.remote.entity.ServerStatus;
 import ru.prolib.aquila.transaq.remote.MessageParser;
 import ru.prolib.aquila.transaq.remote.TQSecIDF;
@@ -904,6 +905,25 @@ public class MessageParserTest {
 	}
 	
 	@Test
+	public void testReadPits_WeirdPointCostForm() throws Exception {
+		XMLStreamReader sr = startReader("fixture/pits2.xml", "pits");
+		
+		List<TQStateUpdate<ISecIDT>> actual = service.readPits(sr);
+		
+		List<TQStateUpdate<ISecIDT>> expected = new ArrayList<>();
+		expected.add(new TQStateUpdate<>(new TQSecIDT("ZOO", "BAR"), new DeltaUpdateBuilder()
+				.withToken(FSecurityBoard.SECCODE, "ZOO")
+				.withToken(FSecurityBoard.BOARD, "BAR")
+				.withToken(FSecurityBoard.MARKET, 1)
+				.withToken(FSecurityBoard.DECIMALS, 2)
+				.withToken(FSecurityBoard.MINSTEP, of("0.02"))
+				.withToken(FSecurityBoard.LOTSIZE, of("100"))
+				.withToken(FSecurityBoard.POINT_COST, of("0.025"))
+				.buildUpdate()));
+		assertEquals(expected, actual);
+	}
+	
+	@Test
 	public void testReadQuotations() throws Exception {
 		InputStream is = new FileInputStream(new File("fixture/quotations1.xml"));
 		XMLStreamReader sr = factory.createXMLStreamReader(is);
@@ -1040,50 +1060,15 @@ public class MessageParserTest {
 	@Test
 	public void testReadQuotes() throws Exception {
 		XMLStreamReader sr = startReader("fixture/quotes.xml", "quotes");
-		List<TQStateUpdate<ISecIDT>> actual = service.readQuotes(sr);
+		List<Quote> actual = service.readQuotes(sr);
 		sr.close();
 		
-		List<TQStateUpdate<ISecIDT>> expected = new ArrayList<>();
-		expected.add(new TQStateUpdate<>(new TQSecIDT("RIZ9", "FUT"), new DeltaUpdateBuilder()
-				.withToken(FQuote.SECID, 41712)
-				.withToken(FQuote.BOARD, "FUT")
-				.withToken(FQuote.SECCODE, "RIZ9")
-				.withToken(FQuote.PRICE, of(141280L))
-				.withToken(FQuote.YIELD, of(0L))
-				.withToken(FQuote.BUY, of(24L))
-				.buildUpdate()));
-		expected.add(new TQStateUpdate<>(new TQSecIDT("RIZ9", "FUT"), new DeltaUpdateBuilder()
-				.withToken(FQuote.SECID, 41712)
-				.withToken(FQuote.BOARD, "FUT")
-				.withToken(FQuote.SECCODE, "RIZ9")
-				.withToken(FQuote.PRICE, of(141290L))
-				.withToken(FQuote.YIELD, of(0L))
-				.withToken(FQuote.BUY, of(10L))
-				.buildUpdate()));
-		expected.add(new TQStateUpdate<>(new TQSecIDT("RIZ9", "FUT"), new DeltaUpdateBuilder()
-				.withToken(FQuote.SECID, 41712)
-				.withToken(FQuote.BOARD, "FUT")
-				.withToken(FQuote.SECCODE, "RIZ9")
-				.withToken(FQuote.PRICE, of(141280L))
-				.withToken(FQuote.YIELD, of(0L))
-				.withToken(FQuote.BUY, of(25L))
-				.buildUpdate()));
-		expected.add(new TQStateUpdate<>(new TQSecIDT("RIZ9", "FUT"), new DeltaUpdateBuilder()
-				.withToken(FQuote.SECID, 41712)
-				.withToken(FQuote.BOARD, "FUT")
-				.withToken(FQuote.SECCODE, "RIZ9")
-				.withToken(FQuote.PRICE, of(141300L))
-				.withToken(FQuote.YIELD, of(0L))
-				.withToken(FQuote.SELL, of(10L))
-				.buildUpdate()));
-		expected.add(new TQStateUpdate<>(new TQSecIDT("RIZ9", "FUT"), new DeltaUpdateBuilder()
-				.withToken(FQuote.SECID, 41712)
-				.withToken(FQuote.BOARD, "FUT")
-				.withToken(FQuote.SECCODE, "RIZ9")
-				.withToken(FQuote.PRICE, of(141310L))
-				.withToken(FQuote.YIELD, of(0L))
-				.withToken(FQuote.SELL, of(28L))
-				.buildUpdate()));
+		List<Quote> expected = new ArrayList<>();
+		expected.add(new Quote(new TQSecIDT("RIZ9", "FUT"), of(141280L), 0L, 24L, null));
+		expected.add(new Quote(new TQSecIDT("RIZ9", "FUT"), of("141290", "BUBBA-5"), 0L, 10L, null));
+		expected.add(new Quote(new TQSecIDT("RIZ9", "FUT"), of(141280L), 0L, 25L, null));
+		expected.add(new Quote(new TQSecIDT("RIZ9", "FUT"), of("141300", "BABBA-12"), 0L, null, 10L));
+		expected.add(new Quote(new TQSecIDT("RIZ9", "FUT"), of(141310L), 0L, null, 28L));
 		assertEquals(expected, actual);
 	}
 	

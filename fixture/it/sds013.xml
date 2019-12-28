@@ -1,0 +1,33 @@
+<script>
+	<phase>
+		<expectation type="ExplicitCall" />
+		<actions>
+			<action type="SendXml" >
+				<quotes>
+					<quote secid="45092">
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+						<price>62699</price>
+						<yield>0</yield>
+						<sell>3</sell>
+					</quote>
+					<quote secid="45092">
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+						<price>62683</price>
+						<yield>0</yield>
+						<buy>5</buy>
+					</quote>
+					<quote secid="45092">
+						<board>FUT</board>
+						<seccode>SiH0</seccode>
+						<price>62692</price>
+						<yield>0</yield>
+						<buy>8</buy>
+						<sell>1</sell>
+					</quote>
+				</quotes>
+			</action>
+		</actions>
+	</phase>
+</script>

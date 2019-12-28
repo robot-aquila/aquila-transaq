@@ -155,6 +155,20 @@ public class TQFieldAssemblerTest {
 	}
 	
 	@Test
+	public void testToTickValue_Case2_RTS_3_20() {
+		sec_brd_state.update(FSecurityBoard.DECIMALS, 0);
+		sec_brd_state.update(FSecurityBoard.MINSTEP, of("10"));
+		sec_brd_state.update(FSecurityBoard.POINT_COST, of("124.06"));
+
+		service.toSecTickValue(sec_brd_state, builder);
+		
+		DeltaUpdate expected = new DeltaUpdateBuilder()
+				.withToken(SecurityField.TICK_VALUE, ofRUB5("12.40600"))
+				.buildUpdate();
+		assertEquals(expected, builder.buildUpdate());
+	}
+	
+	@Test
 	public void testToTickValue_Case3_GOLD_9_19() {
 		sec_brd_state.update(FSecurityBoard.DECIMALS, 1);
 		sec_brd_state.update(FSecurityBoard.MINSTEP, of("0.1"));
@@ -210,6 +224,24 @@ public class TQFieldAssemblerTest {
 		service.toSecTickValue(sec_brd_state, builder);
 		
 		DeltaUpdate expected = new DeltaUpdateBuilder()
+				.buildUpdate();
+		assertEquals(expected, builder.buildUpdate());
+	}
+	
+	@Test
+	public void testToTickValue_PointCostHas6Decimals() {
+		// Sec.code	| Board | Market ID | Decimals | Min.Step | Lot | Point Cost
+		//	MOEX	| RPEU  | 		1	|		4  |   0.0001 |	 1	|  0.617676
+		// 
+		// Стоимость_шага_цены = point_cost * minstep * 10^decimals
+		sec_brd_state.update(FSecurityBoard.DECIMALS, 4);
+		sec_brd_state.update(FSecurityBoard.MINSTEP, of("0.0001"));
+		sec_brd_state.update(FSecurityBoard.POINT_COST, of("0.617676"));
+		
+		service.toSecTickValue(sec_brd_state, builder);
+		
+		DeltaUpdate expected = new DeltaUpdateBuilder()
+				.withToken(SecurityField.TICK_VALUE, of("0.00617676", "RUB"))
 				.buildUpdate();
 		assertEquals(expected, builder.buildUpdate());
 	}

@@ -84,11 +84,12 @@ public class TQFieldAssembler {
 		if ( decimals == null || point_cost == null || min_step == null ) {
 			return;
 		}
+		int new_scale = Math.max(point_cost.getScale() + 2, 5);
 		CDecimal tick_value = CDecimalBD.ofRUB5("10")
 				.pow(decimals)
 				.multiply(point_cost)
 				.multiply(min_step)
-				.divideExact(100L, 5);
+				.divideExact(100L, new_scale);
 		aq_sec_upd_builder.withToken(SecurityField.TICK_VALUE, tick_value);
 	}
 

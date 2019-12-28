@@ -155,15 +155,15 @@ public class MessageFields {
 	/**
 	 * Field identifiers of quotes/quote message.
 	 */
-	public static class FQuote {
-		public static final int SECID				= 5909;
-		public static final int SECCODE				= 5910;
-		public static final int BOARD				= 5911;
-		public static final int PRICE				= 5912;
-		public static final int SOURCE				= 5913;
-		public static final int YIELD				= 5914;
-		public static final int BUY					= 5915;
-		public static final int SELL				= 5916;
-	}
+	//public static class FQuote {
+	//	public static final int SECID				= 5909;
+	//	public static final int SECCODE				= 5910;
+	//	public static final int BOARD				= 5911;
+	//	public static final int PRICE				= 5912;
+	//	public static final int SOURCE				= 5913;
+	//	public static final int YIELD				= 5914;
+	//	public static final int BUY					= 5915;
+	//	public static final int SELL				= 5916;
+	//}
 
 }

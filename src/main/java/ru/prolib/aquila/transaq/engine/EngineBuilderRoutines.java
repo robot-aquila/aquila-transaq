@@ -15,6 +15,7 @@ import ru.prolib.aquila.transaq.engine.mp.MessageRouterImpl;
 import ru.prolib.aquila.transaq.engine.mp.PitsProcessor;
 import ru.prolib.aquila.transaq.engine.mp.ProcessorRegistryBuilder;
 import ru.prolib.aquila.transaq.engine.mp.QuotationsProcessor;
+import ru.prolib.aquila.transaq.engine.mp.QuotesProcessor;
 import ru.prolib.aquila.transaq.engine.mp.MessageProcessorStub;
 import ru.prolib.aquila.transaq.engine.mp.SecInfoProcessor;
 import ru.prolib.aquila.transaq.engine.mp.SecInfoUpdProcessor;
@@ -44,8 +45,8 @@ public class EngineBuilderRoutines {
 				.withProcessor("pits", new PitsProcessor(services))
 				.withProcessor("quotations", new QuotationsProcessor(services))
 				.withProcessor("alltrades", new AlltradesProcessor(services))
+				.withProcessor("quotes", new QuotesProcessor(services))
 				// TODO: do it
-				.withProcessor("quotes", new MessageProcessorStub())
 				.withProcessor("client", new ClientProcessor())
 				.withProcessor("messages", new MessageProcessorStub())
 				.withProcessor("positions", new MessageProcessorStub())

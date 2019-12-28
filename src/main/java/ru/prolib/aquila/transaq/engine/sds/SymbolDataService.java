@@ -8,6 +8,7 @@ import ru.prolib.aquila.transaq.impl.TQStateUpdate;
 import ru.prolib.aquila.transaq.remote.ISecIDF;
 import ru.prolib.aquila.transaq.remote.ISecIDG;
 import ru.prolib.aquila.transaq.remote.ISecIDT;
+import ru.prolib.aquila.transaq.remote.entity.Quote;
 
 public interface SymbolDataService {
 	void onSubscribe(Symbol symbol, MDLevel level);
@@ -18,5 +19,5 @@ public interface SymbolDataService {
 	void onSecurityBoardUpdate(TQStateUpdate<ISecIDT> update);
 	void onSecurityQuotationUpdate(TQStateUpdate<ISecIDT> update);
 	void onSecurityTrade(TQStateUpdate<ISecIDT> update);
-	void onSecurityQuotes(List<TQStateUpdate<ISecIDT>> update_list);
+	void onSecurityQuotes(List<Quote> quotes);
 }

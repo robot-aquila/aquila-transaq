@@ -19,6 +19,7 @@ import ru.prolib.aquila.transaq.remote.ISecIDF;
 import ru.prolib.aquila.transaq.remote.ISecIDG;
 import ru.prolib.aquila.transaq.remote.ISecIDT;
 import ru.prolib.aquila.transaq.remote.MessageParser;
+import ru.prolib.aquila.transaq.remote.entity.Quote;
 import ru.prolib.aquila.transaq.remote.entity.ServerStatus;
 
 @SuppressWarnings("unchecked")
@@ -210,6 +211,23 @@ public class MessageProcessorsTest {
 		reactorMock.registerTrade(su_mock3);
 		control.replay();
 		AlltradesProcessor service = new AlltradesProcessor(services);
+		
+		service.processMessage(readerMock);
+		
+		control.verify();
+	}
+	
+	@Test
+	public void testQuotesProcessor() throws Exception {
+		List<Quote> quote_list = new ArrayList<>();
+		quote_list.add(control.createMock(Quote.class));
+		quote_list.add(control.createMock(Quote.class));
+		quote_list.add(control.createMock(Quote.class));
+		quote_list.add(control.createMock(Quote.class));
+		expect(parserMock.readQuotes(readerMock)).andReturn(quote_list);
+		reactorMock.registerQuotes(quote_list);
+		control.replay();
+		QuotesProcessor service = new QuotesProcessor(services);
 		
 		service.processMessage(readerMock);
 		

@@ -37,10 +37,12 @@ import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.core.BusinessEntities.EditableOrder;
 import ru.prolib.aquila.core.BusinessEntities.EditableTerminal;
 import ru.prolib.aquila.core.BusinessEntities.MDLevel;
+import ru.prolib.aquila.core.BusinessEntities.MarketDepth;
 import ru.prolib.aquila.core.BusinessEntities.OrderException;
 import ru.prolib.aquila.core.BusinessEntities.Security;
 import ru.prolib.aquila.core.BusinessEntities.SecurityEvent;
 import ru.prolib.aquila.core.BusinessEntities.SecurityField;
+import ru.prolib.aquila.core.BusinessEntities.SecurityMarketDepthEvent;
 import ru.prolib.aquila.core.BusinessEntities.SecurityTickEvent;
 import ru.prolib.aquila.core.BusinessEntities.SubscrHandler;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
@@ -680,6 +682,330 @@ public class TransaqTerminalTest {
 		}
 		assertEquals(expected, actual);
 		assertEquals(expected.get(3), terminal.getSecurity(new Symbol("F:RTS-3.20@FUT:RUB")).getLastTrade());
+	}
+	
+	@Test
+	public void testCaseSDS012_DoM_BasicBuild() throws Exception {
+		Symbol symbol = new Symbol("F:Si-3.20@FUT:RUB");
+		CountDownLatch finished = new CountDownLatch(1);
+		testService.addScript("fixture/it/common-init.xml");
+		testService.addScript("fixture/it/common-connected.xml");
+		testService.addScript("fixture/it/common-dom.xml");
+		testService.addScript("fixture/it/sds012.xml");
+		testService.addScript("fixture/it/common-disconnect.xml");
+		testService.addScript("fixture/it/common-end.xml");
+		createTerminal();
+		terminal.subscribe(symbol, MDLevel.L2);
+		terminal.onSecurityMarketDepthUpdate().addListener(new EventListener() {
+			@Override
+			public void onEvent(Event event) {
+				listenerStub.onEvent(event);
+				finished.countDown();
+			}
+		});
+		
+		terminal.start();
+		
+		assertTrue(finished.await(1, TimeUnit.SECONDS));
+		assertTrue(terminal.isSecurityExists(symbol));
+		Security security = terminal.getSecurity(symbol);
+		MarketDepth actual = security.getMarketDepth();
+		assertEquals(1, listenerStub.getEventCount());
+		SecurityMarketDepthEvent actual_event = (SecurityMarketDepthEvent) listenerStub.getEvent(0);
+		Instant time = actual_event.getTime();
+		assertTrue(ChronoUnit.MILLIS.between(time, Instant.now()) < 100L);
+		assertEquals(new SecurityMarketDepthEvent(terminal.onSecurityMarketDepthUpdate(), security,
+				actual_event.getTime(), actual), actual_event);
+		time = actual.getBestAsk().getTime(); // It may differ of event time
+		List<Tick> expected_asks = new ArrayList<>();
+		expected_asks.add(Tick.ofAsk(time, of(62693L), of(  12L)));
+		expected_asks.add(Tick.ofAsk(time, of(62694L), of(  63L)));
+		expected_asks.add(Tick.ofAsk(time, of(62695L), of(  15L)));
+		expected_asks.add(Tick.ofAsk(time, of(62696L), of(1050L)));
+		expected_asks.add(Tick.ofAsk(time, of(62697L), of(  28L)));
+		List<Tick> expected_bids = new ArrayList<>();
+		expected_bids.add(Tick.ofBid(time, of(62690L), of(   2L)));
+		expected_bids.add(Tick.ofBid(time, of(62689L), of(  19L)));
+		expected_bids.add(Tick.ofBid(time, of(62688L), of(  27L)));
+		expected_bids.add(Tick.ofBid(time, of(62687L), of(  74L)));
+		expected_bids.add(Tick.ofBid(time, of(62686L), of(  82L)));
+		assertEquals(expected_asks, actual.getAsks());
+		assertEquals(expected_bids, actual.getBids());
+	}
+	
+	@Test
+	public void testCaseSDS013_DoM_AddingLines() throws Exception {
+		Symbol symbol = new Symbol("F:Si-3.20@FUT:RUB");
+		CountDownLatch started = new CountDownLatch(1), finished = new CountDownLatch(1);
+		testService.addScript("fixture/it/common-init.xml");
+		testService.addScript("fixture/it/common-connected.xml");
+		testService.addScript("fixture/it/common-dom.xml");
+		testService.addScript("fixture/it/sds013.xml");
+		testService.addScript("fixture/it/common-disconnect.xml");
+		testService.addScript("fixture/it/common-end.xml");
+		createTerminal();
+		terminal.subscribe(symbol, MDLevel.L2);
+		terminal.onSecurityMarketDepthUpdate().listenOnce(new CountDownOnEvent(started));
+		terminal.start();
+		assertTrue(started.await(1, TimeUnit.SECONDS));
+		Security security = terminal.getSecurity(symbol);
+		Instant init_time = security.getMarketDepth().getBestAsk().getTime();
+		terminal.onSecurityMarketDepthUpdate().listenOnce(listenerStub);
+		terminal.onSecurityMarketDepthUpdate().listenOnce(new CountDownOnEvent(finished));
+		
+		testService.ExplicitCall();
+		
+		assertTrue(finished.await(1, TimeUnit.SECONDS));
+		MarketDepth actual = security.getMarketDepth();
+		assertEquals(1, listenerStub.getEventCount());
+		SecurityMarketDepthEvent event = (SecurityMarketDepthEvent) listenerStub.getEvent(0);
+		Instant last_time = event.getTime();
+		assertTrue(ChronoUnit.MILLIS.between(last_time, Instant.now()) < 100L);
+		assertEquals(new SecurityMarketDepthEvent(terminal.onSecurityMarketDepthUpdate(), security, last_time, actual), event);
+		last_time = actual.getBestAsk().getTime(); // It may differ of event time
+		List<Tick> expected_asks = new ArrayList<>();
+		expected_asks.add(Tick.ofAsk(last_time, of(62692L), of(   1L)));
+		expected_asks.add(Tick.ofAsk(init_time, of(62693L), of(  12L)));
+		expected_asks.add(Tick.ofAsk(init_time, of(62694L), of(  63L)));
+		expected_asks.add(Tick.ofAsk(init_time, of(62695L), of(  15L)));
+		expected_asks.add(Tick.ofAsk(init_time, of(62696L), of(1050L)));
+		expected_asks.add(Tick.ofAsk(init_time, of(62697L), of(  28L)));
+		expected_asks.add(Tick.ofAsk(last_time, of(62699L), of(   3L)));
+		List<Tick> expected_bids = new ArrayList<>();
+		expected_bids.add(Tick.ofBid(last_time, of(62692L), of(   8L)));
+		expected_bids.add(Tick.ofBid(init_time, of(62690L), of(   2L)));
+		expected_bids.add(Tick.ofBid(init_time, of(62689L), of(  19L)));
+		expected_bids.add(Tick.ofBid(init_time, of(62688L), of(  27L)));
+		expected_bids.add(Tick.ofBid(init_time, of(62687L), of(  74L)));
+		expected_bids.add(Tick.ofBid(init_time, of(62686L), of(  82L)));
+		expected_bids.add(Tick.ofBid(last_time, of(62683L), of(   5L)));
+		assertEquals(expected_asks, actual.getAsks());
+		assertEquals(expected_bids, actual.getBids());
+	}
+	
+	@Test
+	public void testCaseSDS014_DoM_RemovingLines() throws Exception {
+		Symbol symbol = new Symbol("F:Si-3.20@FUT:RUB");
+		CountDownLatch started = new CountDownLatch(1), finished = new CountDownLatch(1);
+		testService.addScript("fixture/it/common-init.xml");
+		testService.addScript("fixture/it/common-connected.xml");
+		testService.addScript("fixture/it/sds014.xml");
+		testService.addScript("fixture/it/common-disconnect.xml");
+		testService.addScript("fixture/it/common-end.xml");
+		createTerminal();
+		terminal.subscribe(symbol, MDLevel.L2);
+		terminal.onSecurityMarketDepthUpdate().listenOnce(new CountDownOnEvent(started));
+		terminal.start();
+		assertTrue(started.await(1, TimeUnit.SECONDS));
+		Security security = terminal.getSecurity(symbol);
+		Instant init_time = security.getMarketDepth().getBestAsk().getTime();
+		terminal.onSecurityMarketDepthUpdate().listenOnce(listenerStub);
+		terminal.onSecurityMarketDepthUpdate().listenOnce(new CountDownOnEvent(finished));
+
+		testService.ExplicitCall();
+		
+		assertTrue(finished.await(1, TimeUnit.SECONDS));
+		MarketDepth actual = security.getMarketDepth();
+		assertEquals(1, listenerStub.getEventCount());
+		SecurityMarketDepthEvent event = (SecurityMarketDepthEvent) listenerStub.getEvent(0);
+		Instant last_time = event.getTime();
+		assertTrue(ChronoUnit.MILLIS.between(last_time, Instant.now()) < 100L);
+		assertEquals(new SecurityMarketDepthEvent(terminal.onSecurityMarketDepthUpdate(), security, last_time, actual), event);
+		last_time = actual.getBestAsk().getTime(); // It may differ of event time
+		List<Tick> expected_asks = new ArrayList<>();
+		expected_asks.add(Tick.ofAsk(init_time, of(62693L), of(  12L)));
+		expected_asks.add(Tick.ofAsk(init_time, of(62695L), of(  15L)));
+		expected_asks.add(Tick.ofAsk(init_time, of(62696L), of(1050L)));
+		expected_asks.add(Tick.ofAsk(init_time, of(62697L), of(  28L)));
+		List<Tick> expected_bids = new ArrayList<>();
+		expected_bids.add(Tick.ofBid(init_time, of(62690L), of(   2L)));
+		expected_bids.add(Tick.ofBid(init_time, of(62688L), of(  27L)));
+		expected_bids.add(Tick.ofBid(init_time, of(62687L), of(  74L)));
+		expected_bids.add(Tick.ofBid(init_time, of(62686L), of(  82L)));
+		assertEquals(expected_asks, actual.getAsks());
+		assertEquals(expected_bids, actual.getBids());
+	}
+	
+	@Test
+	public void testCaseSDS015_DoM_ChangingLines() throws Exception {
+		Symbol symbol = new Symbol("F:Si-3.20@FUT:RUB");
+		CountDownLatch started = new CountDownLatch(1), finished = new CountDownLatch(1);
+		testService.addScript("fixture/it/common-init.xml");
+		testService.addScript("fixture/it/common-connected.xml");
+		testService.addScript("fixture/it/sds015.xml");
+		testService.addScript("fixture/it/common-disconnect.xml");
+		testService.addScript("fixture/it/common-end.xml");
+		createTerminal();
+		terminal.subscribe(symbol, MDLevel.L2);
+		terminal.onSecurityMarketDepthUpdate().listenOnce(new CountDownOnEvent(started));
+		terminal.start();
+		assertTrue(started.await(1, TimeUnit.SECONDS));
+		Security security = terminal.getSecurity(symbol);
+		Instant init_time = security.getMarketDepth().getBestAsk().getTime();
+		terminal.onSecurityMarketDepthUpdate().listenOnce(listenerStub);
+		terminal.onSecurityMarketDepthUpdate().listenOnce(new CountDownOnEvent(finished));
+
+		testService.ExplicitCall();
+		
+		assertTrue(finished.await(1, TimeUnit.SECONDS));
+		MarketDepth actual = security.getMarketDepth();
+		assertEquals(1, listenerStub.getEventCount());
+		SecurityMarketDepthEvent event = (SecurityMarketDepthEvent) listenerStub.getEvent(0);
+		Instant last_time = event.getTime();
+		assertTrue(ChronoUnit.MILLIS.between(last_time, Instant.now()) < 100L);
+		assertEquals(new SecurityMarketDepthEvent(terminal.onSecurityMarketDepthUpdate(), security, last_time, actual), event);
+		last_time = actual.getBestAsk().getTime(); // It may differ of event time
+		List<Tick> expected_asks = new ArrayList<>();
+		expected_asks.add(Tick.ofAsk(last_time, of(62692L), of(  94L)));
+		expected_asks.add(Tick.ofAsk(init_time, of(62693L), of(  12L)));
+		expected_asks.add(Tick.ofAsk(last_time, of(62694L), of(  88L)));
+		expected_asks.add(Tick.ofAsk(init_time, of(62695L), of(  15L)));
+		expected_asks.add(Tick.ofAsk(init_time, of(62696L), of(1050L)));
+		expected_asks.add(Tick.ofAsk(init_time, of(62697L), of(  28L)));
+		List<Tick> expected_bids = new ArrayList<>();
+		expected_bids.add(Tick.ofBid(last_time, of(62692L), of(  53L)));
+		expected_bids.add(Tick.ofBid(init_time, of(62690L), of(   2L)));
+		expected_bids.add(Tick.ofBid(last_time, of(62689L), of(  47L)));
+		expected_bids.add(Tick.ofBid(init_time, of(62688L), of(  27L)));
+		expected_bids.add(Tick.ofBid(init_time, of(62687L), of(  74L)));
+		expected_bids.add(Tick.ofBid(init_time, of(62686L), of(  82L)));
+		assertEquals(expected_asks, actual.getAsks());
+		assertEquals(expected_bids, actual.getBids());
+	}
+	
+	@Test
+	public void testCaseSDS016_DoM_MixedQuotes() throws Exception {
+		Symbol symbol1 = new Symbol("F:Si-3.20@FUT:RUB"), symbol2 = new Symbol("F:RTS-3.20@FUT:RUB");
+		CountDownLatch finished = new CountDownLatch(2);
+		testService.addScript("fixture/it/common-init.xml");
+		testService.addScript("fixture/it/common-connected.xml");
+		testService.addScript("fixture/it/sds016.xml");
+		testService.addScript("fixture/it/common-disconnect.xml");
+		testService.addScript("fixture/it/common-end.xml");
+		createTerminal();
+		terminal.subscribe(symbol1, MDLevel.L2);
+		terminal.subscribe(symbol2, MDLevel.L2);
+		terminal.onSecurityMarketDepthUpdate().addListener(new CountDownOnEvent(finished));
+		
+		terminal.start();
+		
+		assertTrue(finished.await(1, TimeUnit.SECONDS));
+		// First security test
+		Security security = terminal.getSecurity(symbol1);
+		Instant last_time = security.getMarketDepth().getBestAsk().getTime();
+		List<Tick> expected_asks = new ArrayList<>();
+		expected_asks.add(Tick.ofAsk(last_time, of(62695L), of(18L)));
+		expected_asks.add(Tick.ofAsk(last_time, of(62697L), of(85L)));
+		assertEquals(expected_asks, security.getMarketDepth().getAsks());
+		List<Tick> expected_bids = new ArrayList<>();
+		expected_bids.add(Tick.ofBid(last_time, of(62690L), of(10L)));
+		expected_bids.add(Tick.ofBid(last_time, of(62683L), of(12L)));
+		assertEquals(expected_bids, security.getMarketDepth().getBids());
+		// Second security test
+		security = terminal.getSecurity(symbol2);
+		last_time = security.getMarketDepth().getBestAsk().getTime();
+		expected_asks.clear();
+		expected_asks.add(Tick.ofAsk(last_time, of(152890L), of(20L)));
+		expected_asks.add(Tick.ofAsk(last_time, of(152900L), of(44L)));
+		assertEquals(expected_asks, security.getMarketDepth().getAsks());
+		expected_bids.clear();
+		expected_bids.add(Tick.ofBid(last_time, of(152880L), of( 7L)));
+		expected_bids.add(Tick.ofBid(last_time, of(152820L), of( 6L)));
+		assertEquals(expected_bids, security.getMarketDepth().getBids());
+	}
+	
+	@Test
+	public void testCaseSDS017_DoM_QuotesWithSource() throws Exception {
+		Symbol symbol = new Symbol("F:Si-3.20@FUT:RUB");
+		CountDownLatch finished = new CountDownLatch(1);
+		testService.addScript("fixture/it/common-init.xml");
+		testService.addScript("fixture/it/common-connected.xml");
+		testService.addScript("fixture/it/sds017.xml");
+		testService.addScript("fixture/it/common-disconnect.xml");
+		testService.addScript("fixture/it/common-end.xml");
+		createTerminal();
+		terminal.subscribe(symbol, MDLevel.L2);
+		terminal.onSecurityMarketDepthUpdate().addListener(new CountDownOnEvent(finished));
+		
+		terminal.start();
+		
+		assertTrue(finished.await(1, TimeUnit.SECONDS));
+		Security security = terminal.getSecurity(symbol);
+		Instant last_time = security.getMarketDepth().getBestAsk().getTime();
+		List<Tick> expected_asks = new ArrayList<>();
+		expected_asks.add(Tick.ofAsk(last_time, of(62695L), of(10L)));
+		expected_asks.add(Tick.ofAsk(last_time, of(62697L), of(85L)));
+		expected_asks.add(Tick.ofAsk(last_time, of("62697", "MM1"), of(21L)));
+		expected_asks.add(Tick.ofAsk(last_time, of("62697", "MMX"), of( 3L)));
+		assertEquals(expected_asks, security.getMarketDepth().getAsks());
+		List<Tick> expected_bids = new ArrayList<>();
+		expected_bids.add(Tick.ofBid(last_time, of("62680", "MMX"), of(64L)));
+		expected_bids.add(Tick.ofBid(last_time, of("62680", "MM1"), of(27L)));
+		expected_bids.add(Tick.ofBid(last_time, of(62678L), of(10L)));
+		assertEquals(expected_bids, security.getMarketDepth().getBids());
+	}
+	
+	@Test
+	public void testCaseSDS018_DoM_RebuildAfterReconnect() throws Exception {
+		Symbol symbol = new Symbol("F:Si-3.20@FUT:RUB");
+		CountDownLatch started = new CountDownLatch(1), finished = new CountDownLatch(1);
+		testService.addScript("fixture/it/common-init.xml");
+		testService.addScript("fixture/it/common-connected.xml");
+		testService.addScript("fixture/it/sds018.xml");
+		testService.addScript("fixture/it/common-disconnect.xml");
+		testService.addScript("fixture/it/common-end.xml");
+		createTerminal();
+		terminal.subscribe(symbol, MDLevel.L2);
+		terminal.onSecurityMarketDepthUpdate().listenOnce(new CountDownOnEvent(started));
+		terminal.start();
+		assertTrue(started.await(1, TimeUnit.SECONDS));
+		Security security = terminal.getSecurity(symbol);
+		terminal.onSecurityMarketDepthUpdate().listenOnce(new CountDownOnEvent(finished));
+
+		testService.ExplicitCall();
+		
+		assertTrue(finished.await(1, TimeUnit.SECONDS));
+		Instant time = security.getMarketDepth().getBestAsk().getTime();
+		List<Tick> expected_asks = new ArrayList<>();
+		expected_asks.add(Tick.ofAsk(time, of(62510L), of(508L)));
+		expected_asks.add(Tick.ofAsk(time, of(62513L), of(177L)));
+		assertEquals(expected_asks, security.getMarketDepth().getAsks());
+		List<Tick> expected_bids = new ArrayList<>();
+		expected_bids.add(Tick.ofBid(time, of(62490L), of( 83L)));
+		expected_bids.add(Tick.ofBid(time, of(62487L), of( 10L)));
+		assertEquals(expected_bids, security.getMarketDepth().getBids());
+	}
+	
+	@Test
+	public void testCaseSDS019_DoM_RebuildAfterUnsubscribe() throws Exception{
+		Symbol symbol = new Symbol("F:Si-3.20@FUT:RUB");
+		CountDownLatch started = new CountDownLatch(1), finished = new CountDownLatch(1);
+		testService.addScript("fixture/it/common-init.xml");
+		testService.addScript("fixture/it/common-connected.xml");
+		testService.addScript("fixture/it/sds019.xml");
+		testService.addScript("fixture/it/common-disconnect.xml");
+		testService.addScript("fixture/it/common-end.xml");
+		createTerminal();
+		SubscrHandler subscr_handler = terminal.subscribe(symbol, MDLevel.L2);
+		terminal.onSecurityMarketDepthUpdate().listenOnce(new CountDownOnEvent(started));
+		terminal.start();
+		assertTrue(started.await(1, TimeUnit.SECONDS));
+		terminal.onSecurityMarketDepthUpdate().listenOnce(new CountDownOnEvent(finished));
+
+		subscr_handler.close();
+		terminal.subscribe(symbol, MDLevel.L2);
+		
+		assertTrue(finished.await(1, TimeUnit.SECONDS));
+		Security security = terminal.getSecurity(symbol);
+		Instant time = security.getMarketDepth().getBestAsk().getTime();
+		List<Tick> expected_asks = new ArrayList<>();
+		expected_asks.add(Tick.ofAsk(time, of(62510L), of(508L)));
+		expected_asks.add(Tick.ofAsk(time, of(62513L), of(177L)));
+		assertEquals(expected_asks, security.getMarketDepth().getAsks());
+		List<Tick> expected_bids = new ArrayList<>();
+		expected_bids.add(Tick.ofBid(time, of(62490L), of( 83L)));
+		expected_bids.add(Tick.ofBid(time, of(62487L), of( 10L)));
+		assertEquals(expected_bids, security.getMarketDepth().getBids());
 	}
 	
 }

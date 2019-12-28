@@ -2,6 +2,9 @@ package ru.prolib.aquila.transaq.impl;
 
 import static org.easymock.EasyMock.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,6 +14,7 @@ import ru.prolib.aquila.transaq.engine.ServiceLocator;
 import ru.prolib.aquila.transaq.engine.sds.SymbolDataService;
 import ru.prolib.aquila.transaq.entity.SecType;
 import ru.prolib.aquila.transaq.remote.TQSecIDT;
+import ru.prolib.aquila.transaq.remote.entity.Quote;
 import ru.prolib.aquila.transaq.remote.entity.ServerStatus;
 import ru.prolib.aquila.transaq.remote.ISecIDF;
 import ru.prolib.aquila.transaq.remote.ISecIDG;
@@ -143,6 +147,20 @@ public class TQReactorTest {
 		control.replay();
 		
 		service.registerTrade(update);
+		
+		control.verify();
+	}
+	
+	@Test
+	public void testRegisterQuotes() {
+		List<Quote> quotes = new ArrayList<>();
+		quotes.add(control.createMock(Quote.class));
+		quotes.add(control.createMock(Quote.class));
+		quotes.add(control.createMock(Quote.class));
+		sdsMock.onSecurityQuotes(quotes);
+		control.replay();
+		
+		service.registerQuotes(quotes);
 		
 		control.verify();
 	}
