@@ -22,6 +22,7 @@ import ru.prolib.aquila.transaq.entity.SecType;
 import ru.prolib.aquila.transaq.impl.TQStateUpdate;
 import ru.prolib.aquila.transaq.remote.MessageFields.FBoard;
 import ru.prolib.aquila.transaq.remote.MessageFields.FCKind;
+import ru.prolib.aquila.transaq.remote.MessageFields.FClient;
 import ru.prolib.aquila.transaq.remote.MessageFields.FMarket;
 import ru.prolib.aquila.transaq.remote.MessageFields.FQuotation;
 import ru.prolib.aquila.transaq.remote.MessageFields.FSecurity;
@@ -1017,6 +1018,47 @@ public class MessageParser {
 		}
 		skipElement(reader);
 		return new ServerStatus(connected, recover, error_msg);
+	}
+	
+	public TQStateUpdate<String> readClient(XMLStreamReader reader) throws XMLStreamException {
+		if ( ! "client".equals(reader.getLocalName()) ) {
+			throw new IllegalStateException("Unexpected current element: " + reader.getLocalName());
+		}
+		String client_id = null;
+		DeltaUpdateBuilder builder = new DeltaUpdateBuilder()
+				.withToken(FClient.ID, client_id = getAttribute(reader, "id"))
+				.withToken(FClient.REMOVE, getAttributeBool(reader, "remove"));
+		while ( reader.hasNext() ) {
+			switch ( reader.next() ) {
+			case XMLStreamReader.START_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "type":
+					builder.withToken(FClient.TYPE, readCharacters(reader));
+					break;
+				case "currency":
+					builder.withToken(FClient.CURRENCY, readCharacters(reader));
+					break;
+				case "market":
+					builder.withToken(FClient.MARKET_ID, readInt(reader));
+					break;
+				case "union":
+					builder.withToken(FClient.UNION_CODE, readCharacters(reader));
+					break;
+				case "forts_acc":
+					builder.withToken(FClient.FORTS_ACCOUNT, readCharacters(reader));
+					break;
+				}
+				break;
+			case XMLStreamReader.END_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "client":
+					checkNotNull(client_id, "id");
+					return new TQStateUpdate<>(client_id, builder.buildUpdate());
+				}
+				break;
+			}
+		}
+		throw new XMLStreamException("Premature end of file");
 	}
 	
 }

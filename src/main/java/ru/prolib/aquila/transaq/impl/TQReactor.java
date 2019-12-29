@@ -68,5 +68,9 @@ public class TQReactor {
 	public void registerQuotes(List<Quote> quotes) {
 		getSDS().onSecurityQuotes(quotes);
 	}
+	
+	public void updateClient(TQStateUpdate<String> update) {
+		getDir().updateClient(update);
+	}
 
 }

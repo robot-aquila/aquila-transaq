@@ -1089,5 +1089,63 @@ public class MessageParserTest {
 		assertEquals(new ServerStatus(false, false, "Connection lost"), service.readServerStatus(sr));
 		checkIsElementEnd(sr, element);
 	}
+	
+	@Test
+	public void testReadClient() throws Exception {
+		String element = "client";
+		XMLStreamReader sr = startReader("fixture/clients.xml", "root");
+		
+		moveNextElem(sr, element);
+		TQStateUpdate<String> actual = service.readClient(sr);
+		TQStateUpdate<String> expected = new TQStateUpdate<>("1RVKK/1RVKK", new DeltaUpdateBuilder()
+				.withToken(FClient.ID, "1RVKK/1RVKK")
+				.withToken(FClient.REMOVE, false)
+				.withToken(FClient.MARKET_ID, 1)
+				.withToken(FClient.CURRENCY, "RUB")
+				.withToken(FClient.TYPE, "leverage")
+				.withToken(FClient.UNION_CODE, "GISGIS19KV")
+				.buildUpdate());
+		assertEquals(expected, actual);
+		checkIsElementEnd(sr, element);
+		
+		moveNextElem(sr, element);
+		actual = service.readClient(sr);
+		expected = new TQStateUpdate<>("88812chuchi", new DeltaUpdateBuilder()
+				.withToken(FClient.ID, "88812chuchi")
+				.withToken(FClient.REMOVE, false)
+				.withToken(FClient.MARKET_ID, 4)
+				.withToken(FClient.CURRENCY, "RUB")
+				.withToken(FClient.TYPE, "leverage")
+				.withToken(FClient.UNION_CODE, "GISGIS19KV")
+				.withToken(FClient.FORTS_ACCOUNT, "ZYUZEE-MOOZEE")
+				.buildUpdate());
+		assertEquals(expected, actual);
+		checkIsElementEnd(sr, element);
+		
+		moveNextElem(sr, element);
+		actual = service.readClient(sr);
+		expected = new TQStateUpdate<>("SUSEK/2XVKZ", new DeltaUpdateBuilder()
+				.withToken(FClient.ID, "SUSEK/2XVKZ")
+				.withToken(FClient.REMOVE, true)
+				.withToken(FClient.MARKET_ID, 15)
+				.withToken(FClient.CURRENCY, "RUB")
+				.withToken(FClient.TYPE, "leverage")
+				.buildUpdate());
+		assertEquals(expected, actual);
+		checkIsElementEnd(sr, element);
+
+		moveNextElem(sr, element);
+		actual = service.readClient(sr);
+		expected = new TQStateUpdate<>("BUM75/2XVKL", new DeltaUpdateBuilder()
+				.withToken(FClient.ID, "BUM75/2XVKL")
+				.withToken(FClient.REMOVE, false)
+				.withToken(FClient.MARKET_ID, 14)
+				.withToken(FClient.CURRENCY, "USD")
+				.withToken(FClient.TYPE, "mct")
+				.withToken(FClient.UNION_CODE, "GISGIS19KV")
+				.buildUpdate());
+		assertEquals(expected, actual);
+		checkIsElementEnd(sr, element);
+	}
 
 }

@@ -1,0 +1,6 @@
+<root>
+	<client id="1RVKK/1RVKK" remove="false"><market>1</market><currency>RUB</currency><type>leverage</type><union>GISGIS19KV</union></client>
+	<client id="88812chuchi" remove="false"><market>4</market><currency>RUB</currency><type>leverage</type><union>GISGIS19KV</union><forts_acc>ZYUZEE-MOOZEE</forts_acc></client>
+	<client id="SUSEK/2XVKZ" remove="true"><market>15</market><currency>RUB</currency><type>leverage</type></client>
+	<client id="BUM75/2XVKL" remove="false"><market>14</market><currency>USD</currency><type>mct</type><union>GISGIS19KV</union></client>
+</root>

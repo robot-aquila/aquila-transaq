@@ -165,5 +165,36 @@ public class MessageFields {
 	//	public static final int BUY					= 5915;
 	//	public static final int SELL				= 5916;
 	//}
+	
+	public static class FClient {
+		/**
+		 * Type: String
+		 */
+		public static final int ID					= 6001;
+		/**
+		 * Type: Boolean
+		 */
+		public static final int REMOVE				= 6002;
+		/**
+		 * Type: String
+		 */
+		public static final int TYPE				= 6003;
+		/**
+		 * Type: String
+		 */
+		public static final int CURRENCY			= 6004;
+		/**
+		 * Type: Integer
+		 */
+		public static final int MARKET_ID			= 6005;
+		/**
+		 * Type: String
+		 */
+		public static final int UNION_CODE			= 6006;
+		/**
+		 * Type: String
+		 */
+		public static final int FORTS_ACCOUNT		= 6007;
+	}
 
 }

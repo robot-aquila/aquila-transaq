@@ -14,6 +14,7 @@ import ru.prolib.aquila.transaq.engine.ServiceLocator;
 import ru.prolib.aquila.transaq.engine.sds.SymbolDataService;
 import ru.prolib.aquila.transaq.entity.SecType;
 import ru.prolib.aquila.transaq.remote.TQSecIDT;
+import ru.prolib.aquila.transaq.remote.entity.Client;
 import ru.prolib.aquila.transaq.remote.entity.Quote;
 import ru.prolib.aquila.transaq.remote.entity.ServerStatus;
 import ru.prolib.aquila.transaq.remote.ISecIDF;
@@ -161,6 +162,18 @@ public class TQReactorTest {
 		control.replay();
 		
 		service.registerQuotes(quotes);
+		
+		control.verify();
+	}
+	
+	@Test
+	public void testUpdateClient() {
+		Client clientMock = control.createMock(Client.class);
+		TQStateUpdate<String> update = new TQStateUpdate<>("foo", duMock);
+		expect(dirMock.updateClient(update)).andReturn(clientMock);
+		control.replay();
+		
+		service.updateClient(update);
 		
 		control.verify();
 	}

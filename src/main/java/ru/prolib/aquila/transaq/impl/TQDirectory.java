@@ -33,6 +33,8 @@ import ru.prolib.aquila.transaq.remote.ISecIDG;
 import ru.prolib.aquila.transaq.remote.ISecIDT;
 import ru.prolib.aquila.transaq.remote.TQSecIDG;
 import ru.prolib.aquila.transaq.remote.TQSecIDT;
+import ru.prolib.aquila.transaq.remote.entity.Client;
+import ru.prolib.aquila.transaq.remote.entity.ClientFactory;
 
 public class TQDirectory {
 	private static final Map<SecType, SymbolType> TYPE_MAP;
@@ -55,6 +57,7 @@ public class TQDirectory {
 	private final OSCRepository<GSymbol, SecurityParams> secParams;
 	private final OSCRepository<TSymbol, SecurityBoardParams> secBoardParams;
 	private final OSCRepository<TSymbol, SecurityQuotations> secQuots;
+	private final OSCRepository<String, Client> clients;
 	private final ConnectionStatus connectionStatus;
 	
 	/**
@@ -83,6 +86,7 @@ public class TQDirectory {
 			OSCRepository<GSymbol, SecurityParams> secParams,
 			OSCRepository<TSymbol, SecurityBoardParams> secBoardParams,
 			OSCRepository<TSymbol, SecurityQuotations> secQuotations,
+			OSCRepository<String, Client> clients,
 			ConnectionStatus connection_status,
 			Map<ISecIDG, GSymbol> tq2gid_map,
 			Map<GSymbol, ISecIDF> gid2tq_map)
@@ -93,6 +97,7 @@ public class TQDirectory {
 		this.secParams = secParams;
 		this.secBoardParams = secBoardParams;
 		this.secQuots = secQuotations;
+		this.clients = clients;
 		this.connectionStatus = connection_status;
 		this.tq2gidMap = tq2gid_map;
 		this.gid2tqMap = gid2tq_map;
@@ -105,6 +110,7 @@ public class TQDirectory {
 			 new OSCRepositoryImpl<>(new SecurityParamsFactory(queue), "SEC_PARAMS"),
 			 new OSCRepositoryImpl<>(new SecurityBoardParamsFactory(queue), "SEC_BRD_PARAMS"),
 			 new OSCRepositoryImpl<>(new SecurityQuotationsFactory(queue), "SEC_QUOTATIONS"),
+			 new OSCRepositoryImpl<>(new ClientFactory(queue), "CLIENTS"),
 			 new ConnectionStatus(queue, "CONNECTION_STATUS"),
 			 new Hashtable<>(),
 			 new Hashtable<>()
@@ -243,6 +249,10 @@ public class TQDirectory {
 		return new OSCRepositoryDecoratorRO<>(secQuots);
 	}
 	
+	public OSCRepository<String, Client> getClientRepository() {
+		return new OSCRepositoryDecoratorRO<>(clients);
+	}
+	
 	public void updateConnectionStatus(boolean connected) {
 		if ( connected ) {
 			connectionStatus.setConnected();
@@ -297,6 +307,12 @@ public class TQDirectory {
 	
 	public SecurityQuotations updateSecurityQuotations(TQStateUpdate<ISecIDT> update) {
 		SecurityQuotations entity = secQuots.getOrCreate(toSymbolTID(update.getID()));
+		entity.consume(update.getUpdate());
+		return entity;
+	}
+	
+	public Client updateClient(TQStateUpdate<String> update) {
+		Client entity = clients.getOrCreate(update.getID());
 		entity.consume(update.getUpdate());
 		return entity;
 	}

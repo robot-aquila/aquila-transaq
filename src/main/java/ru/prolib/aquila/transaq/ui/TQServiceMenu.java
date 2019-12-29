@@ -33,10 +33,12 @@ import ru.prolib.aquila.transaq.entity.SecurityQuotations;
 import ru.prolib.aquila.transaq.impl.TQDirectory;
 import ru.prolib.aquila.transaq.remote.MessageFields.FBoard;
 import ru.prolib.aquila.transaq.remote.MessageFields.FCKind;
+import ru.prolib.aquila.transaq.remote.MessageFields.FClient;
 import ru.prolib.aquila.transaq.remote.MessageFields.FMarket;
 import ru.prolib.aquila.transaq.remote.MessageFields.FQuotation;
 import ru.prolib.aquila.transaq.remote.MessageFields.FSecurity;
 import ru.prolib.aquila.transaq.remote.MessageFields.FSecurityBoard;
+import ru.prolib.aquila.transaq.remote.entity.Client;
 import ru.prolib.aquila.ui.ITableModel;
 import ru.prolib.aquila.ui.TableModelController;
 import ru.prolib.aquila.ui.form.OSCRepositoryTableModel;
@@ -50,11 +52,13 @@ public class TQServiceMenu implements ActionListener {
 	public static final String ITEM_SHOW_SEC_PARAMS = "SHOW_SEC_PARAMS";
 	public static final String ITEM_SHOW_SEC_BRD_PARAMS = "SHOW_SEC_BRD_PARAMS";
 	public static final String ITEM_SHOW_SEC_QUOTATIONS = "SHOW_SEC_QUOTATIONS";
+	public static final String ITEM_SHOW_CLIENTS = "SHOW_CLIENTS";
 	
 	private final IMessages messages;
 	private final JFrame frame;
 	private final TQDirectory directory;
-	private JDialog marketsDialog, boardsDialog, ckindsDialog, secParamsDialog, secBrdParamsDialog, secQuotationsDialog;
+	private JDialog marketsDialog, boardsDialog, ckindsDialog, secParamsDialog, secBrdParamsDialog,
+		secQuotationsDialog, clientsDialog;
 	
 	public TQServiceMenu(IMessages messages, JFrame frame, TQDirectory directory) {
 		this.messages = messages;
@@ -288,6 +292,28 @@ public class TQServiceMenu implements ActionListener {
 		return new OSCRepositoryTableModel<>(messages, repository, column_id_list, column_id_to_header);
 	}
 	
+	public OSCRepositoryTableModel<Client>
+		createClientTableModel(OSCRepository<String, Client> repository)
+	{
+		List<Integer> column_id_list = new ArrayList<>();
+		column_id_list.add(FClient.ID);
+		column_id_list.add(FClient.REMOVE);
+		column_id_list.add(FClient.TYPE);
+		column_id_list.add(FClient.CURRENCY);
+		column_id_list.add(FClient.MARKET_ID);
+		column_id_list.add(FClient.UNION_CODE);
+		column_id_list.add(FClient.FORTS_ACCOUNT);
+		Map<Integer, MsgID> column_id_to_header = new HashMap<>();
+		column_id_to_header.put(FClient.ID, TQMessages.CLIENT_ID);
+		column_id_to_header.put(FClient.REMOVE, TQMessages.CLIENT_REMOVE);
+		column_id_to_header.put(FClient.TYPE, TQMessages.CLIENT_TYPE);
+		column_id_to_header.put(FClient.CURRENCY, TQMessages.CLIENT_CURRENCY);
+		column_id_to_header.put(FClient.MARKET_ID, TQMessages.MARKET_ID);
+		column_id_to_header.put(FClient.UNION_CODE, TQMessages.CLIENT_UNION_CODE);
+		column_id_to_header.put(FClient.FORTS_ACCOUNT, TQMessages.CLIENT_FORTS_ACCOUNT);
+		return new OSCRepositoryTableModel<>(messages, repository, column_id_list, column_id_to_header);
+	}
+	
 	private JTable createTable(ITableModel table_model) {
 		JTable table = new JTable(table_model);
 		table.setShowGrid(true);
@@ -317,6 +343,10 @@ public class TQServiceMenu implements ActionListener {
 	
 	public JTable createSecQuotationsTable(OSCRepository<TSymbol, SecurityQuotations> repository) {
 		return createTable(createSecurityQuotationsTableModel(repository));
+	}
+	
+	public JTable createClientsTable(OSCRepository<String, Client> repository) {
+		return createTable(createClientTableModel(repository));
 	}
 	
 	private JDialog createTableDialog(JTable table, MsgID title_msg_id, Dimension initial_size) {
@@ -372,6 +402,14 @@ public class TQServiceMenu implements ActionListener {
 			);
 	}
 	
+	public JDialog createClientsDialog(OSCRepository<String, Client> repository) {
+		return createTableDialog(
+				createClientsTable(repository),
+				TQMessages.DIALOG_TITLE_CLIENTS,
+				new Dimension(800, 160)
+			);
+	}
+	
 	public JMenu create() {
 		JMenuItem item;
 		JMenu menu = new JMenu(messages.get(TQMessages.SERVICE_MENU));
@@ -398,6 +436,10 @@ public class TQServiceMenu implements ActionListener {
 		
 		menu.add(item = new JMenuItem(messages.get(TQMessages.SHOW_SEC_QUOTATIONS)));
 		item.setActionCommand(ITEM_SHOW_SEC_QUOTATIONS);
+		item.addActionListener(this);
+		
+		menu.add(item = new JMenuItem(messages.get(TQMessages.SHOW_CLIENTS)));
+		item.setActionCommand(ITEM_SHOW_CLIENTS);
 		item.addActionListener(this);
 		
 		return menu;
@@ -441,6 +483,13 @@ public class TQServiceMenu implements ActionListener {
 				secQuotationsDialog = createSecQuotationsDialog(directory.getSecurityQuotationsRepository());
 			}
 			secQuotationsDialog.setVisible(true);
+			break;
+		case ITEM_SHOW_CLIENTS:
+			if ( clientsDialog == null ) {
+				clientsDialog = createClientsDialog(directory.getClientRepository());
+			}
+			clientsDialog.setVisible(true);
+			break;
 		}
 	}
 	

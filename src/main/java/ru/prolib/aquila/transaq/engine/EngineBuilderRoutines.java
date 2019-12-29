@@ -46,8 +46,8 @@ public class EngineBuilderRoutines {
 				.withProcessor("quotations", new QuotationsProcessor(services))
 				.withProcessor("alltrades", new AlltradesProcessor(services))
 				.withProcessor("quotes", new QuotesProcessor(services))
+				.withProcessor("client", new ClientProcessor(services))
 				// TODO: do it
-				.withProcessor("client", new ClientProcessor())
 				.withProcessor("messages", new MessageProcessorStub())
 				.withProcessor("positions", new MessageProcessorStub())
 				.withProcessor("union", new MessageProcessorStub())

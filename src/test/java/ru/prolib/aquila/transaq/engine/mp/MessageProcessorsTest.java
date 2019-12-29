@@ -41,8 +41,15 @@ public class MessageProcessorsTest {
 	
 	@Test
 	public void testClientProcessor() throws Exception {
-		System.out.println(getClass() + " Not yet implemented");
-		Thread.sleep(5000L);
+		TQStateUpdate<String> upMock = control.createMock(TQStateUpdate.class);
+		expect(parserMock.readClient(readerMock)).andReturn(upMock);
+		reactorMock.updateClient(upMock);
+		control.replay();
+		ClientProcessor service = new ClientProcessor(services);
+		
+		service.processMessage(readerMock);
+		
+		control.verify();
 	}
 
 	@Test
