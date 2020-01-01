@@ -196,5 +196,336 @@ public class MessageFields {
 		 */
 		public static final int FORTS_ACCOUNT		= 6007;
 	}
+	
+	public static class Positions {
+		//public static final int RECORD_TYPE			= 6100;
+		
+		public static class FMoneyPosition {
+			/**
+			 * List of market ID<br/>
+			 * Type: List&lt;Integer&gt;
+			 */
+			public static final int MARKETS			= 6101;
+			/**
+			 * Type: String
+			 */
+			public static final int REGISTER		= 6102;
+			/**
+			 * Type: String
+			 */
+			public static final int ASSET			= 6103;
+			/**
+			 * Type: String
+			 */
+			public static final int CLIENT_ID		= 6104;
+			/**
+			 * Type: String
+			 */
+			public static final int UNION_CODE		= 6105;
+			/**
+			 * Type: String
+			 */
+			public static final int SHORT_NAME		= 6106;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int SALDO_IN		= 6107;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int BOUGHT			= 6108;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int SOLD			= 6109;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int SALDO			= 6110;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int ORD_BUY			= 6111;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int ORB_BUY_COND	= 6112;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int COMISSION		= 6113;
+		}
+		
+		public static class FSecPosition {
+			/**
+			 * Type: Integer
+			 */
+			public static final int SEC_ID			= 6201;
+			/**
+			 * Type: Integer
+			 */
+			public static final int MARKET_ID		= 6202;
+			/**
+			 * Type: String
+			 */
+			public static final int SEC_CODE		= 6203;
+			/**
+			 * Type: String
+			 */
+			public static final int REGISTER		= 6204;
+			/**
+			 * Type: String
+			 */
+			public static final int CLIENT_ID		= 6205;
+			/**
+			 * Type: String
+			 */
+			public static final int UNION_CODE		= 6206;
+			/**
+			 * Type: String
+			 */
+			public static final int SHORT_NAME		= 6207;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int SALDO_IN		= 6208;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int SALDO_MIN		= 6209;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int BOUGHT			= 6210;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int SOLD			= 6211;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int SALDO			= 6212;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int ORD_BUY			= 6213;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int ORD_SELL		= 6214;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int AMOUNT			= 6215;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int EQUITY			= 6216;
+		}
+		
+		public static class FFortsMoney {
+			/**
+			 * Type: String
+			 */
+			public static final int CLIENT_ID		= 6401;
+			/**
+			 * Type: String
+			 */
+			public static final int UNION_CODE		= 6402;
+			/**
+			 * Type: List&lt;Integer&gt;
+			 */
+			public static final int MARKETS			= 6403;
+			/**
+			 * Type: String
+			 */
+			public static final int SHORT_NAME		= 6304;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int CURRENT			= 6305;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int BLOCKED			= 6306;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int FREE			= 6307;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int VAR_MARGIN		= 6308;
+		}
+		
+		public static class FFortsPosition {
+			/**
+			 * Type: Integer
+			 */
+			public static final int SEC_ID			= 6401;
+			/**
+			 * Type: List&lt;Integer&gt;
+			 */
+			public static final int MARKETS			= 6402;
+			/**
+			 * Type: String
+			 */
+			public static final int SEC_CODE		= 6403;
+			/**
+			 * Type: String
+			 */
+			public static final int CLIENT_ID		= 6404;
+			/**
+			 * Type: String
+			 */
+			public static final int UNION_CODE		= 6405;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int START_NET		= 6406;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int OPEN_BUYS		= 6407;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int OPEN_SELLS		= 6408;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int TOTAL_NET		= 6409;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int TOTAL_BUY		= 6410;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int TOTAL_SELL		= 6411;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int OPT_MARGIN		= 6412;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int VAR_MARGIN		= 6413;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int EXPIRATION_POS	= 6414;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int USED_SELL_SPOT_LIMIT = 6415;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int SELL_SPOT_LIMIT	= 6416;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int NETTO			= 6417;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int KGO				= 6418;
+		}
+		
+		public static class FFortsCollaterals {
+			/**
+			 * Type: String
+			 */
+			public static final int CLIENT_ID		= 6501;
+			/**
+			 * Type: String
+			 */
+			public static final int UNION_CODE		= 6502;
+			/**
+			 * Type: List&ltInteger&gt;
+			 */
+			public static final int MARKETS			= 6503;
+			/**
+			 * Type: String
+			 */
+			public static final int SHORT_NAME		= 6504;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int CURRENT			= 6505;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int BLOCKED			= 6506;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int FREE			= 6507;
+		}
+		
+		public static class FSpotLimits {
+			/**
+			 * Type: String
+			 */
+			public static final int CLIENT_ID		= 6601;
+			/**
+			 * Type: String
+			 */
+			public static final int UNION_CODE		= 6602;
+			/**
+			 * Type: List&lt;Integer&gt;
+			 */
+			public static final int MARKETS			= 6603;
+			/**
+			 * Type: String
+			 */
+			public static final int SHORT_NAME		= 6604;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int BUY_LIMIT		= 6605;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int BUY_LIMIT_USED	= 6606;
+		}
+		
+		public static class FUnitedLimits {
+			/**
+			 * Type: String
+			 */
+			public static final int UNION_CODE		= 6701;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int OPEN_EQUITY		= 6702;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int EQUITY			= 6703;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int REQUIREMENTS	= 6704;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int FREE			= 6705;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int VAR_MARGIN		= 6706;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int FIN_RES			= 6707;
+			/**
+			 * Type: CDecimal
+			 */
+			public static final int GO				= 6708;
+		}
+		
+	}
 
 }
