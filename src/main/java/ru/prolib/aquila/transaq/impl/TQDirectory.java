@@ -34,8 +34,7 @@ import ru.prolib.aquila.transaq.remote.ISecIDG;
 import ru.prolib.aquila.transaq.remote.ISecIDT;
 import ru.prolib.aquila.transaq.remote.TQSecIDG;
 import ru.prolib.aquila.transaq.remote.TQSecIDT;
-import ru.prolib.aquila.transaq.remote.entity.Client;
-import ru.prolib.aquila.transaq.remote.entity.ClientFactory;
+import ru.prolib.aquila.transaq.remote.entity.*;
 
 public class TQDirectory {
 	private static final Map<SecType, SymbolType> TYPE_MAP;
@@ -59,6 +58,13 @@ public class TQDirectory {
 	private final OSCRepository<TSymbol, SecurityBoardParams> secBoardParams;
 	private final OSCRepository<TSymbol, SecurityQuotations> secQuots;
 	private final OSCRepository<String, Client> clients;
+	private final OSCRepository<ID.MP, MoneyPosition> moneyPositions;
+	private final OSCRepository<ID.SP, SecPosition> secPositions;
+	private final OSCRepository<ID.FM, FortsMoney> fortsMoney;
+	private final OSCRepository<ID.FP, FortsPosition> fortsPositions;
+	private final OSCRepository<ID.FC, FortsCollaterals> fortsCollaterals;
+	private final OSCRepository<ID.SL, SpotLimits> spotLimits;
+	private final OSCRepository<ID.UL, UnitedLimits> unitedLimits;
 	private final ConnectionStatus connectionStatus;
 	
 	/**
@@ -88,6 +94,13 @@ public class TQDirectory {
 			OSCRepository<TSymbol, SecurityBoardParams> secBoardParams,
 			OSCRepository<TSymbol, SecurityQuotations> secQuotations,
 			OSCRepository<String, Client> clients,
+			OSCRepository<ID.MP, MoneyPosition> moneyPositions,
+			OSCRepository<ID.SP, SecPosition> secPositions,
+			OSCRepository<ID.FM, FortsMoney> fortsMoney,
+			OSCRepository<ID.FP, FortsPosition> fortsPositions,
+			OSCRepository<ID.FC, FortsCollaterals> fortsCollaterals,
+			OSCRepository<ID.SL, SpotLimits> spotLimits,
+			OSCRepository<ID.UL, UnitedLimits> unitedLimits,
 			ConnectionStatus connection_status,
 			Map<ISecIDG, GSymbol> tq2gid_map,
 			Map<GSymbol, ISecIDF> gid2tq_map)
@@ -99,6 +112,13 @@ public class TQDirectory {
 		this.secBoardParams = secBoardParams;
 		this.secQuots = secQuotations;
 		this.clients = clients;
+		this.moneyPositions = moneyPositions;
+		this.secPositions = secPositions;
+		this.fortsMoney = fortsMoney;
+		this.fortsPositions = fortsPositions;
+		this.fortsCollaterals = fortsCollaterals;
+		this.spotLimits = spotLimits;
+		this.unitedLimits = unitedLimits;
 		this.connectionStatus = connection_status;
 		this.tq2gidMap = tq2gid_map;
 		this.gid2tqMap = gid2tq_map;
@@ -112,6 +132,13 @@ public class TQDirectory {
 			 new OSCRepositoryImpl<>(new SecurityBoardParamsFactory(queue), "SEC_BRD_PARAMS"),
 			 new OSCRepositoryImpl<>(new SecurityQuotationsFactory(queue), "SEC_QUOTATIONS"),
 			 new OSCRepositoryImpl<>(new ClientFactory(queue), "CLIENTS"),
+			 new OSCRepositoryImpl<>(new MoneyPositionFactory(queue), "MONEY_POSITIONS"),
+			 new OSCRepositoryImpl<>(new SecPositionFactory(queue), "SEC_POSITIONS"),
+			 new OSCRepositoryImpl<>(new FortsMoneyFactory(queue), "FORTS_MONEY"),
+			 new OSCRepositoryImpl<>(new FortsPositionFactory(queue), "FORTS_POSITIONS"),
+			 new OSCRepositoryImpl<>(new FortsCollateralsFactory(queue), "FORTS_COLLATERALS"),
+			 new OSCRepositoryImpl<>(new SpotLimitsFactory(queue), "SPOT_LIMITS"),
+			 new OSCRepositoryImpl<>(new UnitedLimitsFactory(queue), "UNITED_LIMITS"),
 			 new ConnectionStatus(queue, "CONNECTION_STATUS"),
 			 new Hashtable<>(),
 			 new Hashtable<>()
@@ -254,6 +281,34 @@ public class TQDirectory {
 		return new OSCRepositoryDecoratorRO<>(clients);
 	}
 	
+	public OSCRepository<ID.MP, MoneyPosition> getMoneyPositionRepository() {
+		return new OSCRepositoryDecoratorRO<>(moneyPositions);
+	}
+	
+	public OSCRepository<ID.SP, SecPosition> getSecPositionRepository() {
+		return new OSCRepositoryDecoratorRO<>(secPositions);
+	}
+	
+	public OSCRepository<ID.FM, FortsMoney> getFortsMoneyRepository() {
+		return new OSCRepositoryDecoratorRO<>(fortsMoney);
+	}
+	
+	public OSCRepository<ID.FP, FortsPosition> getFortsPositionRepository() {
+		return new OSCRepositoryDecoratorRO<>(fortsPositions);
+	}
+	
+	public OSCRepository<ID.FC, FortsCollaterals> getFortsCollateralsRepository() {
+		return new OSCRepositoryDecoratorRO<>(fortsCollaterals);
+	}
+	
+	public OSCRepository<ID.SL, SpotLimits> getSpotLimitsRepository() {
+		return new OSCRepositoryDecoratorRO<>(spotLimits);
+	}
+	
+	public OSCRepository<ID.UL, UnitedLimits> getUnitedLimitsRepository() {
+		return new OSCRepositoryDecoratorRO<>(unitedLimits);
+	}
+	
 	public void updateConnectionStatus(boolean connected) {
 		if ( connected ) {
 			connectionStatus.setConnected();
@@ -314,6 +369,48 @@ public class TQDirectory {
 	
 	public Client updateClient(TQStateUpdate<String> update) {
 		Client entity = clients.getOrCreate(update.getID());
+		entity.consume(update.getUpdate());
+		return entity;
+	}
+	
+	public MoneyPosition updateMoneyPosition(TQStateUpdate<ID.MP> update) {
+		MoneyPosition entity = moneyPositions.getOrCreate(update.getID());
+		entity.consume(update.getUpdate());
+		return entity;
+	}
+	
+	public SecPosition updateSecPosition(TQStateUpdate<ID.SP> update) {
+		SecPosition entity = secPositions.getOrCreate(update.getID());
+		entity.consume(update.getUpdate());
+		return entity;
+	}
+	
+	public FortsMoney updateFortsMoney(TQStateUpdate<ID.FM> update) {
+		FortsMoney entity = fortsMoney.getOrCreate(update.getID());
+		entity.consume(update.getUpdate());
+		return entity;
+	}
+	
+	public FortsPosition updateFortsPosition(TQStateUpdate<ID.FP> update) {
+		FortsPosition entity = fortsPositions.getOrCreate(update.getID());
+		entity.consume(update.getUpdate());
+		return entity;
+	}
+	
+	public FortsCollaterals updateFortsCollaterals(TQStateUpdate<ID.FC> update) {
+		FortsCollaterals entity = fortsCollaterals.getOrCreate(update.getID());
+		entity.consume(update.getUpdate());
+		return entity;
+	}
+	
+	public SpotLimits updateSpotLimits(TQStateUpdate<ID.SL> update) {
+		SpotLimits entity = spotLimits.getOrCreate(update.getID());
+		entity.consume(update.getUpdate());
+		return entity;
+	}
+	
+	public UnitedLimits updateUnitedLimits(TQStateUpdate<ID.UL> update) {
+		UnitedLimits entity = unitedLimits.getOrCreate(update.getID());
 		entity.consume(update.getUpdate());
 		return entity;
 	}

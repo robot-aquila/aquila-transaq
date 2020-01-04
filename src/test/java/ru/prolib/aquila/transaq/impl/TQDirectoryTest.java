@@ -2,9 +2,12 @@ package ru.prolib.aquila.transaq.impl;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.easymock.EasyMock.*;
 
@@ -22,13 +25,24 @@ import ru.prolib.aquila.transaq.engine.sds.*;
 import ru.prolib.aquila.transaq.entity.*;
 import ru.prolib.aquila.transaq.remote.*;
 import ru.prolib.aquila.transaq.remote.MessageFields.*;
-import ru.prolib.aquila.transaq.remote.entity.Client;
-import ru.prolib.aquila.transaq.remote.entity.ClientFactory;
+import ru.prolib.aquila.transaq.remote.entity.*;
 
 @SuppressWarnings("rawtypes")
 public class TQDirectoryTest {
 	private static EventQueue queue;
 	
+	static List<Integer> toList(Integer... integers) {
+		List<Integer> list = new ArrayList<>();
+		for ( Integer i : integers ) {
+			list.add(i);
+		}
+		return list;
+	}
+	
+	static Set<Integer> toSet(Integer... integers) {
+		return new HashSet<>(toList(integers));
+	}
+
 	@BeforeClass
 	public static void setUpBeforeClass() {
 		queue = new EventQueueImpl();
@@ -44,6 +58,13 @@ public class TQDirectoryTest {
 	private OSCRepository<TSymbol, SecurityBoardParams> secBoardParamsMock, secBoardParams;
 	private OSCRepository<TSymbol, SecurityQuotations> secQuotsMock, secQuots;
 	private OSCRepository<String, Client> clientsMock, clients;
+	private OSCRepository<ID.MP, MoneyPosition> moneyPositionsMock, moneyPositions;
+	private OSCRepository<ID.SP, SecPosition> secPositionsMock, secPositions;
+	private OSCRepository<ID.FM, FortsMoney> fortsMoneyMock, fortsMoney;
+	private OSCRepository<ID.FP, FortsPosition> fortsPositionsMock, fortsPositions;
+	private OSCRepository<ID.FC, FortsCollaterals> fortsCollateralsMock, fortsCollaterals;
+	private OSCRepository<ID.SL, SpotLimits> spotLimitsMock, spotLimits;
+	private OSCRepository<ID.UL, UnitedLimits> unitedLimitsMock, unitedLimits;
 	private ConnectionStatus conStatMock, conStat;
 	private DeltaUpdate duMock;
 	private Map<ISecIDG, GSymbol> tq2gidMap;
@@ -61,6 +82,13 @@ public class TQDirectoryTest {
 		secBoardParamsMock = control.createMock(OSCRepository.class);
 		secQuotsMock = control.createMock(OSCRepository.class);
 		clientsMock = control.createMock(OSCRepository.class);
+		moneyPositionsMock = control.createMock(OSCRepository.class);
+		secPositionsMock = control.createMock(OSCRepository.class);
+		fortsMoneyMock = control.createMock(OSCRepository.class);
+		fortsPositionsMock = control.createMock(OSCRepository.class);
+		fortsCollateralsMock = control.createMock(OSCRepository.class);
+		spotLimitsMock = control.createMock(OSCRepository.class);
+		unitedLimitsMock = control.createMock(OSCRepository.class);
 		conStatMock = control.createMock(ConnectionStatus.class);
 		duMock = control.createMock(DeltaUpdate.class);
 		ckinds = new OSCRepositoryImpl<>(new CKindFactory(queue), "XXX");
@@ -70,6 +98,13 @@ public class TQDirectoryTest {
 		secBoardParams = new OSCRepositoryImpl<>(new SecurityBoardParamsFactory(queue), "XXX");
 		secQuots = new OSCRepositoryImpl<>(new SecurityQuotationsFactory(queue), "XXX");
 		clients = new OSCRepositoryImpl<>(new ClientFactory(queue), "XXX");
+		moneyPositions = new OSCRepositoryImpl<>(new MoneyPositionFactory(queue), "XXX");
+		secPositions = new OSCRepositoryImpl<>(new SecPositionFactory(queue), "XXX");
+		fortsMoney = new OSCRepositoryImpl<>(new FortsMoneyFactory(queue), "XXX");
+		fortsPositions = new OSCRepositoryImpl<>(new FortsPositionFactory(queue), "XXX");
+		fortsCollaterals = new OSCRepositoryImpl<>(new FortsCollateralsFactory(queue), "XXX");
+		spotLimits = new OSCRepositoryImpl<>(new SpotLimitsFactory(queue), "XXX");
+		unitedLimits = new OSCRepositoryImpl<>(new UnitedLimitsFactory(queue), "XXX");
 		conStat = new ConnectionStatus(queue, "XXX");
 		tq2gidMap = new LinkedHashMap<>();
 		gid2tqMap = new LinkedHashMap<>();
@@ -81,6 +116,13 @@ public class TQDirectoryTest {
 				secBoardParamsMock,
 				secQuotsMock,
 				clientsMock,
+				moneyPositionsMock,
+				secPositionsMock,
+				fortsMoneyMock,
+				fortsPositionsMock,
+				fortsCollateralsMock,
+				spotLimitsMock,
+				unitedLimitsMock,
 				conStatMock,
 				tq2gidMap,
 				gid2tqMap
@@ -143,6 +185,13 @@ public class TQDirectoryTest {
 				secBoardParams,
 				secQuots,
 				clients,
+				moneyPositions,
+				secPositions,
+				fortsMoney,
+				fortsPositions,
+				fortsCollaterals,
+				spotLimits,
+				unitedLimits,
 				conStat,
 				tq2gidMap,
 				gid2tqMap);
@@ -178,6 +227,13 @@ public class TQDirectoryTest {
 				secBoardParams,
 				secQuots,
 				clients,
+				moneyPositions,
+				secPositions,
+				fortsMoney,
+				fortsPositions,
+				fortsCollaterals,
+				spotLimits,
+				unitedLimits,
 				conStat,
 				tq2gidMap,
 				gid2tqMap);
@@ -213,6 +269,13 @@ public class TQDirectoryTest {
 				secBoardParams,
 				secQuots,
 				clients,
+				moneyPositions,
+				secPositions,
+				fortsMoney,
+				fortsPositions,
+				fortsCollaterals,
+				spotLimits,
+				unitedLimits,
 				conStat,
 				tq2gidMap,
 				gid2tqMap);
@@ -269,6 +332,13 @@ public class TQDirectoryTest {
 				secBoardParamsMock,
 				secQuots,
 				clients,
+				moneyPositions,
+				secPositions,
+				fortsMoney,
+				fortsPositions,
+				fortsCollaterals,
+				spotLimits,
+				unitedLimits,
 				conStat,
 				tq2gidMap,
 				gid2tqMap);
@@ -289,6 +359,13 @@ public class TQDirectoryTest {
 				secBoardParamsMock,
 				secQuots,
 				clients,
+				moneyPositions,
+				secPositions,
+				fortsMoney,
+				fortsPositions,
+				fortsCollaterals,
+				spotLimits,
+				unitedLimits,
 				conStat,
 				tq2gidMap,
 				gid2tqMap);
@@ -316,6 +393,13 @@ public class TQDirectoryTest {
 				secBoardParamsMock,
 				secQuots,
 				clients,
+				moneyPositions,
+				secPositions,
+				fortsMoney,
+				fortsPositions,
+				fortsCollaterals,
+				spotLimits,
+				unitedLimits,
 				conStat,
 				tq2gidMap,
 				gid2tqMap);
@@ -378,6 +462,13 @@ public class TQDirectoryTest {
 				secBoardParams,
 				secQuotsMock,
 				clients,
+				moneyPositions,
+				secPositions,
+				fortsMoney,
+				fortsPositions,
+				fortsCollaterals,
+				spotLimits,
+				unitedLimits,
 				conStat,
 				tq2gidMap,
 				gid2tqMap);
@@ -412,6 +503,13 @@ public class TQDirectoryTest {
 				secBoardParams,
 				secQuots,
 				clientsMock,
+				moneyPositions,
+				secPositions,
+				fortsMoney,
+				fortsPositions,
+				fortsCollaterals,
+				spotLimits,
+				unitedLimits,
 				conStat,
 				tq2gidMap,
 				gid2tqMap);
@@ -421,6 +519,97 @@ public class TQDirectoryTest {
 		control.replay();
 		
 		Client actual = service.updateClient(new TQStateUpdate<>("XXX-2495", duMock));
+		
+		control.verify();
+		assertSame(entityMock, actual);
+	}
+	
+	@Test
+	public void testUpdateMoneyPosition() {
+		MoneyPosition entityMock = control.createMock(MoneyPosition.class);
+		expect(moneyPositionsMock.getOrCreate(new ID.MP("suse", "FUND", "TX"))).andReturn(entityMock);
+		entityMock.consume(duMock);
+		control.replay();
+		
+		MoneyPosition actual = service.updateMoneyPosition(new TQStateUpdate<>(new ID.MP("suse", "FUND", "TX"),duMock));
+		
+		control.verify();
+		assertSame(entityMock, actual);
+	}
+	
+	@Test
+	public void testUpdateSecPosition() {
+		SecPosition entityMock = control.createMock(SecPosition.class);
+		expect(secPositionsMock.getOrCreate(new ID.SP("foo", "RIH0", 4, null))).andReturn(entityMock);
+		entityMock.consume(duMock);
+		control.replay();
+		
+		SecPosition actual = service.updateSecPosition(new TQStateUpdate<>(new ID.SP("foo", "RIH0", 4, null), duMock));
+		
+		control.verify();
+		assertSame(entityMock, actual);
+	}
+	
+	@Test
+	public void testUpdateFortsMoney() {
+		FortsMoney entityMock = control.createMock(FortsMoney.class);
+		expect(fortsMoneyMock.getOrCreate(new ID.FM("zuzu25"))).andReturn(entityMock);
+		entityMock.consume(duMock);
+		control.replay();
+		
+		FortsMoney actual = service.updateFortsMoney(new TQStateUpdate<>(new ID.FM("zuzu25"), duMock));
+		
+		control.verify();
+		assertSame(entityMock, actual);
+	}
+	
+	@Test
+	public void testUpdateFortsPosition() {
+		FortsPosition entityMock = control.createMock(FortsPosition.class);
+		expect(fortsPositionsMock.getOrCreate(new ID.FP("zoo", "RIH0", toSet(4, 7)))).andReturn(entityMock);
+		entityMock.consume(duMock);
+		control.replay();
+		
+		FortsPosition actual = service.updateFortsPosition(new TQStateUpdate<>(new ID.FP("zoo", "RIH0", toSet(4, 7)), duMock));
+		
+		control.verify();
+		assertSame(entityMock, actual);
+	}
+	
+	@Test
+	public void testUpdateFortsCollaterals() {
+		FortsCollaterals entityMock = control.createMock(FortsCollaterals.class);
+		expect(fortsCollateralsMock.getOrCreate(new ID.FC("cookie", toSet(4)))).andReturn(entityMock);
+		entityMock.consume(duMock);
+		control.replay();
+		
+		FortsCollaterals actual = service.updateFortsCollaterals(new TQStateUpdate<>(new ID.FC("cookie", toSet(4)), duMock));
+		
+		control.verify();
+		assertSame(entityMock, actual);
+	}
+	
+	@Test
+	public void testUpdateSpotLimits() {
+		SpotLimits entityMock = control.createMock(SpotLimits.class);
+		expect(spotLimitsMock.getOrCreate(new ID.SL("foo", toSet(14, 15)))).andReturn(entityMock);
+		entityMock.consume(duMock);
+		control.replay();
+		
+		SpotLimits actual = service.updateSpotLimits(new TQStateUpdate<>(new ID.SL("foo", toSet(14, 15)), duMock));
+		
+		control.verify();
+		assertSame(entityMock, actual);
+	}
+	
+	@Test
+	public void testUpdateUnitedLimits() {
+		UnitedLimits entityMock = control.createMock(UnitedLimits.class);
+		expect(unitedLimitsMock.getOrCreate(new ID.UL("gabba"))).andReturn(entityMock);
+		entityMock.consume(duMock);
+		control.replay();
+		
+		UnitedLimits actual = service.updateUnitedLimits(new TQStateUpdate<>(new ID.UL("gabba"), duMock));
 		
 		control.verify();
 		assertSame(entityMock, actual);
@@ -509,6 +698,76 @@ public class TQDirectoryTest {
 	}
 	
 	@Test
+	public void testGetMoneyPositionRepository() {
+		OSCRepository<ID.MP, MoneyPosition> actual = service.getMoneyPositionRepository();
+		
+		assertNotNull(actual);
+		assertNotSame(moneyPositionsMock, actual);
+		assertEquals(OSCRepositoryDecoratorRO.class, actual.getClass());
+		assertSame(moneyPositionsMock, ((OSCRepositoryDecoratorRO) actual).getDecoratedRepository());
+	}
+	
+	@Test
+	public void testGetSecPositionRepository() {
+		OSCRepository<ID.SP, SecPosition> actual = service.getSecPositionRepository();
+		
+		assertNotNull(actual);
+		assertNotSame(secPositionsMock, actual);
+		assertEquals(OSCRepositoryDecoratorRO.class, actual.getClass());
+		assertSame(secPositionsMock, ((OSCRepositoryDecoratorRO) actual).getDecoratedRepository());
+	}
+	
+	@Test
+	public void testGetFortsMoneyRepository() {
+		OSCRepository<ID.FM, FortsMoney> actual = service.getFortsMoneyRepository();
+		
+		assertNotNull(actual);
+		assertNotSame(fortsMoneyMock, actual);
+		assertEquals(OSCRepositoryDecoratorRO.class, actual.getClass());
+		assertSame(fortsMoneyMock, ((OSCRepositoryDecoratorRO) actual).getDecoratedRepository());
+	}
+	
+	@Test
+	public void testGetFortsPositionRepository() {
+		OSCRepository<ID.FP, FortsPosition> actual = service.getFortsPositionRepository();
+		
+		assertNotNull(actual);
+		assertNotSame(fortsPositionsMock, actual);
+		assertEquals(OSCRepositoryDecoratorRO.class, actual.getClass());
+		assertSame(fortsPositionsMock, ((OSCRepositoryDecoratorRO) actual).getDecoratedRepository());
+	}
+	
+	@Test
+	public void testGetFortsCollateralsRepository() {
+		OSCRepository<ID.FC, FortsCollaterals> actual = service.getFortsCollateralsRepository();
+		
+		assertNotNull(actual);
+		assertNotSame(fortsCollateralsMock, actual);
+		assertEquals(OSCRepositoryDecoratorRO.class, actual.getClass());
+		assertSame(fortsCollateralsMock, ((OSCRepositoryDecoratorRO) actual).getDecoratedRepository());
+	}
+	
+	@Test
+	public void testGetSpotLimitsRepository() {
+		OSCRepository<ID.SL, SpotLimits> actual = service.getSpotLimitsRepository();
+		
+		assertNotNull(actual);
+		assertNotSame(spotLimitsMock, actual);
+		assertEquals(OSCRepositoryDecoratorRO.class, actual.getClass());
+		assertSame(spotLimitsMock, ((OSCRepositoryDecoratorRO) actual).getDecoratedRepository());
+	}
+	
+	@Test
+	public void testGetUnitedLimitsRepository() {
+		OSCRepository<ID.UL, UnitedLimits> actual = service.getUnitedLimitsRepository();
+		
+		assertNotNull(actual);
+		assertNotSame(unitedLimitsMock, actual);
+		assertEquals(OSCRepositoryDecoratorRO.class, actual.getClass());
+		assertSame(unitedLimitsMock, ((OSCRepositoryDecoratorRO) actual).getDecoratedRepository());
+	}
+	
+	@Test
 	public void testIsExistsSecurityParams_SecIDG() {
 		service = new TQDirectory(
 				ckinds,
@@ -518,6 +777,13 @@ public class TQDirectoryTest {
 				secBoardParams,
 				secQuots,
 				clients,
+				moneyPositions,
+				secPositions,
+				fortsMoney,
+				fortsPositions,
+				fortsCollaterals,
+				spotLimits,
+				unitedLimits,
 				conStat,
 				tq2gidMap,
 				gid2tqMap);
@@ -552,6 +818,13 @@ public class TQDirectoryTest {
 				secBoardParams,
 				secQuots,
 				clients,
+				moneyPositions,
+				secPositions,
+				fortsMoney,
+				fortsPositions,
+				fortsCollaterals,
+				spotLimits,
+				unitedLimits,
 				conStat,
 				tq2gidMap,
 				gid2tqMap);
@@ -730,6 +1003,13 @@ public class TQDirectoryTest {
 				secBoardParamsMock,
 				secQuots,
 				clients,
+				moneyPositions,
+				secPositions,
+				fortsMoney,
+				fortsPositions,
+				fortsCollaterals,
+				spotLimits,
+				unitedLimits,
 				conStat,
 				tq2gidMap,
 				gid2tqMap);
@@ -755,6 +1035,13 @@ public class TQDirectoryTest {
 				secBoardParams,
 				secQuotsMock,
 				clients,
+				moneyPositions,
+				secPositions,
+				fortsMoney,
+				fortsPositions,
+				fortsCollaterals,
+				spotLimits,
+				unitedLimits,
 				conStat,
 				tq2gidMap,
 				gid2tqMap);
@@ -780,6 +1067,13 @@ public class TQDirectoryTest {
 				secBoardParams,
 				secQuots,
 				clients,
+				moneyPositions,
+				secPositions,
+				fortsMoney,
+				fortsPositions,
+				fortsCollaterals,
+				spotLimits,
+				unitedLimits,
 				conStat,
 				tq2gidMap,
 				gid2tqMap);
