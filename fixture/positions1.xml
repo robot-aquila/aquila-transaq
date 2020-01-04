@@ -1,0 +1,19 @@
+<positions>
+	<money_position>
+		<client>1RXXX/1RXXX</client>
+		<union>KASUM-1234</union>
+		<markets>
+			<market>1</market>
+		</markets>
+		<asset>FOND_MICEX</asset>
+		<shortname>Деньги КЦБ ММВБ (RUR)</shortname>
+		<register>T0</register>
+		<saldoin>990196.7</saldoin>
+		<bought>0.1</bought>
+		<sold>0.2</sold>
+		<saldo>990196.7</saldo>
+		<ordbuy>0.3</ordbuy>
+		<ordbuycond>0.4</ordbuycond>
+		<comission>0.5</comission>
+	</money_position>
+</positions>

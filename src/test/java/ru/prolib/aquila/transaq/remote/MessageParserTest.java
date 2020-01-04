@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -35,6 +36,13 @@ import ru.prolib.aquila.transaq.impl.TQStateUpdate;
 import ru.prolib.aquila.transaq.remote.TQSecIDT;
 import ru.prolib.aquila.transaq.remote.entity.Quote;
 import ru.prolib.aquila.transaq.remote.entity.ServerStatus;
+import ru.prolib.aquila.transaq.remote.MessageFields.Positions.FFortsCollaterals;
+import ru.prolib.aquila.transaq.remote.MessageFields.Positions.FFortsMoney;
+import ru.prolib.aquila.transaq.remote.MessageFields.Positions.FFortsPosition;
+import ru.prolib.aquila.transaq.remote.MessageFields.Positions.FMoneyPosition;
+import ru.prolib.aquila.transaq.remote.MessageFields.Positions.FSecPosition;
+import ru.prolib.aquila.transaq.remote.MessageFields.Positions.FSpotLimits;
+import ru.prolib.aquila.transaq.remote.MessageFields.Positions.FUnitedLimits;
 import ru.prolib.aquila.transaq.remote.MessageParser;
 import ru.prolib.aquila.transaq.remote.TQSecIDF;
 import ru.prolib.aquila.transaq.remote.TQSecIDG;
@@ -60,6 +68,18 @@ public class MessageParserTest {
 		EVENT_TYPE_MAP.put(XMLStreamReader.START_ELEMENT, "START_ELEMENT");
 	}
 	
+	static List<Integer> toList(Integer... value) {
+		List<Integer> r = new ArrayList<>();
+		for ( Integer i : value ) {
+			r.add(i);
+		}
+		return r;
+	}
+	
+	static Set<Integer> toSet(Integer... value) {
+		return new HashSet<>(toList(value));
+	}
+	
 	private static XMLInputFactory factory;
 	
 	private String getEventTypeString(int event_type) {
@@ -69,7 +89,7 @@ public class MessageParserTest {
 		}
 		throw new IllegalArgumentException("Unknown event type: " + event_type);
 	}
-
+	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		BasicConfigurator.resetConfiguration();
@@ -1146,6 +1166,141 @@ public class MessageParserTest {
 				.buildUpdate());
 		assertEquals(expected, actual);
 		checkIsElementEnd(sr, element);
+	}
+	
+	@Test
+	public void testReadPositions_Case1() throws Exception {
+		XMLStreamReader sr = startReader("fixture/positions1.xml", "positions");
+		List<TQStateUpdate<? extends ID>> actual = service.readPositions(sr);
+		sr.close();
+		
+		List<TQStateUpdate<? extends ID>> expected = new ArrayList<>();
+		expected.add(new TQStateUpdate<>(new ID.MP("1RXXX/1RXXX", "FOND_MICEX", "T0"), new DeltaUpdateBuilder()
+				.withToken(FMoneyPosition.CLIENT_ID, "1RXXX/1RXXX")
+				.withToken(FMoneyPosition.UNION_CODE, "KASUM-1234")
+				.withToken(FMoneyPosition.MARKETS, toList(1))
+				.withToken(FMoneyPosition.ASSET, "FOND_MICEX")
+				.withToken(FMoneyPosition.SHORT_NAME, "Деньги КЦБ ММВБ (RUR)")
+				.withToken(FMoneyPosition.REGISTER, "T0")
+				.withToken(FMoneyPosition.SALDO_IN, of("990196.7"))
+				.withToken(FMoneyPosition.BOUGHT, of("0.1"))
+				.withToken(FMoneyPosition.SOLD, of("0.2"))
+				.withToken(FMoneyPosition.SALDO, of("990196.7"))
+				.withToken(FMoneyPosition.ORD_BUY, of("0.3"))
+				.withToken(FMoneyPosition.ORB_BUY_COND, of("0.4"))
+				.withToken(FMoneyPosition.COMISSION, of("0.5"))
+				.buildUpdate()));
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	public void testReadPositions_Case2() throws Exception {
+		XMLStreamReader sr = startReader("fixture/positions2.xml", "positions");
+		List<TQStateUpdate<? extends ID>> actual = service.readPositions(sr);
+		sr.close();
+		
+		List<TQStateUpdate<? extends ID>> expected = new ArrayList<>();
+		expected.add(new TQStateUpdate<>(new ID.MP("COOKIE", "FOND_MOEX", "T1"), new DeltaUpdateBuilder()
+				.withToken(FMoneyPosition.MARKETS, toList(1, 5))
+				.withToken(FMoneyPosition.REGISTER, "T1")
+				.withToken(FMoneyPosition.ASSET, "FOND_MOEX")
+				.withToken(FMoneyPosition.CLIENT_ID, "COOKIE")
+				.withToken(FMoneyPosition.UNION_CODE, "UNITED-COOKIE")
+				.withToken(FMoneyPosition.SHORT_NAME, "My money")
+				.withToken(FMoneyPosition.SALDO_IN, of("1000.0"))
+				.withToken(FMoneyPosition.BOUGHT, of("100.0"))
+				.withToken(FMoneyPosition.SOLD, of("25.0"))
+				.withToken(FMoneyPosition.SALDO, of("950.0"))
+				.withToken(FMoneyPosition.ORD_BUY, of("10.05"))
+				.withToken(FMoneyPosition.ORB_BUY_COND, of("5.13"))
+				.withToken(FMoneyPosition.COMISSION, of("4.1"))
+				.buildUpdate()));
+		expected.add(new TQStateUpdate<>(new ID.SP("COOKIE", "GAZP", 1, "T1"), new DeltaUpdateBuilder()
+				.withToken(FSecPosition.SEC_ID, 52013)
+				.withToken(FSecPosition.MARKET_ID, 1)
+				.withToken(FSecPosition.SEC_CODE, "GAZP")
+				.withToken(FSecPosition.REGISTER, "T1")
+				.withToken(FSecPosition.CLIENT_ID, "COOKIE")
+				.withToken(FSecPosition.UNION_CODE, "UNITED-COOKIE")
+				.withToken(FSecPosition.SHORT_NAME, "Газпром АО")
+				.withToken(FSecPosition.SALDO_IN, of(5L))
+				.withToken(FSecPosition.SALDO_MIN, of(1L))
+				.withToken(FSecPosition.BOUGHT, of(3L))
+				.withToken(FSecPosition.SOLD, of(9L))
+				.withToken(FSecPosition.SALDO, of(4L))
+				.withToken(FSecPosition.ORD_BUY, of(7L))
+				.withToken(FSecPosition.ORD_SELL, of(8L))
+				.withToken(FSecPosition.AMOUNT, of("205.12"))
+				.withToken(FSecPosition.EQUITY, of("46.24"))
+				.buildUpdate()));
+		expected.add(new TQStateUpdate<>(new ID.FP("COOKIE", "RIH0", toSet(4, 8)), new DeltaUpdateBuilder()
+				.withToken(FFortsPosition.SEC_ID, 44412)
+				.withToken(FFortsPosition.MARKETS, toList(4, 8))
+				.withToken(FFortsPosition.SEC_CODE, "RIH0")
+				.withToken(FFortsPosition.CLIENT_ID, "COOKIE")
+				.withToken(FFortsPosition.UNION_CODE, "UNITED-COOKIE")
+				.withToken(FFortsPosition.START_NET, of(15L))
+				.withToken(FFortsPosition.OPEN_BUYS, of(10L))
+				.withToken(FFortsPosition.OPEN_SELLS, of(4L))
+				.withToken(FFortsPosition.TOTAL_NET, of(84L))
+				.withToken(FFortsPosition.TODAY_BUY, of(27L))
+				.withToken(FFortsPosition.TODAY_SELL, of(19L))
+				.withToken(FFortsPosition.OPT_MARGIN, of("115.23"))
+				.withToken(FFortsPosition.VAR_MARGIN, of("295.1"))
+				.withToken(FFortsPosition.EXPIRATION_POS, of(77681L))
+				.withToken(FFortsPosition.USED_SELL_SPOT_LIMIT, of("54.26"))
+				.withToken(FFortsPosition.SELL_SPOT_LIMIT, of("200.0"))
+				.withToken(FFortsPosition.NETTO, of("2.15"))
+				.withToken(FFortsPosition.KGO, of("0.05"))
+				.buildUpdate()));
+		expected.add(new TQStateUpdate<>(new ID.FM("COOKIE"), new DeltaUpdateBuilder()
+				.withToken(FFortsMoney.CLIENT_ID, "COOKIE")
+				.withToken(FFortsMoney.UNION_CODE, "UNITED-COOKIE")
+				.withToken(FFortsMoney.MARKETS, toList(4, 6))
+				.withToken(FFortsMoney.SHORT_NAME, "does not matter (part 1)")
+				.withToken(FFortsMoney.CURRENT, of("280.8"))
+				.withToken(FFortsMoney.BLOCKED, of("54.23"))
+				.withToken(FFortsMoney.FREE, of("97.14"))
+				.withToken(FFortsMoney.VAR_MARGIN, of("7176.2"))
+				.buildUpdate()));
+		expected.add(new TQStateUpdate<>(new ID.FC("COOKIE", toSet(9, 3)), new DeltaUpdateBuilder()
+				.withToken(FFortsCollaterals.CLIENT_ID, "COOKIE")
+				.withToken(FFortsCollaterals.UNION_CODE, "UNITED-COOKIE")
+				.withToken(FFortsCollaterals.MARKETS, toList(9, 3))
+				.withToken(FFortsCollaterals.SHORT_NAME, "does not matter (part 2)")
+				.withToken(FFortsCollaterals.CURRENT, of("761.2"))
+				.withToken(FFortsCollaterals.BLOCKED, of("872.1"))
+				.withToken(FFortsCollaterals.FREE, of("581.72"))
+				.buildUpdate()));
+		expected.add(new TQStateUpdate<>(new ID.SL("COOKIE", toSet(14, 15)), new DeltaUpdateBuilder()
+				.withToken(FSpotLimits.CLIENT_ID, "COOKIE")
+				.withToken(FSpotLimits.UNION_CODE, "UNITED-COOKIE")
+				.withToken(FSpotLimits.MARKETS, toList(14, 15))
+				.withToken(FSpotLimits.SHORT_NAME, "does not matter (part 3)")
+				.withToken(FSpotLimits.BUY_LIMIT, of("751.2"))
+				.withToken(FSpotLimits.BUY_LIMIT_USED, of("1.54"))
+				.buildUpdate()));
+		expected.add(new TQStateUpdate<>(new ID.UL("KASUM-1234"), new DeltaUpdateBuilder()
+				.withToken(FUnitedLimits.UNION_CODE, "KASUM-1234")
+				.withToken(FUnitedLimits.OPEN_EQUITY, of("990196.70"))
+				.withToken(FUnitedLimits.EQUITY, of("12651.61"))
+				.withToken(FUnitedLimits.REQUIREMENTS, of("8135.1"))
+				.withToken(FUnitedLimits.FREE, of("33561.12"))
+				.withToken(FUnitedLimits.VAR_MARGIN, of("150.00"))
+				.withToken(FUnitedLimits.FIN_RES, of("245416.89"))
+				.withToken(FUnitedLimits.GO, of("0.02"))
+				.buildUpdate()));
+		expected.add(new TQStateUpdate<>(new ID.FM("pepiz86"), new DeltaUpdateBuilder()
+				.withToken(FFortsMoney.CLIENT_ID, "pepiz86")
+				.withToken(FFortsMoney.UNION_CODE, "KASUM-1234")
+				.withToken(FFortsMoney.CURRENT, of("990196.70"))
+				.withToken(FFortsMoney.FREE, of("990196.70"))
+				.buildUpdate()));
+		
+		for ( int i = 0; i < expected.size(); i ++ ) {
+			assertEquals("At#" + i, expected.get(i), actual.get(i));
+		}
+		assertEquals(expected.size(), actual.size());
 	}
 
 }

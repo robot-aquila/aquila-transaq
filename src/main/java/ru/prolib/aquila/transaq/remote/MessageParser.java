@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
@@ -28,6 +29,13 @@ import ru.prolib.aquila.transaq.remote.MessageFields.FQuotation;
 import ru.prolib.aquila.transaq.remote.MessageFields.FSecurity;
 import ru.prolib.aquila.transaq.remote.MessageFields.FSecurityBoard;
 import ru.prolib.aquila.transaq.remote.MessageFields.FTrade;
+import ru.prolib.aquila.transaq.remote.MessageFields.Positions.FFortsCollaterals;
+import ru.prolib.aquila.transaq.remote.MessageFields.Positions.FFortsMoney;
+import ru.prolib.aquila.transaq.remote.MessageFields.Positions.FFortsPosition;
+import ru.prolib.aquila.transaq.remote.MessageFields.Positions.FMoneyPosition;
+import ru.prolib.aquila.transaq.remote.MessageFields.Positions.FSecPosition;
+import ru.prolib.aquila.transaq.remote.MessageFields.Positions.FSpotLimits;
+import ru.prolib.aquila.transaq.remote.MessageFields.Positions.FUnitedLimits;
 import ru.prolib.aquila.transaq.remote.entity.Quote;
 import ru.prolib.aquila.transaq.remote.entity.ServerStatus;
 
@@ -164,6 +172,26 @@ public class MessageParser {
 			return LocalDateTime.parse(str_date, DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss.SSS"));
 		}
 		return LocalDateTime.parse(str_date,DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
+	}
+	
+	private List<Integer> readIntList(XMLStreamReader reader, String elem_tag_name) throws XMLStreamException {
+		List<Integer> result = new ArrayList<>();
+		String start_tag_name = reader.getLocalName();
+		while ( reader.hasNext() ) {
+        	switch ( reader.next() ) {
+        	case XMLStreamReader.START_ELEMENT:
+				if ( reader.getLocalName().equals(elem_tag_name) ) {
+					result.add(readInt(reader));
+				}
+				break;
+        	case XMLStreamReader.END_ELEMENT:
+				if ( reader.getLocalName().equals(start_tag_name) ) {
+					return result;
+				}
+				break;
+        	}
+		}
+		throw new XMLStreamException("Premature end of file");
 	}
 	
 	private TQStateUpdate<Integer> readMarket(XMLStreamReader reader) throws XMLStreamException {
@@ -1061,6 +1089,434 @@ public class MessageParser {
 		throw new XMLStreamException("Premature end of file");
 	}
 	
+	private TQStateUpdate<ID.MP> readMoneyPosition(XMLStreamReader reader) throws XMLStreamException {
+		String client_id = null, asset = null, register = null;
+		DeltaUpdateBuilder builder = new DeltaUpdateBuilder();
+		while ( reader.hasNext() ) {
+			switch ( reader.next() ) {
+			case XMLStreamReader.START_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "client":
+					builder.withToken(FMoneyPosition.CLIENT_ID, client_id = readCharacters(reader));
+					break;
+				case "union":
+					builder.withToken(FMoneyPosition.UNION_CODE, readCharacters(reader));
+					break;
+				case "markets":
+					builder.withToken(FMoneyPosition.MARKETS, readIntList(reader, "market"));
+					break;
+				case "asset":
+					builder.withToken(FMoneyPosition.ASSET, asset = readCharacters(reader));
+					break;
+				case "shortname":
+					builder.withToken(FMoneyPosition.SHORT_NAME, readCharacters(reader));
+					break;
+				case "register":
+					builder.withToken(FMoneyPosition.REGISTER, register = readCharacters(reader));
+					break;
+				case "saldoin":
+					builder.withToken(FMoneyPosition.SALDO_IN, readDecimal(reader));
+					break;
+				case "bought":
+					builder.withToken(FMoneyPosition.BOUGHT, readDecimal(reader));
+					break;
+				case "sold":
+					builder.withToken(FMoneyPosition.SOLD, readDecimal(reader));
+					break;
+				case "saldo":
+					builder.withToken(FMoneyPosition.SALDO, readDecimal(reader));
+					break;
+				case "ordbuy":
+					builder.withToken(FMoneyPosition.ORD_BUY, readDecimal(reader));
+					break;
+				case "ordbuycond":
+					builder.withToken(FMoneyPosition.ORB_BUY_COND, readDecimal(reader));
+					break;
+				case "comission":
+					builder.withToken(FMoneyPosition.COMISSION, readDecimal(reader));
+					break;
+				}
+				break;
+			case XMLStreamReader.END_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "money_position":
+					checkNotNull(client_id, "client");
+					checkNotNull(asset, "asset");
+					return new TQStateUpdate<>(new ID.MP(client_id, asset, register), builder.buildUpdate());
+				}
+				break;
+			}
+		}
+		throw new XMLStreamException("Premature end of file");
+	}
 	
+	private TQStateUpdate<ID.SP> readSecPosition(XMLStreamReader reader) throws XMLStreamException {
+		String client_id = null, sec_code = null, register = null;
+		Integer market_id = null;
+		DeltaUpdateBuilder builder = new DeltaUpdateBuilder();
+		while ( reader.hasNext() ) {
+			switch ( reader.next() ) {
+			case XMLStreamReader.START_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "secid":
+					builder.withToken(FSecPosition.SEC_ID, readInt(reader));
+					break;
+				case "market":
+					builder.withToken(FSecPosition.MARKET_ID, market_id = readInt(reader));
+					break;
+				case "seccode":
+					builder.withToken(FSecPosition.SEC_CODE, sec_code = readCharacters(reader));
+					break;
+				case "register":
+					builder.withToken(FSecPosition.REGISTER, register = readCharacters(reader));
+					break;
+				case "client":
+					builder.withToken(FSecPosition.CLIENT_ID, client_id = readCharacters(reader));
+					break;
+				case "union":
+					builder.withToken(FSecPosition.UNION_CODE, readCharacters(reader));
+					break;
+				case "shortname":
+					builder.withToken(FSecPosition.SHORT_NAME, readCharacters(reader));
+					break;
+				case "saldoin":
+					builder.withToken(FSecPosition.SALDO_IN, readDecimal(reader));
+					break;
+				case "saldomin":
+					builder.withToken(FSecPosition.SALDO_MIN, readDecimal(reader));
+					break;
+				case "bought":
+					builder.withToken(FSecPosition.BOUGHT, readDecimal(reader));
+					break;
+				case "sold":
+					builder.withToken(FSecPosition.SOLD, readDecimal(reader));
+					break;
+				case "saldo":
+					builder.withToken(FSecPosition.SALDO, readDecimal(reader));
+					break;
+				case "ordbuy":
+					builder.withToken(FSecPosition.ORD_BUY, readDecimal(reader));
+					break;
+				case "ordsell":
+					builder.withToken(FSecPosition.ORD_SELL, readDecimal(reader));
+					break;
+				case "amount":
+					builder.withToken(FSecPosition.AMOUNT, readDecimal(reader));
+					break;
+				case "equity":
+					builder.withToken(FSecPosition.EQUITY, readDecimal(reader));
+					break;
+				}
+				break;
+			case XMLStreamReader.END_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "sec_position":
+					checkNotNull(client_id, "client");
+					checkNotNull(sec_code, "seccode");
+					checkNotNull(market_id, "market");
+					return new TQStateUpdate<>(new ID.SP(client_id, sec_code, market_id, register), builder.buildUpdate());
+				}
+				break;
+			}
+		}
+		throw new XMLStreamException("Premature end of file");
+	}
+	
+	private TQStateUpdate<ID.FP> readFortsPosition(XMLStreamReader reader) throws XMLStreamException {
+		String client_id = null, sec_code = null;
+		List<Integer> markets = null;
+		DeltaUpdateBuilder builder = new DeltaUpdateBuilder();
+		while ( reader.hasNext() ) {
+			switch ( reader.next() ) {
+			case XMLStreamReader.START_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "secid":
+					builder.withToken(FFortsPosition.SEC_ID, readInt(reader));
+					break;
+				case "markets":
+					builder.withToken(FFortsPosition.MARKETS, markets = readIntList(reader, "market"));
+					break;
+				case "seccode":
+					builder.withToken(FFortsPosition.SEC_CODE, sec_code = readCharacters(reader));
+					break;
+				case "client":
+					builder.withToken(FFortsPosition.CLIENT_ID, client_id = readCharacters(reader));
+					break;
+				case "union":
+					builder.withToken(FFortsPosition.UNION_CODE, readCharacters(reader));
+					break;
+				case "startnet":
+					builder.withToken(FFortsPosition.START_NET, readDecimal(reader));
+					break;
+				case "openbuys":
+					builder.withToken(FFortsPosition.OPEN_BUYS, readDecimal(reader));
+					break;
+				case "opensells":
+					builder.withToken(FFortsPosition.OPEN_SELLS, readDecimal(reader));
+					break;
+				case "totalnet":
+					builder.withToken(FFortsPosition.TOTAL_NET, readDecimal(reader));
+					break;
+				case "todaybuy":
+					builder.withToken(FFortsPosition.TODAY_BUY, readDecimal(reader));
+					break;
+				case "todaysell":
+					builder.withToken(FFortsPosition.TODAY_SELL, readDecimal(reader));
+					break;
+				case "optmargin":
+					builder.withToken(FFortsPosition.OPT_MARGIN, readDecimal(reader));
+					break;
+				case "varmargin":
+					builder.withToken(FFortsPosition.VAR_MARGIN, readDecimal(reader));
+					break;
+				case "expirationpos":
+					builder.withToken(FFortsPosition.EXPIRATION_POS, readDecimal(reader));
+					break;
+				case "usedsellspotlimit":
+					builder.withToken(FFortsPosition.USED_SELL_SPOT_LIMIT, readDecimal(reader));
+					break;
+				case "sellspotlimit":
+					builder.withToken(FFortsPosition.SELL_SPOT_LIMIT, readDecimal(reader));
+					break;
+				case "netto":
+					builder.withToken(FFortsPosition.NETTO, readDecimal(reader));
+					break;
+				case "kgo":
+					builder.withToken(FFortsPosition.KGO, readDecimal(reader));
+					break;
+				}
+				break;
+			case XMLStreamReader.END_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "forts_position":
+					checkNotNull(client_id, "client");
+					checkNotNull(sec_code, "seccode");
+					checkNotNull(markets, "markets");
+					return new TQStateUpdate<>(new ID.FP(client_id, sec_code, new HashSet<>(markets)), builder.buildUpdate());
+				}
+				break;
+			}
+		}
+		throw new XMLStreamException("Premature end of file");
+	}
+	
+	private TQStateUpdate<ID.FM> readFortsMoney(XMLStreamReader reader) throws XMLStreamException {
+		String client_id = null;
+		DeltaUpdateBuilder builder = new DeltaUpdateBuilder();
+		while ( reader.hasNext() ) {
+			switch ( reader.next() ) {
+			case XMLStreamReader.START_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "client":
+					builder.withToken(FFortsMoney.CLIENT_ID, client_id = readCharacters(reader));
+					break;
+				case "union":
+					builder.withToken(FFortsMoney.UNION_CODE, readCharacters(reader));
+					break;
+				case "markets":
+					builder.withToken(FFortsMoney.MARKETS, readIntList(reader, "market"));
+					break;
+				case "shortname":
+					builder.withToken(FFortsMoney.SHORT_NAME, readCharacters(reader));
+					break;
+				case "current":
+					builder.withToken(FFortsMoney.CURRENT, readDecimal(reader));
+					break;
+				case "blocked":
+					builder.withToken(FFortsMoney.BLOCKED, readDecimal(reader));
+					break;
+				case "free":
+					builder.withToken(FFortsMoney.FREE, readDecimal(reader));
+					break;
+				case "varmargin":
+					builder.withToken(FFortsMoney.VAR_MARGIN, readDecimal(reader));
+					break;
+				}
+				break;
+			case XMLStreamReader.END_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "forts_money":
+					checkNotNull(client_id, "client");
+					return new TQStateUpdate<>(new ID.FM(client_id), builder.buildUpdate());
+				}
+				break;
+			}
+		}
+		throw new XMLStreamException("Premature end of file");
+	}
+	
+	private TQStateUpdate<ID.FC> readFortsCollaterals(XMLStreamReader reader) throws XMLStreamException {
+		String client_id = null;
+		List<Integer> markets = null;
+		DeltaUpdateBuilder builder = new DeltaUpdateBuilder();
+		while ( reader.hasNext() ) {
+			switch ( reader.next() ) {
+			case XMLStreamReader.START_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "client":
+					builder.withToken(FFortsCollaterals.CLIENT_ID, client_id = readCharacters(reader));
+					break;
+				case "union":
+					builder.withToken(FFortsCollaterals.UNION_CODE, readCharacters(reader));
+					break;
+				case "markets":
+					builder.withToken(FFortsCollaterals.MARKETS, markets = readIntList(reader, "market"));
+					break;
+				case "shortname":
+					builder.withToken(FFortsCollaterals.SHORT_NAME, readCharacters(reader));
+					break;
+				case "current":
+					builder.withToken(FFortsCollaterals.CURRENT, readDecimal(reader));
+					break;
+				case "blocked":
+					builder.withToken(FFortsCollaterals.BLOCKED, readDecimal(reader));
+					break;
+				case "free":
+					builder.withToken(FFortsCollaterals.FREE, readDecimal(reader));
+					break;
+				}
+				break;
+			case XMLStreamReader.END_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "forts_collaterals":
+					checkNotNull(client_id, "client");
+					checkNotNull(markets, "markets");
+					return new TQStateUpdate<>(new ID.FC(client_id, new HashSet<>(markets)), builder.buildUpdate());
+				}
+				break;
+			}
+		}
+		throw new XMLStreamException("Premature end of file");
+	}
+	
+	private TQStateUpdate<ID.SL> readSpotLimit(XMLStreamReader reader) throws XMLStreamException {
+		String client_id = null;
+		List<Integer> markets = null;
+		DeltaUpdateBuilder builder = new DeltaUpdateBuilder();
+		while ( reader.hasNext() ) {
+			switch ( reader.next() ) {
+			case XMLStreamReader.START_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "client":
+					builder.withToken(FSpotLimits.CLIENT_ID, client_id = readCharacters(reader));
+					break;
+				case "union":
+					builder.withToken(FSpotLimits.UNION_CODE, readCharacters(reader));
+					break;
+				case "markets":
+					builder.withToken(FSpotLimits.MARKETS, markets = readIntList(reader, "market"));
+					break;
+				case "shortname":
+					builder.withToken(FSpotLimits.SHORT_NAME, readCharacters(reader));
+					break;
+				case "buylimit":
+					builder.withToken(FSpotLimits.BUY_LIMIT, readDecimal(reader));
+					break;
+				case "buylimitused":
+					builder.withToken(FSpotLimits.BUY_LIMIT_USED, readDecimal(reader));
+					break;
+				}
+				break;
+			case XMLStreamReader.END_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "spot_limit":
+					checkNotNull(client_id, "client");
+					checkNotNull(markets, "markets");
+					return new TQStateUpdate<>(new ID.SL(client_id, new HashSet<>(markets)), builder.buildUpdate());
+				}
+				break;
+			}
+		}
+		throw new XMLStreamException("Premature end of file");
+	}
+	
+	private TQStateUpdate<ID.UL> readUnitedLimits(XMLStreamReader reader) throws XMLStreamException {
+		String union_code = null;
+		DeltaUpdateBuilder builder = new DeltaUpdateBuilder()
+				.withToken(FUnitedLimits.UNION_CODE, union_code = getAttribute(reader, "union"));
+		while ( reader.hasNext() ) {
+			switch ( reader.next() ) {
+			case XMLStreamReader.START_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "open_equity":
+					builder.withToken(FUnitedLimits.OPEN_EQUITY, readDecimal(reader));
+					break;
+				case "equity":
+					builder.withToken(FUnitedLimits.EQUITY, readDecimal(reader));
+					break;
+				case "requirements":
+					builder.withToken(FUnitedLimits.REQUIREMENTS, readDecimal(reader));
+					break;
+				case "free":
+					builder.withToken(FUnitedLimits.FREE, readDecimal(reader));
+					break;
+				case "vm":
+					builder.withToken(FUnitedLimits.VAR_MARGIN, readDecimal(reader));
+					break;
+				case "finres":
+					builder.withToken(FUnitedLimits.FIN_RES, readDecimal(reader));
+					break;
+				case "go":
+					builder.withToken(FUnitedLimits.GO, readDecimal(reader));
+					break;
+				}
+				break;
+			case XMLStreamReader.END_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "united_limits":
+					checkNotNull(union_code, "union");
+					return new TQStateUpdate<>(new ID.UL(union_code), builder.buildUpdate());
+				}
+				break;
+			}
+		}
+		throw new XMLStreamException("Premature end of file");
+	}
+
+	public List<TQStateUpdate<? extends ID>> readPositions(XMLStreamReader reader) throws XMLStreamException {
+		if ( ! "positions".equals(reader.getLocalName()) ) {
+			throw new IllegalStateException("Unexpected current element: " + reader.getLocalName());
+		}
+		List<TQStateUpdate<? extends ID>> result = new ArrayList<>();
+		while ( reader.hasNext() ) {
+			switch ( reader.next() ) {
+			case XMLStreamReader.START_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "money_position":
+					result.add(readMoneyPosition(reader));
+					break;
+				case "sec_position":
+					result.add(readSecPosition(reader));
+					break;
+				case "forts_position":
+					result.add(readFortsPosition(reader));
+					break;
+				case "forts_money":
+					result.add(readFortsMoney(reader));
+					break;
+				case "forts_collaterals":
+					result.add(readFortsCollaterals(reader));
+					break;
+				case "spot_limit":
+					result.add(readSpotLimit(reader));
+					break;
+				case "united_limits":
+					result.add(readUnitedLimits(reader));
+					break;
+				default:
+					logger.warn("Unsupported position type: {}", reader.getLocalName());
+					skipElement(reader);
+				}
+				break;
+			case XMLStreamReader.END_ELEMENT:
+				switch ( reader.getLocalName() ) {
+				case "positions":
+					return result;
+				}
+				break;
+			}
+		}
+		throw new XMLStreamException("Premature end of file");
+	}
 	
 }

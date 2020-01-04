@@ -5,12 +5,24 @@ import java.util.Set;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class ID {
+public abstract class ID {
+	
+	public enum Type {
+		MONEY_POSITION,
+		SEC_POSITION,
+		FORTS_POSITION,
+		FORTS_MONEY,
+		FORTS_COLLATERALS,
+		SPOT_LIMIT,
+		UNITED_LIMITS
+	}
+	
+	public abstract Type getType();
 	
 	/**
 	 * ID of money_position.
 	 */
-	public static class MP {
+	public static class MP extends ID {
 		private final String clientID;
 		private final String asset;
 		private final String register;
@@ -19,6 +31,11 @@ public class ID {
 			this.clientID = client_id;
 			this.asset = asset;
 			this.register = register;
+		}
+		
+		@Override
+		public Type getType() {
+			return Type.MONEY_POSITION;
 		}
 		
 		public String getClientID() {
@@ -72,7 +89,7 @@ public class ID {
 	/**
 	 * ID of sec_position.
 	 */
-	public static class SP {
+	public static class SP extends ID {
 		private final String clientID;
 		private final String secCode;
 		private final int marketID;
@@ -83,6 +100,11 @@ public class ID {
 			this.secCode = sec_code;
 			this.marketID = market_id;
 			this.register = register;
+		}
+		
+		@Override
+		public Type getType() {
+			return Type.SEC_POSITION;
 		}
 		
 		public String getClientID() {
@@ -143,7 +165,7 @@ public class ID {
 	/**
 	 * ID of forts_position.
 	 */
-	public static class FP {
+	public static class FP extends ID {
 		private final String clientID;
 		private final String secCode;
 		private final Set<Integer> markets;
@@ -152,6 +174,11 @@ public class ID {
 			this.clientID = client_id;
 			this.secCode = sec_code;
 			this.markets = markets;
+		}
+		
+		@Override
+		public Type getType() {
+			return Type.FORTS_POSITION;
 		}
 		
 		public String getClientID() {
@@ -202,7 +229,7 @@ public class ID {
 		
 	}
 
-	static abstract class X {
+	static abstract class X extends ID {
 		private final String clientID;
 		private final Set<Integer> markets;
 		
@@ -259,20 +286,54 @@ public class ID {
 	/**
 	 * ID of forts_money.
 	 */
-	public static class FM extends X {
+	public static class FM extends ID {
+		private final String clientID;
 
-		public FM(String client_id, Set<Integer> markets) {
-			super(client_id, markets);
+		public FM(String client_id) {
+			this.clientID = client_id;
 		}
-
+		
 		@Override
+		public Type getType() {
+			return Type.FORTS_MONEY;
+		}
+		
+		public String getClientID() {
+			return clientID;
+		}
+		
 		protected int getInitHcbNum() {
 			return 7009715;
 		}
 
-		@Override
 		protected int getMultHcbNum() {
 			return 51;
+		}
+		
+		@Override
+		public int hashCode() {
+			return new HashCodeBuilder(getInitHcbNum(), getMultHcbNum())
+					.append(clientID)
+					.build();
+		}
+		
+		@Override
+		public String toString() {
+			return new StringBuilder().append("ID.FM[clientID=").append(clientID).append("]").toString();
+		}
+		
+		@Override
+		public boolean equals(Object other) {
+			if ( other == this ) {
+				return true;
+			}
+			if ( other == null || other.getClass() != FM.class ) {
+				return false;
+			}
+			FM o = (FM) other;
+			return new EqualsBuilder()
+					.append(o.clientID, clientID)
+					.build();
 		}
 		
 	}
@@ -284,6 +345,11 @@ public class ID {
 
 		public FC(String client_id, Set<Integer> markets) {
 			super(client_id, markets);
+		}
+		
+		@Override
+		public Type getType() {
+			return Type.FORTS_COLLATERALS;
 		}
 
 		@Override
@@ -306,6 +372,11 @@ public class ID {
 		public SL(String client_id, Set<Integer> markets) {
 			super(client_id, markets);
 		}
+		
+		@Override
+		public Type getType() {
+			return Type.SPOT_LIMIT;
+		}
 
 		@Override
 		protected int getInitHcbNum() {
@@ -315,6 +386,55 @@ public class ID {
 		@Override
 		protected int getMultHcbNum() {
 			return 331;
+		}
+		
+	}
+	
+	/**
+	 * ID of united_limits.
+	 */
+	public static class UL extends ID {
+		private final String unionCode;
+		
+		public UL(String union_code) {
+			this.unionCode = union_code;
+		}
+		
+		@Override
+		public Type getType() {
+			return Type.UNITED_LIMITS;
+		}
+		
+		public String getUnionCode() {
+			return unionCode;
+		}
+		
+		@Override
+		public String toString() {
+			return new StringBuilder()
+					.append("ID.UL[unionCode=").append(unionCode).append("]")
+					.toString();
+		}
+		
+		@Override
+		public int hashCode() {
+			return new HashCodeBuilder(7781, 13)
+					.append(unionCode)
+					.build();
+		}
+		
+		@Override
+		public boolean equals(Object other) {
+			if ( other == this ) {
+				return true;
+			}
+			if( other == null || other.getClass() != UL.class ) {
+				return false;
+			}
+			UL o = (UL) other;
+			return new EqualsBuilder()
+					.append(o.unionCode, unionCode)
+					.build();
 		}
 		
 	}

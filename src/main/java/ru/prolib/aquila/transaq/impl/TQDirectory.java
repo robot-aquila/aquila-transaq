@@ -28,6 +28,7 @@ import ru.prolib.aquila.transaq.entity.SecurityParamsFactory;
 import ru.prolib.aquila.transaq.entity.SecurityQuotations;
 import ru.prolib.aquila.transaq.entity.SecurityQuotationsFactory;
 import ru.prolib.aquila.transaq.remote.ConnectionStatus;
+import ru.prolib.aquila.transaq.remote.ID;
 import ru.prolib.aquila.transaq.remote.ISecIDF;
 import ru.prolib.aquila.transaq.remote.ISecIDG;
 import ru.prolib.aquila.transaq.remote.ISecIDT;

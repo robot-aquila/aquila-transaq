@@ -398,11 +398,11 @@ public class MessageFields {
 			/**
 			 * Type: CDecimal
 			 */
-			public static final int TOTAL_BUY		= 6410;
+			public static final int TODAY_BUY		= 6410;
 			/**
 			 * Type: CDecimal
 			 */
-			public static final int TOTAL_SELL		= 6411;
+			public static final int TODAY_SELL		= 6411;
 			/**
 			 * Type: CDecimal
 			 */

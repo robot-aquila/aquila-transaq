@@ -19,6 +19,7 @@ public class IDTest {
 	private ID.FM id_fm;
 	private ID.FC id_fc;
 	private ID.SL id_sl;
+	private ID.UL id_ul;
 
 	@Before
 	public void setUp() throws Exception {
@@ -31,13 +32,15 @@ public class IDTest {
 		id_mp = new ID.MP("xxx1234", "CASH", "T0");
 		id_sp = new ID.SP("cookie", "GAZP", 1, "T1");
 		id_fp = new ID.FP("cookie", "GAZP", markets1);
-		id_fm = new ID.FM("cookie", markets2);
+		id_fm = new ID.FM("cookie");
 		id_fc = new ID.FC("wookie", markets1);
 		id_sl = new ID.SL("bookie", markets2);
+		id_ul = new ID.UL("boogie");
 	}
 
 	@Test
 	public void testMP_Getters() {
+		assertEquals(ID.Type.MONEY_POSITION, id_mp.getType());
 		assertEquals("xxx1234", id_mp.getClientID());
 		assertEquals("CASH", id_mp.getAsset());
 		assertEquals("T0", id_mp.getRegister());
@@ -90,6 +93,7 @@ public class IDTest {
 	
 	@Test
 	public void testSP_Getters() {
+		assertEquals(ID.Type.SEC_POSITION, id_sp.getType());
 		assertEquals("cookie", id_sp.getClientID());
 		assertEquals("GAZP", id_sp.getSecCode());
 		assertEquals(1, id_sp.getMarketID());
@@ -147,6 +151,7 @@ public class IDTest {
 
 	@Test
 	public void testFP_Getters() {
+		assertEquals(ID.Type.FORTS_POSITION, id_fp.getType());
 		assertEquals("cookie", id_fp.getClientID());
 		assertEquals("GAZP", id_fp.getSecCode());
 		assertEquals(markets1, id_fp.getMarkets());
@@ -200,13 +205,13 @@ public class IDTest {
 	
 	@Test
 	public void testFM_Getters() {
+		assertEquals(ID.Type.FORTS_MONEY, id_fm.getType());
 		assertEquals("cookie", id_fm.getClientID());
-		assertEquals(markets2, id_fm.getMarkets());
 	}
 	
 	@Test
 	public void testFM_ToString() {
-		String expected = "ID.FM[clientID=cookie,markets=[14, 15]]";
+		String expected = "ID.FM[clientID=cookie]";
 		
 		assertEquals(expected, id_fm.toString());
 	}
@@ -215,7 +220,6 @@ public class IDTest {
 	public void testFM_HashCode() {
 		int expected = new HashCodeBuilder(7009715, 51)
 				.append("cookie")
-				.append(markets2)
 				.build();
 
 		assertEquals(expected, id_fm.hashCode());
@@ -231,12 +235,11 @@ public class IDTest {
 	@Test
 	public void testFM_Equals() {
 		Variant<String> vCID = new Variant<>("cookie", "wookie");
-		Variant<Set<Integer>> vMkt = new Variant<>(vCID, markets2, markets1);
-		Variant<?> iterator = vMkt;
+		Variant<?> iterator = vCID;
 		int found_cnt = 0;
 		ID.FM x, found = null;
 		do {
-			x = new ID.FM(vCID.get(), vMkt.get());
+			x = new ID.FM(vCID.get());
 			if ( id_fm.equals(x) ) {
 				found_cnt ++;
 				found = x;
@@ -244,11 +247,11 @@ public class IDTest {
 		} while ( iterator.next() );
 		assertEquals(1, found_cnt);
 		assertEquals("cookie", found.getClientID());
-		assertEquals(markets2, found.getMarkets());
 	}
 
 	@Test
 	public void testFC_Getters() {
+		assertEquals(ID.Type.FORTS_COLLATERALS, id_fc.getType());
 		assertEquals("wookie", id_fc.getClientID());
 		assertEquals(markets1, id_fc.getMarkets());
 	}
@@ -298,6 +301,7 @@ public class IDTest {
 
 	@Test
 	public void testSL_Getters() {
+		assertEquals(ID.Type.SPOT_LIMIT, id_sl.getType());
 		assertEquals("bookie", id_sl.getClientID());
 		assertEquals(markets2, id_sl.getMarkets());
 	}
@@ -343,6 +347,41 @@ public class IDTest {
 		assertEquals(1, found_cnt);
 		assertEquals("bookie", found.getClientID());
 		assertEquals(markets2, found.getMarkets());
+	}
+	
+	@Test
+	public void testUL_Getters() {
+		assertEquals(ID.Type.UNITED_LIMITS, id_ul.getType());
+		assertEquals("boogie", id_ul.getUnionCode());
+	}
+
+	@Test
+	public void testUL_ToString() {
+		String expected = "ID.UL[unionCode=boogie]";
+		
+		assertEquals(expected, id_ul.toString());
+	}
+	
+	@Test
+	public void testUL_HashCode() {
+		int expected = new HashCodeBuilder(7781, 13)
+				.append("boogie")
+				.build();
+		
+		assertEquals(expected, id_ul.hashCode());
+	}
+
+	@Test
+	public void testUL_Equals_SpecialCases() {
+		assertTrue(id_ul.equals(id_ul));
+		assertFalse(id_ul.equals(null));
+		assertFalse(id_ul.equals(this));
+	}
+
+	@Test
+	public void testUL_Equals() {
+		assertTrue(id_ul.equals(new ID.UL("boogie")));
+		assertFalse(id_ul.equals(new ID.UL("babaka")));
 	}
 
 }
