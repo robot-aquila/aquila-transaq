@@ -1130,7 +1130,7 @@ public class MessageParser {
 					builder.withToken(FMoneyPosition.ORD_BUY, readDecimal(reader));
 					break;
 				case "ordbuycond":
-					builder.withToken(FMoneyPosition.ORB_BUY_COND, readDecimal(reader));
+					builder.withToken(FMoneyPosition.ORD_BUY_COND, readDecimal(reader));
 					break;
 				case "comission":
 					builder.withToken(FMoneyPosition.COMISSION, readDecimal(reader));

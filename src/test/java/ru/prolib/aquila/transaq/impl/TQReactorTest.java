@@ -3,7 +3,9 @@ package ru.prolib.aquila.transaq.impl;
 import static org.easymock.EasyMock.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.easymock.IMocksControl;
 import org.junit.Before;
@@ -17,6 +19,14 @@ import ru.prolib.aquila.transaq.remote.TQSecIDT;
 import ru.prolib.aquila.transaq.remote.entity.Client;
 import ru.prolib.aquila.transaq.remote.entity.Quote;
 import ru.prolib.aquila.transaq.remote.entity.ServerStatus;
+import ru.prolib.aquila.transaq.remote.ID;
+import ru.prolib.aquila.transaq.remote.ID.FC;
+import ru.prolib.aquila.transaq.remote.ID.FM;
+import ru.prolib.aquila.transaq.remote.ID.FP;
+import ru.prolib.aquila.transaq.remote.ID.MP;
+import ru.prolib.aquila.transaq.remote.ID.SL;
+import ru.prolib.aquila.transaq.remote.ID.SP;
+import ru.prolib.aquila.transaq.remote.ID.UL;
 import ru.prolib.aquila.transaq.remote.ISecIDF;
 import ru.prolib.aquila.transaq.remote.ISecIDG;
 import ru.prolib.aquila.transaq.remote.ISecIDT;
@@ -24,6 +34,15 @@ import ru.prolib.aquila.transaq.remote.TQSecIDF;
 import ru.prolib.aquila.transaq.remote.TQSecIDG;
 
 public class TQReactorTest {
+	
+	static Set<Integer> toSet(Integer... integers) {
+		Set<Integer> r = new HashSet<>();
+		for ( Integer i : integers ) {
+			r.add(i);
+		}
+		return r;
+	}
+	
 	private IMocksControl control;
 	private ServiceLocator services;
 	private TQDirectory dirMock;
@@ -174,6 +193,31 @@ public class TQReactorTest {
 		control.replay();
 		
 		service.updateClient(update);
+		
+		control.verify();
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testUpdatePositions() {
+		List<TQStateUpdate<? extends ID>> list = new ArrayList<>();
+		list.add(new TQStateUpdate<ID.MP>(new ID.MP("xxx", "fund", "T0"), duMock));
+		list.add(new TQStateUpdate<ID.SP>(new ID.SP("xxx", "RIH0", 4, null), duMock));
+		list.add(new TQStateUpdate<ID.FM>(new ID.FM("xxx"), duMock));
+		list.add(new TQStateUpdate<ID.FP>(new ID.FP("xxx", "RIH9", toSet(4, 7)), duMock));
+		list.add(new TQStateUpdate<ID.FC>(new ID.FC("xxx", toSet(8, 10)), duMock));
+		list.add(new TQStateUpdate<ID.SL>(new ID.SL("xxx", toSet(14, 15)), duMock));
+		list.add(new TQStateUpdate<ID.UL>(new ID.UL("foo"), duMock));
+		expect(dirMock.updateMoneyPosition((TQStateUpdate<MP>) list.get(0))).andReturn(null);
+		expect(dirMock.updateSecPosition((TQStateUpdate<SP>) list.get(1))).andReturn(null);
+		expect(dirMock.updateFortsMoney((TQStateUpdate<FM>) list.get(2))).andReturn(null);
+		expect(dirMock.updateFortsPosition((TQStateUpdate<FP>) list.get(3))).andReturn(null);
+		expect(dirMock.updateFortsCollaterals((TQStateUpdate<FC>) list.get(4))).andReturn(null);
+		expect(dirMock.updateSpotLimits((TQStateUpdate<SL>) list.get(5))).andReturn(null);
+		expect(dirMock.updateUnitedLimits((TQStateUpdate<UL>) list.get(6))).andReturn(null);
+		control.replay();
+		
+		service.updatePositions(list);
 		
 		control.verify();
 	}

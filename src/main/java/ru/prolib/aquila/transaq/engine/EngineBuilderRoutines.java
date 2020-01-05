@@ -13,6 +13,7 @@ import ru.prolib.aquila.transaq.engine.mp.MessageRouter;
 
 import ru.prolib.aquila.transaq.engine.mp.MessageRouterImpl;
 import ru.prolib.aquila.transaq.engine.mp.PitsProcessor;
+import ru.prolib.aquila.transaq.engine.mp.PositionsProcessor;
 import ru.prolib.aquila.transaq.engine.mp.ProcessorRegistryBuilder;
 import ru.prolib.aquila.transaq.engine.mp.QuotationsProcessor;
 import ru.prolib.aquila.transaq.engine.mp.QuotesProcessor;
@@ -47,9 +48,9 @@ public class EngineBuilderRoutines {
 				.withProcessor("alltrades", new AlltradesProcessor(services))
 				.withProcessor("quotes", new QuotesProcessor(services))
 				.withProcessor("client", new ClientProcessor(services))
+				.withProcessor("positions", new PositionsProcessor(services))
 				// TODO: do it
 				.withProcessor("messages", new MessageProcessorStub())
-				.withProcessor("positions", new MessageProcessorStub())
 				.withProcessor("union", new MessageProcessorStub())
 				.withProcessor("overnight", new MessageProcessorStub())
 				

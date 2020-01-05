@@ -249,7 +249,7 @@ public class MessageFields {
 			/**
 			 * Type: CDecimal
 			 */
-			public static final int ORB_BUY_COND	= 6112;
+			public static final int ORD_BUY_COND	= 6112;
 			/**
 			 * Type: CDecimal
 			 */

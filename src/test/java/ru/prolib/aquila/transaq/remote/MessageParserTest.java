@@ -1187,7 +1187,7 @@ public class MessageParserTest {
 				.withToken(FMoneyPosition.SOLD, of("0.2"))
 				.withToken(FMoneyPosition.SALDO, of("990196.7"))
 				.withToken(FMoneyPosition.ORD_BUY, of("0.3"))
-				.withToken(FMoneyPosition.ORB_BUY_COND, of("0.4"))
+				.withToken(FMoneyPosition.ORD_BUY_COND, of("0.4"))
 				.withToken(FMoneyPosition.COMISSION, of("0.5"))
 				.buildUpdate()));
 		assertEquals(expected, actual);
@@ -1212,7 +1212,7 @@ public class MessageParserTest {
 				.withToken(FMoneyPosition.SOLD, of("25.0"))
 				.withToken(FMoneyPosition.SALDO, of("950.0"))
 				.withToken(FMoneyPosition.ORD_BUY, of("10.05"))
-				.withToken(FMoneyPosition.ORB_BUY_COND, of("5.13"))
+				.withToken(FMoneyPosition.ORD_BUY_COND, of("5.13"))
 				.withToken(FMoneyPosition.COMISSION, of("4.1"))
 				.buildUpdate()));
 		expected.add(new TQStateUpdate<>(new ID.SP("COOKIE", "GAZP", 1, "T1"), new DeltaUpdateBuilder()

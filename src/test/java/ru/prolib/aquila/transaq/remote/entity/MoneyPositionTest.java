@@ -56,7 +56,7 @@ public class MoneyPositionTest {
 			.withToken(FMoneyPosition.SOLD, of("134.12"))
 			.withToken(FMoneyPosition.SALDO, of("91.92"))
 			.withToken(FMoneyPosition.ORD_BUY, of("23.98"))
-			.withToken(FMoneyPosition.ORB_BUY_COND, of("643.4"))
+			.withToken(FMoneyPosition.ORD_BUY_COND, of("643.4"))
 			.withToken(FMoneyPosition.COMISSION, of("85.24"))
 			.buildUpdate());
 		

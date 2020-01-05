@@ -51,6 +51,7 @@ public class DefaultMessageProcessor implements MessageProcessor {
 
 	private void dump_stats() {
 		if ( unprocMessagesCount.size() == 0 ) {
+			logger.debug("No unprocessed messages registered");
 			return;
 		}
 		logger.debug("Dumping map of unprocessed messages: ");

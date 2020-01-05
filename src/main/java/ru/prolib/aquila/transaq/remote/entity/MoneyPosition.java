@@ -59,7 +59,7 @@ public class MoneyPosition extends ObservableStateContainerImpl {
 	}
 
 	public CDecimal getOrdBuyCond() {
-		return getCDecimal(FMoneyPosition.ORB_BUY_COND);
+		return getCDecimal(FMoneyPosition.ORD_BUY_COND);
 	}
 
 	public CDecimal getComission() {

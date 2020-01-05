@@ -4,6 +4,14 @@ import java.util.List;
 
 import ru.prolib.aquila.transaq.engine.ServiceLocator;
 import ru.prolib.aquila.transaq.engine.sds.SymbolDataService;
+import ru.prolib.aquila.transaq.remote.ID;
+import ru.prolib.aquila.transaq.remote.ID.FC;
+import ru.prolib.aquila.transaq.remote.ID.FM;
+import ru.prolib.aquila.transaq.remote.ID.FP;
+import ru.prolib.aquila.transaq.remote.ID.MP;
+import ru.prolib.aquila.transaq.remote.ID.SL;
+import ru.prolib.aquila.transaq.remote.ID.SP;
+import ru.prolib.aquila.transaq.remote.ID.UL;
 import ru.prolib.aquila.transaq.remote.ISecIDF;
 import ru.prolib.aquila.transaq.remote.ISecIDG;
 import ru.prolib.aquila.transaq.remote.ISecIDT;
@@ -71,6 +79,36 @@ public class TQReactor {
 	
 	public void updateClient(TQStateUpdate<String> update) {
 		getDir().updateClient(update);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void updatePositions(List<TQStateUpdate<? extends ID>> updates) {
+		TQDirectory dir = getDir();
+		for ( TQStateUpdate<? extends ID> update : updates ) {
+			switch ( update.getID().getType() ) {
+			case MONEY_POSITION:
+				dir.updateMoneyPosition((TQStateUpdate<MP>) update);
+				break;
+			case SEC_POSITION:
+				dir.updateSecPosition((TQStateUpdate<SP>) update);
+				break;
+			case FORTS_MONEY:
+				dir.updateFortsMoney((TQStateUpdate<FM>) update);
+				break;
+			case FORTS_POSITION:
+				dir.updateFortsPosition((TQStateUpdate<FP>) update);
+				break;
+			case FORTS_COLLATERALS:
+				dir.updateFortsCollaterals((TQStateUpdate<FC>) update);
+				break;
+			case SPOT_LIMIT:
+				dir.updateSpotLimits((TQStateUpdate<SL>) update);
+				break;
+			case UNITED_LIMITS:
+				dir.updateUnitedLimits((TQStateUpdate<UL>) update);
+				break;
+			}
+		}
 	}
 
 }

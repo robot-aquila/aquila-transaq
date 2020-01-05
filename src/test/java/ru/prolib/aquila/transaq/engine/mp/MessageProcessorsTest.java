@@ -15,6 +15,7 @@ import ru.prolib.aquila.transaq.engine.ServiceLocator;
 import ru.prolib.aquila.transaq.engine.mp.BoardsProcessor;
 import ru.prolib.aquila.transaq.impl.TQReactor;
 import ru.prolib.aquila.transaq.impl.TQStateUpdate;
+import ru.prolib.aquila.transaq.remote.ID;
 import ru.prolib.aquila.transaq.remote.ISecIDF;
 import ru.prolib.aquila.transaq.remote.ISecIDG;
 import ru.prolib.aquila.transaq.remote.ISecIDT;
@@ -235,6 +236,22 @@ public class MessageProcessorsTest {
 		reactorMock.registerQuotes(quote_list);
 		control.replay();
 		QuotesProcessor service = new QuotesProcessor(services);
+		
+		service.processMessage(readerMock);
+		
+		control.verify();
+	}
+	
+	@Test
+	public void testPositionsProcessor() throws Exception {
+		List<TQStateUpdate<? extends ID>> update_list = new ArrayList<>();
+		update_list.add(control.createMock(TQStateUpdate.class));
+		update_list.add(control.createMock(TQStateUpdate.class));
+		update_list.add(control.createMock(TQStateUpdate.class));
+		expect(parserMock.readPositions(readerMock)).andReturn(update_list);
+		reactorMock.updatePositions(update_list);
+		control.replay();
+		PositionsProcessor service = new PositionsProcessor(services);
 		
 		service.processMessage(readerMock);
 		
