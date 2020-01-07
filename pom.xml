@@ -17,7 +17,7 @@
 		<dependency>
 			<groupId>ru.prolib.aquila</groupId>
 			<artifactId>aquila-ui</artifactId>
-			<version>0.1.55</version>			
+			<version>0.1.56</version>			
 		</dependency>
 
 		<dependency>
