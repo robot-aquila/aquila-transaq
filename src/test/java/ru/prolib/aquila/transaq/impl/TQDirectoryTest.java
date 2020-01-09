@@ -45,7 +45,7 @@ public class TQDirectoryTest {
 
 	@BeforeClass
 	public static void setUpBeforeClass() {
-		queue = new EventQueueImpl();
+		queue = new EventQueueFactory().createDefault();
 	}
 	
 	@Rule

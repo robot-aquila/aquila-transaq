@@ -10,8 +10,7 @@ import java.time.ZonedDateTime;
 import org.junit.Before;
 import org.junit.Test;
 
-import ru.prolib.aquila.core.EventQueue;
-import ru.prolib.aquila.core.EventQueueImpl;
+import ru.prolib.aquila.core.*;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdate;
 import ru.prolib.aquila.core.BusinessEntities.DeltaUpdateBuilder;
 import ru.prolib.aquila.core.BusinessEntities.SecurityField;
@@ -38,7 +37,7 @@ public class TQFieldAssemblerTest {
 
 	@Before
 	public void setUp() throws Exception {
-		queue = new EventQueueImpl();
+		queue = new EventQueueFactory().createDefault();
 		service = new TQFieldAssembler();
 		sec_state = new SecurityParamsFactory(queue).produce(null, new GSymbol("GAZP", "MICEX", "RUB", SymbolType.STOCK));
 		sec_quots = new SecurityQuotationsFactory(queue).produce(null, new TSymbol("GAZP", "EQTB", "RUB", SymbolType.STOCK));

@@ -7,7 +7,7 @@ import org.ini4j.Profile.Section;
 
 import ru.prolib.JTransaq.JTransaqHandler;
 import ru.prolib.aquila.core.EventQueue;
-import ru.prolib.aquila.core.EventQueueImpl;
+import ru.prolib.aquila.core.EventQueueFactory;
 import ru.prolib.aquila.transaq.engine.Cmd;
 import ru.prolib.aquila.transaq.engine.Engine;
 import ru.prolib.aquila.transaq.engine.EngineBuilderRoutines;
@@ -59,7 +59,7 @@ public class TransaqBuilder {
 
 		String _service_id = serviceID == null ? DEFAULT_SERVICE_ID : serviceID;
 		ServiceLocator services = new ServiceLocator();
-		services.setEventQueue(queue == null ? new EventQueueImpl(_service_id) : queue);
+		services.setEventQueue(queue == null ? new EventQueueFactory().createDefault(_service_id) : queue);
 		
 		BlockingQueue<Cmd> cmd_queue = new LinkedBlockingQueue<>();
 		Engine engine = new EngineImpl(cmd_queue);

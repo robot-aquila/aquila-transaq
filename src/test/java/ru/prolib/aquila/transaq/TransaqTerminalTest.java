@@ -28,7 +28,7 @@ import ru.prolib.aquila.core.Event;
 import ru.prolib.aquila.core.EventListener;
 import ru.prolib.aquila.core.EventListenerStub;
 import ru.prolib.aquila.core.EventQueue;
-import ru.prolib.aquila.core.EventQueueImpl;
+import ru.prolib.aquila.core.EventQueueFactory;
 import ru.prolib.aquila.core.BusinessEntities.Account;
 import ru.prolib.aquila.core.BusinessEntities.BasicTerminalBuilder;
 import ru.prolib.aquila.core.BusinessEntities.CDecimal;
@@ -144,7 +144,7 @@ public class TransaqTerminalTest {
 	public static void setUpBeforeClass() {
 		BasicConfigurator.resetConfiguration();
 		BasicConfigurator.configure();
-		eventQueue = new EventQueueImpl();
+		eventQueue = new EventQueueFactory().createDefault();
 	}
 	
 	private static Set<Integer> toSet(int ...values) {

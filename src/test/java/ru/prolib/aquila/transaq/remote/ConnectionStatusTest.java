@@ -15,7 +15,7 @@ import ru.prolib.aquila.core.Event;
 import ru.prolib.aquila.core.EventListener;
 import ru.prolib.aquila.core.EventListenerStub;
 import ru.prolib.aquila.core.EventQueue;
-import ru.prolib.aquila.core.EventQueueImpl;
+import ru.prolib.aquila.core.EventQueueFactory;
 
 public class ConnectionStatusTest {
 	
@@ -37,7 +37,7 @@ public class ConnectionStatusTest {
 	
 	@BeforeClass
 	public static void setUpBeforeClass() {
-		queue = new EventQueueImpl();
+		queue = new EventQueueFactory().createDefault();
 	}
 	
 	private IMocksControl control;
