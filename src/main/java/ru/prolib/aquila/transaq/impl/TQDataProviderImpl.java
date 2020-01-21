@@ -74,8 +74,7 @@ public class TQDataProviderImpl implements TQDataProvider {
 
 	@Override
 	public SubscrHandler subscribe(Symbol symbol, MDLevel level, EditableTerminal terminal) {
-		engine.subscribeSymbol(symbol, level);
-		return new TQSymbolSubscrHandler(engine, symbol, level);
+		return new TQSymbolSubscrHandler(engine, symbol, level, engine.subscribeSymbol(symbol, level));
 	}
 
 	@Override

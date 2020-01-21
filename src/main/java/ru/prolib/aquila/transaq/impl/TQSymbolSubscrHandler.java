@@ -1,5 +1,6 @@
 package ru.prolib.aquila.transaq.impl;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -14,12 +15,14 @@ public class TQSymbolSubscrHandler implements SubscrHandler {
 	private final Symbol symbol;
 	private final MDLevel level;
 	private final AtomicBoolean closed;
+	private final CompletableFuture<Boolean> confirm;
 	
-	public TQSymbolSubscrHandler(Engine engine, Symbol symbol, MDLevel level) {
+	public TQSymbolSubscrHandler(Engine engine, Symbol symbol, MDLevel level, CompletableFuture<Boolean> confirm) {
 		this.engine = engine;
 		this.symbol = symbol;
 		this.level = level;
 		this.closed = new AtomicBoolean(false);
+		this.confirm = confirm;
 	}
 	
 	public Engine getEngine() {
@@ -60,6 +63,11 @@ public class TQSymbolSubscrHandler implements SubscrHandler {
 				.append(o.level, level)
 				.append(o.closed.get(), closed.get())
 				.build();
+	}
+
+	@Override
+	public CompletableFuture<Boolean> getConfirmation() {
+		return confirm;
 	}
 
 }

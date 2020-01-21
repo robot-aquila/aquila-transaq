@@ -10,6 +10,6 @@ public interface Engine {
 	void disconnect();
 	CompletableFuture<Boolean> shutdown();
 	void messageFromServer(String message);
-	void subscribeSymbol(Symbol symbol, MDLevel level);
+	CompletableFuture<Boolean> subscribeSymbol(Symbol symbol, MDLevel level);
 	void unsubscribeSymbol(Symbol symbol, MDLevel level);
 }

@@ -57,9 +57,12 @@ public class EngineImplTest {
 	
 	@Test
 	public void testSubscribeSymbol() throws Exception {
-		service.subscribeSymbol(symbol, MDLevel.L1_BBO);
+		CompletableFuture<Boolean> result = service.subscribeSymbol(symbol, MDLevel.L1_BBO);
 		
-		assertEquals(new CmdSubscrSymbol(symbol, MDLevel.L1_BBO), queue.poll(1, TimeUnit.SECONDS));
+		Cmd actual = queue.poll(1, TimeUnit.SECONDS);
+		assertEquals(new CmdSubscrSymbol(symbol, MDLevel.L1_BBO), actual);
+		assertNotNull(result);
+		assertSame(result, actual.getResult());
 	}
 
 	@Test

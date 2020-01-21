@@ -53,8 +53,8 @@ public class EngineImpl implements Engine {
 	}
 
 	@Override
-	public void subscribeSymbol(Symbol symbol, MDLevel level) {
-		enqueue(new CmdSubscrSymbol(symbol, level));
+	public CompletableFuture<Boolean> subscribeSymbol(Symbol symbol, MDLevel level) {
+		return enqueue(new CmdSubscrSymbol(symbol, level));
 	}
 
 	@Override

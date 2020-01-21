@@ -83,14 +83,16 @@ public class TQDataProviderImplTest {
 	
 	@Test
 	public void testSubscribe_Symbol() throws Exception {
-		engMock.subscribeSymbol(new Symbol("foo"), MDLevel.L1_BBO);
+		CompletableFuture<Boolean> confirm = new CompletableFuture<>();
+		expect(engMock.subscribeSymbol(new Symbol("foo"), MDLevel.L1_BBO)).andReturn(confirm);
 		control.replay();
 		
 		SubscrHandler actual = service.subscribe(new Symbol("foo"), MDLevel.L1_BBO, terminalMock);
 		
 		control.verify();
-		SubscrHandler expected = new TQSymbolSubscrHandler(engMock, new Symbol("foo"), MDLevel.L1_BBO);
+		SubscrHandler expected = new TQSymbolSubscrHandler(engMock, new Symbol("foo"), MDLevel.L1_BBO, confirm);
 		assertEquals(expected, actual);
+		assertSame(confirm, actual.getConfirmation());
 	}
 	
 	@Test

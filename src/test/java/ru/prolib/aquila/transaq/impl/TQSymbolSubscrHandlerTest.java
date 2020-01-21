@@ -1,6 +1,9 @@
 package ru.prolib.aquila.transaq.impl;
 
 import static org.junit.Assert.*;
+
+import java.util.concurrent.CompletableFuture;
+
 import static org.easymock.EasyMock.*;
 
 import org.easymock.IMocksControl;
@@ -24,6 +27,7 @@ public class TQSymbolSubscrHandlerTest {
 	
 	private IMocksControl control;
 	private Engine engMock1, engMock2;
+	private CompletableFuture<Boolean> confirm;
 	private TQSymbolSubscrHandler service;
 
 	@Before
@@ -31,7 +35,8 @@ public class TQSymbolSubscrHandlerTest {
 		control = createStrictControl();
 		engMock1 = control.createMock(Engine.class);
 		engMock2 = control.createMock(Engine.class);
-		service = new TQSymbolSubscrHandler(engMock1, symbol1, MDLevel.L1);
+		confirm = new CompletableFuture<>();
+		service = new TQSymbolSubscrHandler(engMock1, symbol1, MDLevel.L1, confirm);
 	}
 	
 	@Test
@@ -40,6 +45,7 @@ public class TQSymbolSubscrHandlerTest {
 		assertEquals(symbol1, service.getSymbol());
 		assertEquals(MDLevel.L1, service.getLevel());
 		assertFalse(service.isClosed());
+		assertSame(confirm, service.getConfirmation());
 	}
 	
 	@Test
@@ -74,7 +80,7 @@ public class TQSymbolSubscrHandlerTest {
 		int found_cnt = 0;
 		TQSymbolSubscrHandler x, found = null;
 		do {
-			x = new TQSymbolSubscrHandler(vEng.get(), vSym.get(), vLev.get());
+			x = new TQSymbolSubscrHandler(vEng.get(), vSym.get(), vLev.get(), confirm);
 			if ( vCls.get() ) {
 				x.close();
 			}
