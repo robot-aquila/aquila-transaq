@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import ru.prolib.aquila.data.DFSubscrStatus;
 import ru.prolib.aquila.transaq.remote.TQSecIDT;
 
 public class StateOfDataFeedsFactoryTest {
@@ -21,10 +22,10 @@ public class StateOfDataFeedsFactoryTest {
 		
 		assertNotNull(actual);
 		assertEquals(new TQSecIDT("SBER", "TQBR"), actual.getSecIDT());
-		assertEquals(SubscrStatus.NOT_SUBSCR, actual.getFeedStatus(FeedID.SYMBOL_PRIMARY));
-		assertEquals(SubscrStatus.NOT_SUBSCR, actual.getFeedStatus(FeedID.SYMBOL_QUOTATIONS));
-		assertEquals(SubscrStatus.NOT_SUBSCR, actual.getFeedStatus(FeedID.SYMBOL_ALLTRADES));
-		assertEquals(SubscrStatus.NOT_SUBSCR, actual.getFeedStatus(FeedID.SYMBOL_QUOTES));
+		assertEquals(DFSubscrStatus.NOT_SUBSCR, actual.getFeedStatus(FeedID.SYMBOL_PRIMARY));
+		assertEquals(DFSubscrStatus.NOT_SUBSCR, actual.getFeedStatus(FeedID.SYMBOL_QUOTATIONS));
+		assertEquals(DFSubscrStatus.NOT_SUBSCR, actual.getFeedStatus(FeedID.SYMBOL_ALLTRADES));
+		assertEquals(DFSubscrStatus.NOT_SUBSCR, actual.getFeedStatus(FeedID.SYMBOL_QUOTES));
 	}
 
 }

@@ -31,6 +31,7 @@ import ru.prolib.aquila.core.BusinessEntities.Security;
 import ru.prolib.aquila.core.BusinessEntities.Symbol;
 import ru.prolib.aquila.core.BusinessEntities.SymbolSubscrCounter;
 import ru.prolib.aquila.core.BusinessEntities.SymbolSubscrCounter.Field;
+import ru.prolib.aquila.data.DFSubscrStatus;
 import ru.prolib.aquila.core.BusinessEntities.SymbolSubscrRepository;
 import ru.prolib.aquila.core.BusinessEntities.TickType;
 import ru.prolib.aquila.core.BusinessEntities.UpdatableStateContainer;
@@ -276,7 +277,7 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 			);
 		for ( FeedID feed_id : cache.keySet() ) {
 			for ( ISecIDT sec_id : cache.get(feed_id).getLeft() ) {
-				feedStateMap.get(sec_id).setFeedStatus(feed_id, SubscrStatus.SUBSCR);
+				feedStateMap.get(sec_id).setFeedStatus(feed_id, DFSubscrStatus.SUBSCR);
 			}
 		}
 		
@@ -289,7 +290,7 @@ public class SymbolDataServiceImpl implements SymbolDataService {
 			);
 		for ( FeedID feed_id : cache.keySet() ) {
 			for ( ISecIDT sec_id : cache.get(feed_id).getRight() ) {
-				feedStateMap.get(sec_id).setFeedStatus(feed_id, SubscrStatus.NOT_SUBSCR);
+				feedStateMap.get(sec_id).setFeedStatus(feed_id, DFSubscrStatus.NOT_SUBSCR);
 			}
 		}
 	}

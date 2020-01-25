@@ -19,6 +19,11 @@
 			<artifactId>aquila-ui</artifactId>
 			<version>0.1.56</version>			
 		</dependency>
+        <dependency>
+            <groupId>ru.prolib.aquila</groupId>
+            <artifactId>aquila-data</artifactId>
+            <version>0.1.56</version>           
+        </dependency>
 
 		<dependency>
 			<groupId>ru.prolib.JTransaq</groupId>
