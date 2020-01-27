@@ -23,7 +23,6 @@ import ru.prolib.aquila.transaq.engine.mp.SecInfoUpdProcessor;
 import ru.prolib.aquila.transaq.engine.mp.SecuritiesProcessor;
 import ru.prolib.aquila.transaq.engine.mp.ServerStatusProcessor;
 import ru.prolib.aquila.transaq.engine.sds.SymbolDataServiceImpl;
-import ru.prolib.aquila.transaq.engine.sds.StateOfDataFeedsFactory;
 import ru.prolib.aquila.transaq.impl.TQDirectory;
 import ru.prolib.aquila.transaq.impl.TQFieldAssembler;
 import ru.prolib.aquila.transaq.impl.TQReactor;
@@ -65,7 +64,6 @@ public class EngineBuilderRoutines {
 		services.setReactor(new TQReactor(services));
 		services.setSymbolDataService(new SymbolDataServiceImpl(
 				services,
-				new StateOfDataFeedsFactory(),
 				new SymbolSubscrRepository(services.getEventQueue(), "TRANSAQ-SUBSCR")
 			));
 	}
