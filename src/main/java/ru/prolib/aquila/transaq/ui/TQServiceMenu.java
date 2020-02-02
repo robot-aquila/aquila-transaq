@@ -2,8 +2,6 @@ package ru.prolib.aquila.transaq.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +10,6 @@ import java.util.Map;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -54,13 +51,14 @@ import ru.prolib.aquila.transaq.remote.entity.MoneyPosition;
 import ru.prolib.aquila.transaq.remote.entity.SecPosition;
 import ru.prolib.aquila.transaq.remote.entity.SpotLimits;
 import ru.prolib.aquila.transaq.remote.entity.UnitedLimits;
+import ru.prolib.aquila.ui.AbstractServiceMenu;
 import ru.prolib.aquila.ui.ITableModel;
 import ru.prolib.aquila.ui.TableModelController;
 import ru.prolib.aquila.ui.form.OSCRepositoryTableModel;
 import ru.prolib.aquila.ui.msg.CommonMsg;
 import ru.prolib.aquila.ui.msg.SecurityMsg;
 
-public class TQServiceMenu implements ActionListener {
+public class TQServiceMenu extends AbstractServiceMenu {
 	public static final String ITEM_SHOW_MARKETS = "SHOW_MARKETS";
 	public static final String ITEM_SHOW_BOARDS = "SHOW_BOARDS";
 	public static final String ITEM_SHOW_CKINDS = "SHOW_CKINDS";
@@ -76,35 +74,11 @@ public class TQServiceMenu implements ActionListener {
 	public static final String ITEM_SHOW_POS_SPOT_LIMITS = "SHOW_POS_SPOT_LIMITS";
 	public static final String ITEM_SHOW_POS_UNITED_LIMITS = "SHOW_POS_UNITED_LIMITS";
 	
-	interface DialogFactory {
-		JDialog produce();
-	}
-	
-	static class LazyDialogInitializer implements DialogFactory {
-		private final DialogFactory factory;
-		private JDialog dialog;
-		
-		public LazyDialogInitializer(DialogFactory factory) {
-			this.factory = factory;
-		}
-
-		@Override
-		public JDialog produce() {
-			if ( dialog == null ) {
-				dialog = factory.produce();
-			}
-			return dialog;
-		}
-		
-	}
-	
-	private final IMessages messages;
 	private final JFrame frame;
 	private final TQDirectory directory;
-	private final Map<String, DialogFactory> actionCmdToDialogMap = new HashMap<>();
 	
 	public TQServiceMenu(IMessages messages, JFrame frame, TQDirectory directory) {
-		this.messages = messages;
+		super(messages);
 		this.frame = frame;
 		this.directory = directory;
 	}
@@ -773,15 +747,6 @@ public class TQServiceMenu implements ActionListener {
 			);
 	}
 	
-	private JMenuItem addMenuItem(JMenu menu, MsgID msg_id, String action_command, DialogFactory factory) {
-		JMenuItem item = null;
-		menu.add(item = new JMenuItem(messages.get(msg_id)));
-		item.setActionCommand(action_command);
-		item.addActionListener(this);
-		actionCmdToDialogMap.put(action_command, new LazyDialogInitializer(factory));
-		return item;
-	}
-	
 	public JMenu create() {
 		JMenu menu = new JMenu(messages.get(TQMessages.SERVICE_MENU));
 		addMenuItem(menu, TQMessages.SHOW_CKINDS, ITEM_SHOW_CKINDS, this::createCKindsDialog);
@@ -799,14 +764,6 @@ public class TQServiceMenu implements ActionListener {
 		addMenuItem(menu, TQMessages.SHOW_POS_SPOT_LIMITS, ITEM_SHOW_POS_SPOT_LIMITS, this::createSpotLimitsDialog);
 		addMenuItem(menu, TQMessages.SHOW_POS_UNITED_LIMITS, ITEM_SHOW_POS_UNITED_LIMITS, this::createUnitedLimitsDialog);
 		return menu;
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		DialogFactory factory = actionCmdToDialogMap.get(e.getActionCommand());
-		if ( factory != null ) {
-			factory.produce().setVisible(true);
-		}
 	}
 	
 	void infoBox(String message, String title) {
