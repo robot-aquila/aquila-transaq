@@ -41,6 +41,7 @@ import ru.prolib.aquila.core.BusinessEntities.MarketDepth;
 import ru.prolib.aquila.core.BusinessEntities.OrderException;
 import ru.prolib.aquila.core.BusinessEntities.Security;
 import ru.prolib.aquila.core.BusinessEntities.SecurityEvent;
+import ru.prolib.aquila.core.BusinessEntities.SecurityUpdateEvent;
 import ru.prolib.aquila.core.BusinessEntities.SecurityField;
 import ru.prolib.aquila.core.BusinessEntities.SecurityMarketDepthEvent;
 import ru.prolib.aquila.core.BusinessEntities.SecurityTickEvent;
@@ -258,7 +259,15 @@ public class TransaqTerminalTest {
 		EventListener listener = new EventListener() {
 			@Override
 			public void onEvent(Event event) {
-				if ( symbol.equals(((SecurityEvent) event).getSecurity().getSymbol()) ) {
+				Symbol event_symbol = null;
+				if ( event instanceof SecurityEvent ) {
+					event_symbol = ((SecurityEvent) event).getSecurity().getSymbol();
+				} else
+				if ( event instanceof SecurityUpdateEvent ) {
+					event_symbol = ((SecurityUpdateEvent) event).getSecurity().getSymbol();
+				}
+				
+				if ( symbol.equals(event_symbol) ) {
 					event.getType().removeListener(this);
 					finished.countDown();
 				}
@@ -327,7 +336,15 @@ public class TransaqTerminalTest {
 		EventListener listener = new EventListener() {
 			@Override
 			public void onEvent(Event event) {
-				if ( symbol.equals(((SecurityEvent) event).getSecurity().getSymbol()) ) {
+				Symbol event_symbol = null;
+				if ( event instanceof SecurityEvent ) {
+					event_symbol = ((SecurityEvent) event).getSecurity().getSymbol();
+				} else
+				if ( event instanceof SecurityUpdateEvent ) {
+					event_symbol = ((SecurityUpdateEvent) event).getSecurity().getSymbol();
+				}
+				
+				if ( symbol.equals(event_symbol) ) {
 					event.getType().removeListener(this);
 					finished.countDown();
 				}
@@ -458,12 +475,12 @@ public class TransaqTerminalTest {
 		terminal.subscribe(symbol, MDLevel.L1_BBO);
 		
 		assertTrue(finished.await(1, TimeUnit.SECONDS));
-		SecurityEvent event;
+		SecurityUpdateEvent event;
 		Instant now = Instant.now();
 		List<Set<Integer>> actual = new ArrayList<>();
 		Security security = terminal.getSecurity(symbol);
 		for ( int i = 0; i < listenerStub.getEventCount(); i ++ ) {
-			event = (SecurityEvent) listenerStub.getEvent(i);
+			event = (SecurityUpdateEvent) listenerStub.getEvent(i);
 			assertEquals(symbol, event.getSecurity().getSymbol());
 			assertEquals(security.onUpdate(), event.getType());
 			assertTrue(ChronoUnit.MILLIS.between(event.getTime(), now) <= 100L);
