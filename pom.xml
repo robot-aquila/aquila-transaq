@@ -17,12 +17,12 @@
 		<dependency>
 			<groupId>ru.prolib.aquila</groupId>
 			<artifactId>aquila-ui</artifactId>
-			<version>0.1.56</version>			
+			<version>0.1.58</version>			
 		</dependency>
         <dependency>
             <groupId>ru.prolib.aquila</groupId>
             <artifactId>aquila-data</artifactId>
-            <version>0.1.56</version>           
+            <version>0.1.58</version>           
         </dependency>
 
 		<dependency>
@@ -34,14 +34,14 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.12</version>
+			<version>4.13</version>
 			<scope>test</scope>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.easymock</groupId>
 			<artifactId>easymock</artifactId>
-			<version>3.4</version>
+			<version>4.2</version>
 			<scope>test</scope>
 		</dependency>
 
