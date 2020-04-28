@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>aquila-transaq</artifactId>
 	<groupId>ru.prolib.aquila</groupId>
-	<version>0.1.0</version>
+	<version>0.1.1</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -17,12 +17,12 @@
 		<dependency>
 			<groupId>ru.prolib.aquila</groupId>
 			<artifactId>aquila-ui</artifactId>
-			<version>0.1.58</version>			
+			<version>0.1.59</version>			
 		</dependency>
         <dependency>
             <groupId>ru.prolib.aquila</groupId>
             <artifactId>aquila-data</artifactId>
-            <version>0.1.58</version>           
+            <version>0.1.59</version>           
         </dependency>
 
 		<dependency>

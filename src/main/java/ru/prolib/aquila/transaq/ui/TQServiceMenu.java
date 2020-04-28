@@ -73,6 +73,7 @@ public class TQServiceMenu extends AbstractServiceMenu {
 	public static final String ITEM_SHOW_POS_FORTS_COLLATERALS = "SHOW_POS_FORTS_COLLATERALS";
 	public static final String ITEM_SHOW_POS_SPOT_LIMITS = "SHOW_POS_SPOT_LIMITS";
 	public static final String ITEM_SHOW_POS_UNITED_LIMITS = "SHOW_POS_UNITED_LIMITS";
+	public static final String ITEM_SHOW_SYMBOL_LIST = "SHOW_SYMBOL_LIST";
 	
 	private final JFrame frame;
 	private final TQDirectory directory;
@@ -747,6 +748,18 @@ public class TQServiceMenu extends AbstractServiceMenu {
 			);
 	}
 	
+	public JDialog createSymbolListDialog() {
+		JDialog dialog = new JDialog(frame);
+		JTable boards_table = createBoardTable(directory.getBoardRepository());
+		TQSymbolListPanel panel = new TQSymbolListPanel(boards_table, directory);
+		dialog.getContentPane().add(panel);
+		dialog.setTitle(messages.get(TQMessages.DIALOG_TITLE_SYMBOL_LIST));
+		//dialog.setPreferredSize(new Dimension(600, 300));
+		new TableModelController((ITableModel) boards_table.getModel(), dialog);
+		dialog.pack();
+		return dialog;
+	}
+	
 	public JMenu create() {
 		JMenu menu = new JMenu(messages.get(TQMessages.SERVICE_MENU));
 		addMenuItem(menu, TQMessages.SHOW_CKINDS, ITEM_SHOW_CKINDS, this::createCKindsDialog);
@@ -763,6 +776,7 @@ public class TQServiceMenu extends AbstractServiceMenu {
 		addMenuItem(menu, TQMessages.SHOW_POS_FORTS_COLLATERALS, ITEM_SHOW_POS_FORTS_COLLATERALS, this::createFortsCollateralsDialog);
 		addMenuItem(menu, TQMessages.SHOW_POS_SPOT_LIMITS, ITEM_SHOW_POS_SPOT_LIMITS, this::createSpotLimitsDialog);
 		addMenuItem(menu, TQMessages.SHOW_POS_UNITED_LIMITS, ITEM_SHOW_POS_UNITED_LIMITS, this::createUnitedLimitsDialog);
+		addMenuItem(menu, TQMessages.SHOW_SYMBOL_LIST, ITEM_SHOW_SYMBOL_LIST, this::createSymbolListDialog);
 		return menu;
 	}
 	
